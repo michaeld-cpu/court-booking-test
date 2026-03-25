@@ -726,8 +726,8 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
       <div className="pt-0 md:pt-8 pb-0 md:pb-12 min-h-svh">
         <div className="px-6 pr-4 sm:px-0 mb-0 md:mb-3 flex items-center justify-between gap-3 py-4 sm:py-5 md:py-2 lg:py-2 bg-neutral-900 text-white sm:bg-transparent sm:text-inherit">
           <h1
-            className="text-xl md:text-2xl font-semibold text-white sm:text-inherit"
-            style={{ fontFamily: 'Alegreya Sans, sans-serif', letterSpacing: '0.02em' }}
+            className="text-xl md:text-2xl font-semibold text-white sm:text-inherit font-alegreya"
+            style={{ letterSpacing: '0.02em' }}
           >
             Bookings
           </h1>
@@ -861,8 +861,8 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
     <div className="pt-0 md:pt-4 pb-0 md:pb-8 min-h-svh">
       <div className="mb-0 md:mb-3 flex items-center justify-between gap-3 bg-neutral-900 px-6 pr-4 py-4 text-white sm:bg-transparent sm:px-0 sm:py-5 sm:text-inherit md:py-2 lg:py-2">
         <h1
-          className="text-xl md:text-2xl font-semibold text-white sm:text-inherit"
-          style={{ fontFamily: 'Alegreya Sans, sans-serif', letterSpacing: '0.02em' }}
+          className="text-lg md:text-xl font-semibold font-alegreya"
+          style={{ letterSpacing: '0.02em' }}
         >
           Bookings
         </h1>

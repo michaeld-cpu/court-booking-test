@@ -887,8 +887,8 @@ export function OperatorPage({
 
             <div>
               <h1
-                className="text-2xl sm:text-2xl lg:text-4xl font-bold mb-1 sm:mb-2"
-                style={{ fontFamily: 'Alegreya Sans, sans-serif', letterSpacing: '0.02em' }}
+                className="text-2xl sm:text-2xl lg:text-4xl font-bold mb-1 sm:mb-2 font-alegreya"
+                style={{ letterSpacing: '0.02em' }}
               >
                 {operator.name}
               </h1>

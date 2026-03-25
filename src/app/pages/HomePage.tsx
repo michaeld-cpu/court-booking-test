@@ -2136,8 +2136,8 @@ export function HomePage({
                         <div className="absolute bottom-0 left-0 right-0 p-5 pt-10 flex w-full items-end justify-between gap-4">
                           <div className="min-w-0">
                             <div
-                              className="truncate text-3xl font-semibold uppercase tracking-tight text-white drop-shadow-md"
-                              style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+                              className="truncate text-3xl font-semibold uppercase tracking-tight text-white drop-shadow-md font-bebas"
+                              style={{ letterSpacing: '1px' }}
                             >
                               {operatorGroup.operatorName}
                             </div>
@@ -2171,8 +2171,7 @@ export function HomePage({
                           <div className="min-w-0 ml-2 flex flex-1 items-center gap-2">
                             <div className="min-w-0">
                               <div
-                                className="truncate text-lg font-semibold"
-                                style={{ fontFamily: 'Alegreya Sans, sans-serif' }}
+                                className="truncate text-lg font-semibold font-alegreya"
                               >
                                 {operatorGroup.operatorName}
                               </div>
@@ -2233,13 +2232,12 @@ export function HomePage({
           <div className="flex-1 p-8 md:p-12 lg:p-14 space-y-8">
             <div className="space-y-4">
               <h2
-                className="text-4xl md:text-5xl lg:text-5xl font-bold text-white leading-none uppercase"
-                style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '0.02em' }}
+                className="text-4xl md:text-5xl lg:text-5xl font-bold text-white leading-none uppercase font-bebas"
+                style={{ letterSpacing: '0.02em' }}
               >
                 Are you a court operator?
               </h2>
-              <p className="text-gray-400 text-s md:text-base lg:text-md max-w-xl font-regular"
-                style={{ fontFamily: 'DM sans, sans-serif' }}>
+              <p className="text-gray-400 text-s md:text-base lg:text-md max-w-xl font-regular font-dm-sans">
                 Join Korte and reach thousands of players looking for courts. Grow
                 your business with our easy-to-use booking platform.
               </p>
@@ -2265,7 +2263,7 @@ export function HomePage({
           <div className="w-full md:w-[320px] bg-[#C8F542] p-8 md:p-10 flex flex-col items-center justify-center text-center relative overflow-hidden group">
             <div className="relative w-full max-w-[200px] flex flex-col items-center">
               <div className="relative w-[160px] aspect-[4/5] border border-black/30 rounded-[1rem] p-1 pt-5 flex flex-col items-center justify-start bg-transparent transition-transform">
-                <div className="text-7xl font-bold text-black leading-none" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                <div className="text-7xl font-bold text-black leading-none font-bebas">
                   40+
                 </div>
                 {/* Label */}

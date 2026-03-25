@@ -169,8 +169,8 @@ export function MyBookmarks({
     <div className="pt-0 md:pt-4 pb-0 md:pb-8 min-h-svh">
       <div className="mb-0 md:mb-3 flex items-center justify-between gap-3 py-4 sm:py-5 md:py-2 lg:py-2 bg-neutral-900 text-white sm:px-0 sm:bg-transparent sm:text-inherit">
         <h1
-          className="text-xl md:text-2xl font-semibold text-white sm:text-inherit"
-          style={{ fontFamily: 'Alegreya Sans, sans-serif', letterSpacing: '0.02em' }}
+          className="text-xl md:text-2xl font-semibold text-white sm:text-inherit font-alegreya"
+          style={{ letterSpacing: '0.02em' }}
         >
           Saved
         </h1>
@@ -253,8 +253,7 @@ export function MyBookmarks({
               >
                 <div className="min-w-0">
                   <div
-                    className="truncate text-lg md:text-xl font-semibold"
-                    style={{ fontFamily: 'Alegreya Sans, sans-serif' }}
+                    className="truncate text-lg md:text-xl font-semibold font-alegreya"
                   >
                     {operator.name}
                   </div>
