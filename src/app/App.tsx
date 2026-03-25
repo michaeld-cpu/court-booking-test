@@ -831,7 +831,7 @@ export function AppContent() {
           </div>
         )}
 
-        <main className="container mx-auto px-4 md:px-8">
+        <main className="mx-auto w-full max-w-[1300px] px-4 md:px-8">
           <Routes>
             <Route 
               path="/" 

@@ -20,6 +20,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { Icons } from '../components/ui/icons';
 import { Badge } from '../components/ui/badge';
 import {
   Dialog,
@@ -123,6 +124,7 @@ export function OperatorPage({
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [preselectedTimeSlot, setPreselectedTimeSlot] = useState<string | null>(null);
   const [selectedSlots, setSelectedSlots] = useState<Record<string, Record<string, string[]>>>({});
+  const [expandedCourtId, setExpandedCourtId] = useState<string | null>(null);
   const selectionLimit = maxSlotSelection;
   const mobileDateBarRef = useRef<HTMLElement | null>(null);
   const mobileDateSentinelRef = useRef<HTMLDivElement | null>(null);
@@ -366,6 +368,10 @@ export function OperatorPage({
 
         if (isActive && mappedCourts.length > 0) {
           setOperatorCourts(mappedCourts);
+          // Auto-expand the first court
+          if (expandedCourtId === null) {
+            setExpandedCourtId(mappedCourts[0].id);
+          }
         }
       } catch {
         // keep existing courts when API fails
@@ -831,7 +837,7 @@ export function OperatorPage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative h-64 overflow-hidden sm:h-80 min-[1300px]:mt-3 min-[1300px]:rounded-lg">
+      <div className="relative -mx-4 sm:mx-0 h-64 overflow-hidden sm:h-90 mt-0 sm:mt-6 md:mt-8 rounded-none sm:rounded-lg">
         <ImageWithFallback
           src={operator.image}
           alt={`${operator.name} banner`}
@@ -872,10 +878,10 @@ export function OperatorPage({
           </div>
 
           <div className="text-white flex flex-col items-center text-center">
-            {/* Profile Image with Rating Badge */}
+            {/* Profile Image */}
             {operator.profileImage && (
               <div className="relative mb-3">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full overflow-hidden border-4 border-black/50 shadow-xl">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-35 lg:h-35 rounded-full overflow-hidden border-4 border-gray/10 shadow-xl">
                   <ImageWithFallback
                     src={operator.profileImage}
                     alt={`${operator.name} profile`}
@@ -886,13 +892,21 @@ export function OperatorPage({
             )}
 
             <div>
+              {/* Covered Pill Badge */}
+              {operator.isCovered && (
+                <div className="flex justify-center mb-2">
+                  <span className="inline-block bg-[#C8E64A] px-3 py-0.5 mt-1 mb-1 text-[11px] font-bold uppercase tracking-wider text-gray-900">
+                    Covered
+                  </span>
+                </div>
+              )}
               <h1
-                className="text-2xl sm:text-2xl lg:text-4xl font-bold mb-1 sm:mb-2 font-alegreya"
-                style={{ letterSpacing: '0.02em' }}
+                className="text-4xl sm:text-3xl lg:text-5xl font-bold mb-1 font-bebas uppercase"
+                style={{ letterSpacing: '0.04em' }}
               >
                 {operator.name}
               </h1>
-              <div className="flex items-center justify-center gap-2 text-sm sm:text-base lg:text-lg min-w-0">
+              <div className="flex items-center justify-center gap-2 text-sm sm:text-base lg:text-lg min-w-0 opacity-60">
                 <MapPin className="size-4 sm:size-5 shrink-0" />
                 <span className="block max-w-[80vw] truncate sm:max-w-[70vw] lg:max-w-[36rem]">
                   {operator.location}
@@ -912,8 +926,8 @@ export function OperatorPage({
       <section
         ref={mobileDateBarRef}
         className={`sticky top-0 z-[1100] px-1 py-3 backdrop-blur-sm sm:hidden overflow-visible border-b ${isMobileDateBarPinned
-            ? 'border-neutral-800 bg-neutral-950/95'
-            : 'border-gray-200 bg-gradient-to-b from-gray-100/95 to-white/95'
+          ? 'border-neutral-800 bg-neutral-950/95'
+          : 'border-gray-200 bg-gradient-to-b from-gray-100/95 to-white/95'
           }`}
       >
         <div className="relative w-full">
@@ -926,8 +940,8 @@ export function OperatorPage({
                 <Button
                   variant="outline"
                   className={`!h-10 !min-h-[40px] !max-h-[40px] !w-auto justify-start rounded-md border-0 px-3 text-left text-sm font-medium shadow-none ${isMobileDateBarPinned
-                      ? 'bg-transparent text-white'
-                      : 'bg-transparent text-gray-900'
+                    ? 'bg-transparent text-white'
+                    : 'bg-transparent text-gray-900'
                     }`}
                 >
                   <Calendar
@@ -961,8 +975,8 @@ export function OperatorPage({
               <a
                 href={`tel:${operator.phone}`}
                 className={`ml-auto mr-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${isMobileDateBarPinned
-                    ? 'border-white/20 text-white/85 hover:bg-white/10'
-                    : 'border-white/80 bg-white/80 text-gray-700 hover:bg-gray-50'
+                  ? 'border-white/20 text-white/85 hover:bg-white/10'
+                  : 'border-white/80 bg-white/80 text-gray-700 hover:bg-gray-50'
                   }`}
                 aria-label={`Call ${operator.name}`}
                 title={`Call ${operator.name}`}
@@ -975,8 +989,8 @@ export function OperatorPage({
                 target="_blank"
                 rel="noreferrer"
                 className={`ml-auto mr-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${isMobileDateBarPinned
-                    ? 'border-white/20 text-white/85 hover:bg-white/10'
-                    : 'border-white/80 bg-white/80 text-gray-700 hover:bg-gray-50'
+                  ? 'border-white/20 text-white/85 hover:bg-white/10'
+                  : 'border-white/80 bg-white/80 text-gray-700 hover:bg-gray-50'
                   }`}
                 aria-label={`Open ${operator.name} link`}
                 title={`Open ${operator.name} link`}
@@ -995,7 +1009,7 @@ export function OperatorPage({
           <div className="lg:col-span-1 order-2 lg:order-1 -mx-4 sm:mx-0 mb-0 sm:mb-6 md:mb-8">
             <div className="bg-white rounded-none sm:rounded-lg border-0 shadow-none sm:shadow-sm p-6 space-y-6 lg:sticky lg:top-4">
               <div>
-                <h2 className="text-base sm:text-lg font-semibold mb-3">
+                <h2 className="text-base sm:text-lg font-medium mb-3">
                   About
                 </h2>
                 <p className="text-gray-600 text-sm lg:text-base">
@@ -1004,7 +1018,7 @@ export function OperatorPage({
               </div>
 
               <div>
-                <h3 className="text-sm sm:text-base font-semibold mb-3">
+                <h3 className="text-sm sm:text-base font-medium mb-3">
                   Location
                 </h3>
                 <div className="relative rounded-lg overflow-hidden border border-gray-200">
@@ -1029,13 +1043,14 @@ export function OperatorPage({
                     aria-label="Open larger map"
                   />
                 </div>
-                <p className="mt-2 truncate text-sm text-gray-600">
-                  {operator.location}
-                </p>
+                <div className="flex items-center gap-1.5 mt-2 text-sm text-gray-600">
+                  <MapPin className="size-3.5 shrink-0 text-gray-400" />
+                  <span className="truncate">{operator.location}</span>
+                </div>
               </div>
 
               <div>
-                <h3 className="text-sm sm:text-base font-semibold mb-3">
+                <h3 className="text-sm sm:text-base font-medium mb-3">
                   Contact
                 </h3>
                 <div className="space-y-3">
@@ -1140,23 +1155,37 @@ export function OperatorPage({
                   )}
                 </div>
               </div>
-              {/* 
-              <div>
-                <h3 className="text-sm sm:text-base font-semibold mb-3">Facility Amenities</h3>
-                <div className="flex flex-wrap gap-2">
-                  {operator.amenities.map((amenity) => (
-                    <Badge key={amenity} variant="secondary" className="text-xs">
-                      {amenity}
-                    </Badge>
-                  ))}
+              {operator.amenities && operator.amenities.length > 0 && (
+                <div>
+                  <h3 className="text-sm sm:text-base font-semibold mb-3">Amenities</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {operator.amenities.map((amenity) => (
+                      <span
+                        key={amenity}
+                        className="inline-block rounded-full bg-gray-900 px-3.5 py-1.5 text-xs font-medium text-white"
+                      >
+                        {amenity}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div> */}
+              )}
             </div>
           </div>
 
           {/* Right Column - Courts */}
           <div className="lg:col-span-2 order-1 lg:order-2">
-            <div className="hidden sm:flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="hidden sm:flex items-center justify-between mb-5">
+              {/* Available Courts Header */}
+              <div>
+                <h2 className="text-sm sm:text-base font-medium">Available Courts</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {operatorCourts.length} court{operatorCourts.length !== 1 ? 's' : ''}
+                  {' · '}
+                  {operatorCourts.reduce((total, court) => total + court.availableSlots.filter(s => s.available).length, 0)} total slots
+                </p>
+              </div>
+
               {/* Date Filter */}
               <Popover
                 open={isDesktopDatePickerOpen}
@@ -1165,14 +1194,14 @@ export function OperatorPage({
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="hidden sm:flex gap-2 h-11 px-4 text-base justify-start"
+                    className="gap-2 h-9 px-3 text-xs justify-start"
                   >
-                    <Calendar className="size-5" />
+                    <Calendar className="size-3.5" />
                     <span className="truncate">{renderDateLabel(selectedDates[0])}</span>
-                    <ChevronDown className="ml-auto size-4 text-gray-500" />
+                    <ChevronDown className="ml-1 size-3.5 text-gray-500" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0" align="end">
                   <CalendarComponent
                     mode="single"
                     selected={selectedDates[0]}
@@ -1186,10 +1215,6 @@ export function OperatorPage({
                   />
                 </PopoverContent>
               </Popover>
-
-              <h2 className=" text-sm lg:text-lg font-semibold">
-                {operatorCourts.length} Courts
-              </h2>
             </div>
 
             {isLoadingCourts && operatorCourts.length === 0 ? (
@@ -1221,7 +1246,7 @@ export function OperatorPage({
               </div>
             ) : operatorCourts.length > 0 ? (
               <div
-                className={`-mx-4 -mt-6 -mb-5 pt-3 pb-4 sm:m-0 overflow-hidden rounded-none sm:rounded-lg border-b border-gray-200 sm:border-0 bg-white shadow-none sm:shadow-sm md:mx-0 md:mt-0 md:grid md:grid-cols-2 md:gap-5 md:pt-0 md:pb-0 sm:px-2 md:px-0 lg:p-0 lg:gap-6 md:bg-transparent lg:border-0 md:shadow-none md:rounded-none transition-opacity duration-200 ${isLoadingCourts ? 'opacity-45 pointer-events-none' : 'opacity-100'
+                className={`-mx-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 md:gap-5 lg:gap-6 items-start transition-opacity duration-200 ${isLoadingCourts ? 'opacity-45 pointer-events-none' : 'opacity-100'
                   }`}
               >
                 {operatorCourts.map((court) => {
@@ -1311,19 +1336,34 @@ export function OperatorPage({
                     purposeKey.charAt(0).toUpperCase() + purposeKey.slice(1)
                   const purposeIcon = courtTypeIcons[purposeKey]
 
+                  const isCourtExpanded = expandedCourtId === court.id
+
                   return (
                     <div
                       key={court.id}
-                      className="overflow-hidden md:rounded-lg md:border md:border-gray-200 md:bg-white md:shadow-sm"
+                      className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
                     >
-                      {/* Court Header */}
-                      <div className="bg-white md:bg-gradient-to-b md:from-gray-100 md:to-white py-2 sm:py-4 px-5 sm:px-3 border-0 md:border-b md:border-gray-200">
+                      {/* Court Header – Accordion Toggle */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // On mobile, open booking modal; on desktop, toggle accordion
+                          if (window.innerWidth < 768) {
+                            handleBookCourt(court)
+                          } else {
+                            setExpandedCourtId(prev => (prev === court.id ? null : court.id))
+                          }
+                        }}
+                        className="w-full bg-white py-3 sm:py-4 px-5 sm:px-4 border-0 md:border-b md:border-gray-200 text-left hover:bg-gray-50 transition-colors"
+                      >
                         <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-3 min-w-0 mx-0 sm:mx-1">
+                          <div className="flex items-center gap-3 min-w-0">
                             <div
                               className="w-10 h-10 flex items-center justify-center shrink-0"
                             >
-                              {purposeIcon && (
+                              {(purposeKey === 'pickleball' || purposeKey === 'pickle') ? (
+                                <Icons.pickleball className="size-7 text-gray-900" />
+                              ) : purposeIcon && (
                                 <img
                                   src={purposeIcon}
                                   alt={`${purposeText} icon`}
@@ -1333,158 +1373,151 @@ export function OperatorPage({
                               )}
                             </div>
                             <div>
-                              <h3 className="font-semibold text-base truncate">
+                              <h3 className="font-medium text-sm truncate">
                                 {purposeText} {court.name}
                               </h3>
-                              <p className="mt-[2px] text-xs text-gray-600">
-                                {availableSlotsCount} slot
-                                {availableSlotsCount !== 1 ? 's' : ''}
+                              <p className="mt-[2px] text-xs text-gray-500">
+                                {availableSlotsCount} slot{availableSlotsCount !== 1 ? 's' : ''} available
                               </p>
                             </div>
                           </div>
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="md:hidden whitespace-nowrap px-4 min-w-[80px]"
-                            onClick={() => handleBookCourt(court)}
-                          >
-                            Book
-                          </Button>
+                          <ChevronDown
+                            className={`hidden md:block size-5 text-gray-400 transition-transform duration-200 shrink-0 ${isCourtExpanded ? 'rotate-180' : ''}`}
+                          />
                         </div>
-                      </div>
+                      </button>
 
-                      {/* Time Slots List - Grouped by Date */}
-                      <div className="hidden md:block p-4">
-                        {selectedDates
-                          .sort((a, b) => a.getTime() - b.getTime())
-                          .map((date, dateIndex) => {
-                            const dateStr = format(date, 'yyyy-MM-dd')
-                            return (
-                              <div
-                                key={dateStr}
-                                className={
-                                  dateIndex > 0
-                                    ? 'mt-4 pt-4 border-t border-gray-200'
-                                    : ''
-                                }
-                              >
-                                {selectedDates.length > 1 && (
-                                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                                    {format(date, 'EEE, MMM dd')}
-                                  </h4>
-                                )}
-                                <div className="space-y-4">
-                                  {(
-                                    ['', 'Morning', 'Afternoon', 'Evening'] as const
-                                  ).map((label, labelIndex) => {
-                                    const groupedRanges = timeRanges.filter(
-                                      (range) =>
-                                        getTimeGroup(range.startSlot.time) ===
-                                        label,
-                                    )
-                                    if (groupedRanges.length === 0) {
-                                      return null
-                                    }
-                                    return (
-                                      <div
-                                        key={`${dateStr}-${label}`}
-                                        className={`space-y-2 ${labelIndex > 0 ? 'pt-3' : ''}`}
-                                      >
-                                        {label ? (
-                                          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-500">
-                                            {label}
-                                          </div>
-                                        ) : null}
-                                        {groupedRanges.map((range) => {
-                                          const isAlreadyInCart =
-                                            cartLabelsByDate
-                                              .get(dateStr)
-                                              ?.has(range.label) ?? false
-                                          const isSelected =
-                                            isAlreadyInCart ||
-                                            selectedSlots[court.id]?.[
-                                              dateStr
-                                            ]?.includes(range.id)
-                                          const isLimitReached =
-                                            !isAlreadyInCart &&
-                                            !selectedSlots[court.id]?.[
-                                              dateStr
-                                            ]?.includes(range.id) &&
-                                            selectedCountForCourt >=
-                                            selectionLimit
+                      {/* Time Slots – Accordion Body */}
+                      {isCourtExpanded && (
+                        <div className="hidden md:block p-4">
+                          {selectedDates
+                            .sort((a, b) => a.getTime() - b.getTime())
+                            .map((date, dateIndex) => {
+                              const dateStr = format(date, 'yyyy-MM-dd')
+                              return (
+                                <div
+                                  key={dateStr}
+                                  className={
+                                    dateIndex > 0
+                                      ? 'mt-4 pt-4 border-t border-gray-200'
+                                      : ''
+                                  }
+                                >
+                                  {selectedDates.length > 1 && (
+                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                                      {format(date, 'EEE, MMM dd')}
+                                    </h4>
+                                  )}
+                                  <div className="space-y-4">
+                                    {(
+                                      ['', 'Morning', 'Afternoon', 'Evening'] as const
+                                    ).map((label, labelIndex) => {
+                                      const groupedRanges = timeRanges.filter(
+                                        (range) =>
+                                          getTimeGroup(range.startSlot.time) ===
+                                          label,
+                                      )
+                                      if (groupedRanges.length === 0) {
+                                        return null
+                                      }
+                                      return (
+                                        <div
+                                          key={`${dateStr}-${label}`}
+                                          className={`space-y-2 ${labelIndex > 0 ? 'pt-3' : ''}`}
+                                        >
+                                          {label ? (
+                                            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+                                              {label}
+                                            </div>
+                                          ) : null}
+                                          <div className="grid grid-cols-1 gap-2">
+                                            {groupedRanges.map((range) => {
+                                              const isAlreadyInCart =
+                                                cartLabelsByDate
+                                                  .get(dateStr)
+                                                  ?.has(range.label) ?? false
+                                              const isSelected =
+                                                isAlreadyInCart ||
+                                                selectedSlots[court.id]?.[
+                                                  dateStr
+                                                ]?.includes(range.id)
+                                              const isLimitReached =
+                                                !isAlreadyInCart &&
+                                                !selectedSlots[court.id]?.[
+                                                  dateStr
+                                                ]?.includes(range.id) &&
+                                                selectedCountForCourt >=
+                                                selectionLimit
 
-                                          return (
-                                            <button
-                                              key={`${dateStr}-${range.id}`}
-                                              onClick={() => {
-                                                if (isAlreadyInCart) {
-                                                  toast.info(
-                                                    'Already added to cart',
-                                                    {
-                                                      description:
-                                                        'Check your cart to manage this slot.',
-                                                    },
-                                                  )
-                                                  return
-                                                }
-                                                if (range.available) {
-                                                  toggleTimeSlot(
-                                                    court.id,
-                                                    dateStr,
-                                                    range.id,
-                                                  )
-                                                }
-                                              }}
-                                              disabled={
-                                                (!range.available &&
-                                                  !isAlreadyInCart) ||
-                                                isLimitReached
-                                              }
-                                              className={`w-full px-3 py-2 rounded-lg text-sm transition-all text-left ${isSelected
-                                                  ? 'bg-blue-50 text-blue-700'
-                                                  : !range.available ||
+                                              return (
+                                                <button
+                                                  key={`${dateStr}-${range.id}`}
+                                                  onClick={() => {
+                                                    if (isAlreadyInCart) {
+                                                      toast.info(
+                                                        'Already added to cart',
+                                                        {
+                                                          description:
+                                                            'Check your cart to manage this slot.',
+                                                        },
+                                                      )
+                                                      return
+                                                    }
+                                                    if (range.available) {
+                                                      toggleTimeSlot(
+                                                        court.id,
+                                                        dateStr,
+                                                        range.id,
+                                                      )
+                                                    }
+                                                  }}
+                                                  disabled={
+                                                    (!range.available &&
+                                                      !isAlreadyInCart) ||
                                                     isLimitReached
-                                                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                                    : 'bg-gray-50 hover:bg-gray-100'
-                                                }`}
-                                            >
-                                              <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2 flex-1">
-                                                  {isSelected ? (
-                                                    <Check className="size-4 flex-shrink-0 text-blue-600" />
-                                                  ) : (
-                                                    <DynamicClock
-                                                      time={
-                                                        range.startSlot.time
-                                                      }
-                                                      className="size-4 flex-shrink-0"
-                                                    />
-                                                  )}
-                                                  <div className="font-medium">
-                                                    {range.label}
+                                                  }
+                                                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all text-left ${isSelected
+                                                    ? 'bg-gray-900 text-white'
+                                                    : !range.available ||
+                                                      isLimitReached
+                                                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                      : 'bg-gray-50 hover:bg-gray-100'
+                                                    }`}
+                                                >
+                                                  <div className="flex items-center gap-2">
+                                                    {isSelected ? (
+                                                      <Check className="size-4 flex-shrink-0" />
+                                                    ) : (
+                                                      <DynamicClock
+                                                        time={
+                                                          range.startSlot.time
+                                                        }
+                                                        className="size-4 flex-shrink-0"
+                                                      />
+                                                    )}
+                                                    <span className="font-medium whitespace-nowrap">
+                                                      {range.label}
+                                                    </span>
                                                   </div>
-                                                </div>
-                                                {(range.available ||
-                                                  isAlreadyInCart) && (
-                                                    <div className="font-medium">
-                                                      ₱
-                                                      {formatCurrency(
-                                                        range.price,
-                                                      )}
-                                                    </div>
-                                                  )}
-                                              </div>
-                                            </button>
-                                          )
-                                        })}
-                                      </div>
-                                    )
-                                  })}
+                                                  {(range.available ||
+                                                    isAlreadyInCart) && (
+                                                      <span className={`font-semibold ${isSelected ? 'text-white' : ''}`}>
+                                                        ₱{formatCurrency(range.price)}
+                                                      </span>
+                                                    )}
+                                                </button>
+                                              )
+                                            })}
+                                          </div>
+                                        </div>
+                                      )
+                                    })}
+                                  </div>
                                 </div>
-                              </div>
-                            )
-                          })}
-                      </div>
+                              )
+                            })}
+                        </div>
+                      )}
                     </div>
                   )
                 })}
@@ -1572,34 +1605,23 @@ export function OperatorPage({
         </DialogContent>
       </Dialog>
 
-      {/* Floating Panel for Total Booking Details */}
+      {/* Floating Cart Pill */}
       {totals.hasSelections && (
         <button
           onClick={handleFloatingPanelClick}
-          className="hidden md:block fixed bottom-6 right-6 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl shadow-2xl p-4 hover:shadow-3xl transition-all hover:scale-105 cursor-pointer z-50 min-w-[270px]"
+          className="hidden md:flex fixed bottom-6 right-6 items-center gap-3 bg-gray-900 text-white rounded-full shadow-2xl pl-4 pr-3 py-3 hover:bg-gray-800 transition-all hover:scale-105 cursor-pointer z-50"
         >
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Slots</p>
-                  <p className="text-lg font-bold">
-                    {totals.totalHours}
-                    {/* hr{totals.totalHours !== 1 ? 's' : ''} */}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Total Price</p>
-                  <p className="text-lg font-bold">
-                    ₱{formatCurrency(totals.totalPrice)}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="ml-3 flex-shrink-0 bg-white text-gray-900 px-5 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-              Book
-            </div>
+          <div className="relative">
+            <Icons.cart className="size-5 text-white" />
+            <span className="absolute -top-2 -right-2 flex items-center justify-center size-4 rounded-full bg-[#C8E64A] text-[10px] font-bold text-gray-900">
+              {totals.totalHours}
+            </span>
           </div>
+          <div className="flex items-center gap-2">
+            <span className="text-base font-bold">₱{formatCurrency(totals.totalPrice)}</span>
+            <span className="text-sm text-gray-300">{totals.totalHours} slot{totals.totalHours !== 1 ? 's' : ''} · View</span>
+          </div>
+          <ChevronDown className="size-4 text-gray-400 rotate-180" />
         </button>
       )}
     </div>

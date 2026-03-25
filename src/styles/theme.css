@@ -191,3 +191,18 @@
     line-height: 1.5;
   }
 }
+
+@layer components {
+
+  .leaflet-tooltip.venue-pin-label {
+    @apply bg-white text-black border-none font-medium shadow-md rounded-[2px] px-3 py-1.5;
+  }
+
+  .leaflet-tooltip.venue-pin-label::before {
+    @apply border-t-white;
+  }
+
+  .leaflet-tile-pane {
+    filter: brightness(2) contrast(1) grayscale(0.2);
+  }
+}

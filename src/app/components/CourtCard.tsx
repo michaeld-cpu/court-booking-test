@@ -37,7 +37,7 @@ export function CourtCard({ court, onBook, onOperatorClick, isBookmarked, onTogg
       {/* Type Badge */}
       <div className="w-9 h-9 flex items-center justify-center shrink-0">
         {isPickleball ? (
-          <Icons.paddle className="size-7 text-black" />
+          <Icons.pickleball className="size-7 text-black" />
         ) : purposeIcon && (
           <img
             src={purposeIcon}

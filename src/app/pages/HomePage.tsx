@@ -1445,7 +1445,7 @@ export function HomePage({
     <>
       {/* Header Banner */}
       <header
-        className="relative z-0 hidden sm:flex flex-col overflow-hidden text-white mt-6 md:mt-8 min-[1300px]:mt-10 min-[1300px]:rounded-lg min-h-[400px] md:min-h-[350px]"
+        className="relative z-0 flex flex-col overflow-hidden text-white -mx-4 sm:mx-0 mt-0 sm:mt-6 md:mt-8 min-[1300px]:mt-10 rounded-none sm:rounded-lg min-h-[280px] sm:min-h-[350px] md:min-h-[350px]"
         style={{
           backgroundImage: `url(${bannerImages[currentImageIndex]})`,
           backgroundSize: 'cover',
@@ -1456,16 +1456,16 @@ export function HomePage({
         <div className="absolute inset-0 bg-[#0F273A]/90 backdrop-blur-[4px]"></div>
 
         {/* Top Content: Main Title & Text */}
-        <div className="relative flex-1 flex flex-col justify-center items-center px-4 pt-10 pb-10 text-center">
-          <div className="w-full max-w-3xl space-y-4">
+        <div className="relative flex-1 flex flex-col justify-center items-center px-4 pt-8 sm:pt-10 pb-6 sm:pb-10 text-center">
+          <div className="w-full max-w-3xl space-y-3 sm:space-y-4">
             {/* Pre-title */}
-            <div className="text-[#C8F542] text-xs md:text-sm font-regular tracking-[0.2em] uppercase mb-2 p-4">
+            <div className="text-[#C8F542] text-[10px] sm:text-xs md:text-sm font-regular tracking-[0.2em] uppercase mb-1 sm:mb-2 px-2 sm:p-4">
               Book Your Game
             </div>
 
             {/* Title */}
             <h1
-              className="text-5xl md:text-7xl lg:text-[80px] font-bold text-white drop-shadow-md leading-none"
+              className="text-3xl sm:text-5xl md:text-7xl lg:text-[80px] font-bold text-white drop-shadow-md leading-none"
               style={{
                 fontFamily: 'Bebas Neue, sans-serif',
                 letterSpacing: '0.02em',
@@ -1475,7 +1475,7 @@ export function HomePage({
             </h1>
 
             {/* Subtitle */}
-            <p className="text-gray-300 text-sm md:text-base lg:text-md max-w-xl mx-auto font-regular mt-4"
+            <p className="text-gray-300 text-xs sm:text-sm md:text-base lg:text-md max-w-xl mx-auto font-regular mt-2 sm:mt-4 px-4 sm:px-0"
               style={{
                 fontFamily: 'DM sans, sans-serif',
                 letterSpacing: '0.02em',
@@ -1487,10 +1487,10 @@ export function HomePage({
         </div>
 
         {/* Bottom Content: Search Bar and Filters */}
-        <div className="relative w-full bg-[#0D2032]/80 backdrop-blur-md border-t border-white/5 py-5">
-          <div className="hidden sm:flex items-center justify-center max-w-md mx-auto divide-x divide-white/10">
+        <div className="relative w-full bg-[#0D2032]/80 backdrop-blur-md border-t border-white/5 py-3 sm:py-5">
+          <div className="flex items-center justify-center max-w-md mx-auto divide-x divide-white/10 px-2">
             {/* Filter 1: City */}
-            <div className="flex-1 px-2">
+            <div className="flex-1 px-1 sm:px-2">
               <Select
                 value={selectedCity}
                 onValueChange={(value) => {
@@ -1522,9 +1522,9 @@ export function HomePage({
                   }
                 }}
               >
-                <SelectTrigger className="w-full h-auto py-1 border-0 bg-transparent text-gray-200 hover:text-white px-2 gap-2 text-sm font-medium shadow-none focus:ring-0 [&>svg]:opacity-50">
-                  <span className="flex items-center gap-2 flex-1">
-                    <MapPin className="size-4 text-[#C8F542]" />
+                <SelectTrigger className="w-full h-auto py-1 border-0 bg-transparent text-gray-200 hover:text-white px-1 sm:px-2 gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shadow-none focus:ring-0 [&>svg]:opacity-50">
+                  <span className="flex items-center gap-1.5 sm:gap-2 flex-1">
+                    <MapPin className="size-3.5 sm:size-4 text-[#C8F542]" />
                     <SelectValue placeholder="Select city" />
                   </span>
                 </SelectTrigger>
@@ -1544,7 +1544,7 @@ export function HomePage({
             </div>
 
             {/* Filter 2: Date */}
-            <div className="flex-1 px-2">
+            <div className="flex-1 px-1 sm:px-2">
               <Popover
                 open={isDesktopDatePickerOpen}
                 onOpenChange={setIsDesktopDatePickerOpen}
@@ -1552,11 +1552,11 @@ export function HomePage({
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-full h-auto py-1 justify-start rounded-none border-0 bg-transparent hover:bg-transparent px-2 text-sm font-medium text-gray-200 hover:text-white focus:ring-0"
+                    className="w-full h-auto py-1 justify-start rounded-none border-0 bg-transparent hover:bg-transparent px-1 sm:px-2 text-xs sm:text-sm font-medium text-gray-200 hover:text-white focus:ring-0"
                   >
-                    <Calendar className="size-4 text-[#C8F542] mr-2" />
+                    <Calendar className="size-3.5 sm:size-4 text-[#C8F542] mr-1.5 sm:mr-2" />
                     <span className="truncate">{renderDateLabel(selectedDate)}</span>
-                    <ChevronDown className="ml-auto size-4 opacity-50" />
+                    <ChevronDown className="ml-auto size-3.5 sm:size-4 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
@@ -1579,14 +1579,14 @@ export function HomePage({
             </div>
 
             {/* Filter 3: Court Type */}
-            <div className="flex-1 px-2">
+            <div className="flex-1 px-1 sm:px-2">
               <Select
                 value={selectedCourtType}
                 onValueChange={setSelectedCourtType}
               >
-                <SelectTrigger className="w-full h-auto py-1 border-0 bg-transparent text-gray-200 hover:text-white px-2 gap-2 text-sm font-medium shadow-none focus:ring-0 [&>svg]:opacity-50">
-                  <span className="flex items-center gap-2 flex-1">
-                    <LayoutGrid className="size-4 text-[#C8F542]" />
+                <SelectTrigger className="w-full h-auto py-1 border-0 bg-transparent text-gray-200 hover:text-white px-1 sm:px-2 gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shadow-none focus:ring-0 [&>svg]:opacity-50">
+                  <span className="flex items-center gap-1.5 sm:gap-2 flex-1">
+                    <LayoutGrid className="size-3.5 sm:size-4 text-[#C8F542]" />
                     <SelectValue placeholder="Select court type" />
                   </span>
                 </SelectTrigger>
@@ -1768,13 +1768,13 @@ export function HomePage({
 
       {/* Main Content */}
       <div className="pb-0 md:pb-1 pt-4.5 md:pt-10">
-        <div className="mb-4 md:mb-6 pl-6 pr-4 md:px-0 flex  flex-row items-center justify-between">
+        <div className="mb-4 md:mb-6 px-0 flex flex-row items-center justify-between">
           {availableCourts.length > 0 ? (
             <>
               <h2 className="text-sm sm:text-base font-semibold">
                 {`${availableCourts.length} Court${availableCourts.length !== 1 ? 's' : ''}`}
               </h2>
-              <div className="flex items-center gap-1.5 bg-white border border-gray-100 pt-2 pb-2 shadow-sm p-1 rounded-lg">
+              <div className="hidden md:flex items-center gap-1.5 bg-white border border-gray-100 pt-2 pb-2 shadow-sm p-1 rounded-lg">
                 <button
                   type="button"
                   onClick={() => setViewMode('grid')}
@@ -1926,7 +1926,7 @@ export function HomePage({
             {Array.from({ length: 6 }).map((_, index) => (
               <Card
                 key={`skeleton-${index}`}
-                className="overflow-hidden border-0 sm:border rounded-none sm:rounded-lg flex flex-col gap-0 shadow-sm"
+                className="overflow-hidden border-0 sm:border rounded-xl sm:rounded-lg flex flex-col gap-0 shadow-sm"
               >
                 <div className="relative h-40 sm:h-44 lg:h-48 bg-gray-200 animate-pulse flex flex-col justify-end p-5">
                   <div className="absolute top-4 right-4 flex items-center gap-3">
@@ -2061,7 +2061,7 @@ export function HomePage({
               return (
                 <Card
                   key={operatorGroup.operatorId}
-                  className={`overflow-hidden border-0 sm:border rounded-none sm:rounded-lg flex flex-col gap-0 shadow-sm hover:shadow-lg transition-shadow md:mb-6 md:inline-block md:w-full md:break-inside-avoid ${index === displayedCourtsByOperator.length - 1
+                  className={`overflow-hidden border-0 sm:border rounded-xl sm:rounded-lg flex flex-col gap-0 shadow-sm hover:shadow-lg transition-shadow md:mb-6 md:inline-block md:w-full md:break-inside-avoid ${index === displayedCourtsByOperator.length - 1
                     ? 'mb-3 md:mb-0'
                     : ''
                     }`}

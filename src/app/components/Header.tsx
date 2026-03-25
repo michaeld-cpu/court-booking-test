@@ -75,22 +75,10 @@ export function Header({
         : 'block'
         }`}
     >
-      <div className="container mx-auto px-4 md:px-8 py-3">
+      <div className="mx-auto w-full max-w-[1300px] px-4 md:px-8 py-3">
         <nav className="flex items-center justify-between h-14">
           {/* Left side - Hamburger and Title */}
           <div className="flex items-center gap-6 md:gap-10 hover:cursor-pointer">
-            {/* Hamburger Menu Button - Mobile Only */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-slate-500 hover:text-slate-800 p-2 -ml-2"
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <Icons.close className="size-6" />
-              ) : (
-                <Icons.menu className="size-6" />
-              )}
-            </button>
 
             {/* Title / Logo */}
             <Link
@@ -133,11 +121,11 @@ export function Header({
           </div>
 
           {/* Right side - Auth & Cart buttons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {/* Cart button */}
             <button
               onClick={isAuthenticated ? onCartClick : onLoginClick}
-              className="relative flex items-center justify-center h-10 w-10 rounded-full bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors"
+              className="hidden md:flex relative items-center justify-center h-10 w-10 rounded-full bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors"
               aria-label="Cart"
             >
               <Icons.cart className="size-[18px] text-slate-800" strokeWidth={2.5} />
@@ -153,7 +141,7 @@ export function Header({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="flex items-center justify-center h-10 w-10 rounded-full bg-black text-white hover:bg-slate-800 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+                    className="hidden md:flex items-center justify-center h-10 w-10 rounded-full bg-black text-white hover:bg-slate-800 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
                     aria-label="Profile"
                   >
                     <Icons.user className="size-[18px]" strokeWidth={2.5} />
@@ -179,12 +167,25 @@ export function Header({
             ) : (
               <button
                 onClick={onLoginClick}
-                className="flex items-center justify-center h-10 w-10 rounded-full bg-black text-white hover:bg-slate-800 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+                className="hidden md:flex items-center justify-center h-10 w-10 rounded-full bg-black text-white hover:bg-slate-800 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
                 aria-label="Login"
               >
                 <Icons.user className="size-[18px]" strokeWidth={2.5} />
               </button>
             )}
+
+            {/* Hamburger Menu Button - Mobile Only */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden text-slate-600 hover:text-slate-900 p-2.5 -mr-2 bg-slate-50 rounded-full transition-colors active:bg-slate-100"
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <Icons.close className="size-6" />
+              ) : (
+                <Icons.menu className="size-6" />
+              )}
+            </button>
           </div>
         </nav>
 
@@ -217,6 +218,25 @@ export function Header({
                   <span>{label}</span>
                 </Link>
               ))}
+
+              {/* Cart in Mobile Menu */}
+              <button
+                onClick={() => {
+                  onCartClick();
+                  handleLinkClick();
+                }}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 w-full text-left"
+              >
+                <div className="relative">
+                  <Icons.cart className="size-[18px]" strokeWidth={2.5} />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#C8F542] text-black font-extrabold rounded-full min-w-[16px] h-[16px] flex items-center justify-center text-[10px] px-0.5">
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
+                <span>Cart</span>
+              </button>
 
               {/* Auth in Mobile Menu */}
               <div className="border-t border-slate-100 pt-3 mt-3 px-2">

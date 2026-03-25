@@ -139,10 +139,10 @@ const parseVenueSlug = (slug = '') => {
   const slugName = value.slice(numericMatch[0].length).trim();
   const venueNameFromSlug = slugName
     ? slugName
-        .split('-')
-        .filter(Boolean)
-        .map((part) => `${part[0]?.toUpperCase() ?? ''}${part.slice(1)}`)
-        .join(' ')
+      .split('-')
+      .filter(Boolean)
+      .map((part) => `${part[0]?.toUpperCase() ?? ''}${part.slice(1)}`)
+      .join(' ')
     : null;
   return { venueId, venueNameFromSlug };
 };

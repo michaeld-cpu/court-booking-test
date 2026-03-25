@@ -29,9 +29,9 @@ const MAP_PROVIDER = (import.meta.env.VITE_MAP_PROVIDER ?? 'leaflet')
 const GOOGLE_MAPS_API_KEY = (
   import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? ''
 ).toString()
-const MAPCN_NEUTRAL_TILE_URL =
-  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-const MAPCN_NEUTRAL_TILE_ATTRIBUTION =
+const MAPCN_DARK_TILE_URL =
+  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+const MAPCN_DARK_TILE_ATTRIBUTION =
   '&copy; OpenStreetMap contributors &copy; CARTO'
 
 const isLeafletProvider = MAP_PROVIDER === 'leaflet'
@@ -308,9 +308,9 @@ export function VenueMapView({
 
       const tileSources = [
         {
-          // mapcn defaults to CARTO basemaps; use a neutral light style first.
-          url: MAPCN_NEUTRAL_TILE_URL,
-          attribution: MAPCN_NEUTRAL_TILE_ATTRIBUTION,
+          // mapcn defaults to CARTO basemaps; use a dark style.
+          url: MAPCN_DARK_TILE_URL,
+          attribution: MAPCN_DARK_TILE_ATTRIBUTION,
         },
         {
           url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -418,8 +418,8 @@ export function VenueMapView({
     venues.forEach((venue) => {
       const marker = L.circleMarker([venue.coordinates.lat, venue.coordinates.lng], {
         radius: 8,
-        fillColor: '#ef4444',
-        color: '#ffffff',
+        fillColor: '#C8F542',
+        color: '#000000',
         weight: 2,
         opacity: 1,
         fillOpacity: 0.95,
@@ -435,9 +435,9 @@ export function VenueMapView({
 
       const ring = L.circleMarker([venue.coordinates.lat, venue.coordinates.lng], {
         radius: 13,
-        color: '#ef4444',
-        weight: 1,
-        opacity: 0.35,
+        color: '#C8F542',
+        weight: 2,
+        opacity: 0.8,
         fillOpacity: 0,
       })
       ring.on('click', () => onVenueClickRef.current(venue))
