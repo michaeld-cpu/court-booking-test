@@ -1,0 +1,27 @@
+import React from 'react';
+
+export function ContactUs() {
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-100 via-white to-cyan-50 py-20">
+      <div className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-cyan-200/40 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-12 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl" />
+
+      <div className="mx-auto flex min-h-[65vh] max-w-3xl items-center justify-center">
+        <div className="w-full rounded-2xl border border-white/70 bg-white/85 p-10 text-center shadow-[0_20px_60px_-30px_rgba(15,23,42,0.35)] backdrop-blur-sm md:p-14">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">
+            Korte.ph
+          </p>
+          <h1 className="mt-4 text-4xl font-semibold text-slate-900 md:text-5xl">
+            Contact Us
+          </h1>
+          <p className="mt-5 text-base text-slate-600 md:text-lg">
+            We are preparing a better support experience.
+          </p>
+          <p className="mt-1 text-base font-medium text-slate-800 md:text-lg">
+            Coming soon.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

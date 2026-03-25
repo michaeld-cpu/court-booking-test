@@ -1,0 +1,27 @@
+{
+  "buildCommand": "npm run build:ssr",
+  "outputDirectory": "dist/client",
+  "functions": {
+    "api/ssr.js": {
+      "includeFiles": "dist/{server/**,client/index.html}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/operator/:path*",
+      "destination": "/api/ssr?path=/operator/:path*"
+    },
+    {
+      "source": "/venue/:path*",
+      "destination": "/api/ssr?path=/venue/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
