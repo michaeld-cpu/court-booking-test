@@ -1452,132 +1452,136 @@ export function HomePage({
         {/* Filter Card */}
         <div className="bg-white rounded-[1rem] shadow-sm sm:shadow-md border border-gray-200 overflow-hidden divide-y divide-gray-50">
           {/* Filter 1: City */}
-          <div className="flex items-center gap-4 p-5 py-4.5 hover:bg-gray-50/50 transition-colors">
-            <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
-              <MapPin className="size-5 text-gray-500" />
-            </div>
-            <div className="flex-1 flex flex-col items-start min-w-0">
-              <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider mb-0.5">Location</span>
-              <Select
-                value={selectedCity}
-                onValueChange={(value) => {
-                  if (value === 'Current Location') {
-                    requestUserLocation(undefined, {
-                      fallbackToDumaguete: false,
-                      showPromptOnError: true,
-                    })
-                    return
-                  }
-                  setSelectedCity(value)
-                  if (value === 'All Locations') {
-                    setSelectedLocationCoords(null)
-                    setHasUserLocation(false)
-                    setUserLocation(null)
-                    setIsLocationResolved(true);
-                    return
-                  }
-                  const selectedLocation = availableLocations.find(
-                    (location) => location.name === value,
-                  )
-                  if (selectedLocation) {
-                    setSelectedLocationCoords({
-                      lat: Number(selectedLocation.latitude),
-                      lng: Number(selectedLocation.longitude),
-                    })
-                    setHasUserLocation(false)
-                    setIsLocationResolved(true)
-                  }
-                }}
-              >
-                <SelectTrigger className="w-full h-auto p-0 border-0 bg-transparent text-gray-900 text-[15px] font-medium shadow-none focus:ring-0 [&>svg]:hidden text-left truncate">
+          <Select
+            value={selectedCity}
+            onValueChange={(value) => {
+              if (value === 'Current Location') {
+                requestUserLocation(undefined, {
+                  fallbackToDumaguete: false,
+                  showPromptOnError: true,
+                })
+                return
+              }
+              setSelectedCity(value)
+              if (value === 'All Locations') {
+                setSelectedLocationCoords(null)
+                setHasUserLocation(false)
+                setUserLocation(null)
+                setIsLocationResolved(true);
+                return
+              }
+              const selectedLocation = availableLocations.find(
+                (location) => location.name === value,
+              )
+              if (selectedLocation) {
+                setSelectedLocationCoords({
+                  lat: Number(selectedLocation.latitude),
+                  lng: Number(selectedLocation.longitude),
+                })
+                setHasUserLocation(false)
+                setIsLocationResolved(true)
+              }
+            }}
+          >
+            <SelectTrigger className="flex w-full items-center gap-4 p-5 py-10 hover:bg-gray-50/50 transition-colors border-0 bg-transparent h-auto shadow-none focus:ring-0 [&>svg]:hidden text-left group">
+              <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
+                <MapPin className="size-5 text-gray-500" />
+              </div>
+              <div className="flex-1 flex flex-col items-start min-w-0">
+                <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider mb-0.5 pointer-events-none">Location</span>
+                <span className="text-gray-900 text-[15px] font-medium truncate pointer-events-none w-full text-left">
                   <SelectValue placeholder="Select city" />
-                </SelectTrigger>
-                <SelectContent className="z-[1400]">
-                  <SelectItem value="Current Location">
-                    {hasUserLocation
-                      ? 'Current Location'
-                      : 'Current Location'}
-                  </SelectItem>
-                  {availableLocations.map((location) => (
-                    <SelectItem key={location.name} value={location.name}>
-                      {location.description || location.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <ChevronDown className="size-5 text-gray-300" />
-          </div>
+                </span>
+              </div>
+              <div className="flex shrink-0">
+                <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="z-[1400]">
+              <SelectItem value="Current Location">
+                {hasUserLocation
+                  ? 'Current Location'
+                  : 'Current Location'}
+              </SelectItem>
+              {availableLocations.map((location) => (
+                <SelectItem key={location.name} value={location.name}>
+                  {location.description || location.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           {/* Filter 2: Date */}
-          <div className="flex items-center gap-4 p-5 py-4.5 hover:bg-gray-50/50 transition-colors">
-            <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
-              <Calendar className="size-5 text-gray-500" />
-            </div>
-            <div className="flex-1 flex flex-col items-start min-w-0">
-              <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Date</span>
-              <Popover
-                open={isMobileDatePickerOpen}
-                onOpenChange={setIsMobileDatePickerOpen}
-              >
-                <PopoverTrigger asChild>
-                  <button className="w-full text-left text-gray-900 text-[15px] font-medium truncate">
+          <Popover
+            open={isMobileDatePickerOpen}
+            onOpenChange={setIsMobileDatePickerOpen}
+          >
+            <PopoverTrigger asChild>
+              <button className="flex w-full items-center gap-4 p-5 py-5 hover:bg-gray-50/50 transition-colors border-0 bg-transparent h-auto text-left group">
+                <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
+                  <Calendar className="size-5 text-gray-500" />
+                </div>
+                <div className="flex-1 flex flex-col items-start min-w-0">
+                  <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Date</span>
+                  <span className="w-full text-left text-gray-900 text-[15px] font-medium truncate">
                     {isSameDay(selectedDate, new Date()) ? 'Today' : format(selectedDate, 'MMM d')}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="z-[1400] w-auto p-0"
-                  align="start"
-                >
-                  <CalendarComponent
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(date) => {
-                      if (!date) return
-                      setSelectedDate(date)
-                      setIsMobileDatePickerOpen(false)
-                    }}
-                    disabled={{ before: new Date() }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <ChevronDown className="size-5 text-gray-300" />
-          </div>
+                  </span>
+                </div>
+                <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="z-[1400] w-auto p-0"
+              align="end"
+            >
+              <CalendarComponent
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  if (!date) return
+                  setSelectedDate(date)
+                  setIsMobileDatePickerOpen(false)
+                }}
+                disabled={{ before: new Date() }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
 
           {/* Filter 3: Court Type */}
-          <div className="flex items-center gap-4 p-5 py-4.5 hover:bg-gray-50/50 transition-colors">
-            <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
-              <LayoutGrid className="size-5 text-gray-500" />
-            </div>
-            <div className="flex-1 flex flex-col items-start min-w-0">
-              <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider mb-0.5">Court Type</span>
-              <Select
-                value={selectedCourtType}
-                onValueChange={setSelectedCourtType}
-              >
-                <SelectTrigger className="w-full h-auto p-0 border-0 bg-transparent text-gray-900 text-[15px] font-medium shadow-none focus:ring-0 [&>svg]:hidden text-left truncate">
+          <Select
+            value={selectedCourtType}
+            onValueChange={setSelectedCourtType}
+          >
+            <SelectTrigger className="flex w-full items-center gap-4 p-5 py-10 hover:bg-gray-50/50 transition-colors border-0 bg-transparent h-auto shadow-none focus:ring-0 [&>svg]:hidden text-left group">
+              <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
+                <LayoutGrid className="size-5 text-gray-500" />
+              </div>
+              <div className="flex-1 flex flex-col items-start min-w-0">
+                <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider mb-0.5 pointer-events-none">Court Type</span>
+                <span className="w-full text-left text-gray-900 text-[15px] font-medium truncate pointer-events-none">
                   <SelectValue placeholder="Select court type" />
-                </SelectTrigger>
-                <SelectContent className="z-[1400]">
-                  <SelectItem value="All Courts">All Courts</SelectItem>
-                  {Array.from(
-                    new Set(
-                      availableCourts.map(
-                        (court) => court.purpose ?? court.type ?? 'Others',
-                      ),
-                    ),
-                  ).map((purpose) => (
-                    <SelectItem key={purpose} value={purpose}>
-                      {purpose.charAt(0).toUpperCase() + purpose.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <ChevronDown className="size-5 text-gray-300" />
-          </div>
+                </span>
+              </div>
+              <div className="flex shrink-0">
+                <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="z-[1400]">
+              <SelectItem value="All Courts">All Courts</SelectItem>
+              {Array.from(
+                new Set(
+                  availableCourts.map(
+                    (court) => court.purpose ?? court.type ?? 'Others',
+                  ),
+                ),
+              ).map((purpose) => (
+                <SelectItem key={purpose} value={purpose}>
+                  {purpose.charAt(0).toUpperCase() + purpose.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </header>
 
@@ -2247,14 +2251,14 @@ export function HomePage({
           </div>
 
           {/* Right Content - Lime Section */}
-          <div className="w-full md:w-[320px] bg-[#C8F542] p-8 md:p-10 flex flex-col items-center justify-center text-center relative overflow-hidden group">
-            <div className="relative w-full max-w-[200px] flex flex-col items-center">
-              <div className="relative w-[160px] aspect-[4/5] border border-black/30 rounded-[1rem] p-1 pt-5 flex flex-col items-center justify-start bg-transparent transition-transform">
-                <div className="text-7xl font-bold text-black leading-none font-bebas">
+          <div className="w-full md:w-[320px] bg-[#C8F542] py-12 px-6 md:p-10 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+            <div className="relative w-full max-w-[180px] sm:max-w-[200px] flex flex-col items-center">
+              <div className="relative w-[140px] sm:w-[160px] aspect-[4/5] border border-black/30 rounded-[1rem] p-1 pt-4 sm:pt-5 flex flex-col items-center justify-start bg-transparent transition-transform">
+                <div className="text-6xl sm:text-7xl font-bold text-black leading-none font-bebas">
                   40+
                 </div>
                 {/* Label */}
-                <div className="text-[14px] font-medium uppercase tracking-[0.1em] text-black/80 mt-1">
+                <div className="text-[12px] sm:text-[14px] font-medium uppercase tracking-[0.1em] text-black/80 mt-1">
                   Courts Listed
                 </div>
 
@@ -2265,10 +2269,10 @@ export function HomePage({
               {/* Overlapping Pill Button */}
               <button
                 onClick={() => navigate('/contact-us')}
-                className="absolute -bottom-2 w-[112%] bg-black text-white py-4 md:py-5 rounded-2xl md:rounded-[1rem] flex items-center justify-center gap-2 shadow-2xl transition-all duration-300"
+                className="absolute -bottom-5 sm:-bottom-2 w-[120%] sm:w-[112%] bg-black text-white py-3.5 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl md:rounded-[1rem] flex items-center justify-center gap-2 shadow-2xl transition-all duration-300"
               >
-                <span className="text-base md:text-sm font-semibold">Join Korte</span>
-                <ChevronRight className="size-5" />
+                <span className="text-sm font-semibold">Join Korte</span>
+                <ChevronRight className="size-4 sm:size-5" />
               </button>
             </div>
           </div>

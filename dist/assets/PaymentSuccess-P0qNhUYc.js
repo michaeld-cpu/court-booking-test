@@ -1,0 +1,1 @@
+import{a as e,r as t,v as a}from"./index-CAoap1TG.js";function o(){const s=e();return t.useEffect(()=>{a.success("Payment successful",{description:"Your booking has been paid successfully."}),s("/bookings",{replace:!0})},[s]),null}export{o as PaymentSuccess};

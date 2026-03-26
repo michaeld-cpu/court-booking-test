@@ -1,0 +1,1 @@
+import{a,r as t,v as r}from"./index-CAoap1TG.js";function n(){const e=a();return t.useEffect(()=>{r.error("Payment failed",{description:"We could not process your payment. Please try again."}),e("/bookings",{replace:!0})},[e]),null}export{n as PaymentFailed};
