@@ -306,7 +306,7 @@ export function AppContent() {
   }) => {
     login(auth);
     setIsLoginModalOpen(false);
-    
+
     // Execute pending action if any
     const actionToRun = pendingAction;
     setPendingAction(null);
@@ -495,7 +495,7 @@ export function AppContent() {
       next[existingIndex] = mergedItem;
       return next;
     });
-    
+
     toast.success('Added to cart!', {
       description: `${selectedCourt.name} added for ${formatTimeRangeLabel(
         timeSlotFrom.time,
@@ -536,9 +536,9 @@ export function AppContent() {
       location: selectedCourt.location,
       city: selectedCourt.city,
     };
-    
+
     setBookings([...bookings, newBooking]);
-    
+
     toast.success('Booking confirmed -!', {
       description: `${selectedCourt.name} booked for ${formatTimeRangeLabel(
         timeSlotFrom.time,
@@ -618,7 +618,7 @@ export function AppContent() {
       });
       return;
     }
-    
+
     const newBookings = cart.map(item => {
       const court = mockCourts.find(c => c.id === item.courtId);
       return {
@@ -636,12 +636,12 @@ export function AppContent() {
         city: court?.city || '',
       };
     });
-    
+
     setBookings([...bookings, ...newBookings]);
     setCart([]);
     setIsCartOpen(false);
     setIsCartSummaryOpen(false);
-    
+
     toast.success('Bookings confirmed!', {
       description: `Your ${newBookings.length} booking${newBookings.length !== 1 ? 's have' : ' has'} been confirmed`,
     });
@@ -811,11 +811,7 @@ export function AppContent() {
 
   return (
     <div
-      className={`min-h-svh bg-gray-50 ${
-        isPaymentRoute || isLoginRequired
-          ? 'pb-0'
-          : 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0'
-      }`}
+      className="min-h-dvh flex flex-col bg-gray-50 overflow-x-hidden"
     >
       <Toaster />
 
@@ -832,7 +828,7 @@ export function AppContent() {
         </div>
       )}
 
-      <main className="mx-auto w-full max-w-[1300px] px-4 md:px-8">
+      <main className="flex-1 mx-auto w-full max-w-[1300px] px-4 md:px-8">
         <React.Suspense
           fallback={
             <div className="min-h-[60vh] flex items-center justify-center">
@@ -942,51 +938,49 @@ export function AppContent() {
         hasPendingBookings={hasPendingBookings}
       />
 
-        <BookingSummaryModal
-          isOpen={isCartSummaryOpen}
-          onClose={() => setIsCartSummaryOpen(false)}
-          bookingsByCourtAndDate={cartBookingItems}
-          grandTotalPrice={cartGrandTotalPrice}
-          grandTotalHours={cartGrandTotalHours}
-          onConfirm={handleCheckout}
+      <BookingSummaryModal
+        isOpen={isCartSummaryOpen}
+        onClose={() => setIsCartSummaryOpen(false)}
+        bookingsByCourtAndDate={cartBookingItems}
+        grandTotalPrice={cartGrandTotalPrice}
+        grandTotalHours={cartGrandTotalHours}
+        onConfirm={handleCheckout}
+      />
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      <AlertDialog open={isVenueLimitOpen} onOpenChange={setIsVenueLimitOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cart limited to one venue</AlertDialogTitle>
+            <AlertDialogDescription>
+              Checkout or clear your cart before booking a different venue.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogAction onClick={() => setIsVenueLimitOpen(false)}>
+            Got it
+          </AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Footer */}
+      {!hideFooterRoutes && (
+        <Footer
+          className={
+            hideFooterOnMobile || hideFooterForHomeEmptyOnMobile
+              ? 'hidden sm:block'
+              : ''
+          }
         />
-
-        {/* Login Modal */}
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLoginSuccess={handleLoginSuccess}
-        />
-
-        <AlertDialog open={isVenueLimitOpen} onOpenChange={setIsVenueLimitOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Cart limited to one venue</AlertDialogTitle>
-              <AlertDialogDescription>
-                Checkout or clear your cart before booking a different venue.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogAction onClick={() => setIsVenueLimitOpen(false)}>
-              Got it
-            </AlertDialogAction>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {/* Footer */}
-        {!hideFooterRoutes && (
-          <div
-            className={
-              hideFooterOnMobile || hideFooterForHomeEmptyOnMobile
-                ? 'hidden sm:block'
-                : ''
-            }
-          >
-            <Footer />
-          </div>
-        )}
+      )}
 
 
-      </div>
+    </div>
   );
 }
 

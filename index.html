@@ -1,35 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
 
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-      <meta name="theme-color" content="#ffffff" />
-      <meta name="color-scheme" content="light" />
-      
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-      
-      <!-- Preload critical hero banner to maximize LCP -->
-      <link rel="preload" as="image" href="/imgs/bannerbg-optimized.jpg" />
-      
-      <!-- Preload the critical fonts (Google Fonts API will return woff2) -->
-      <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Alegreya+Sans:wght@700&family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=block" />
-      
-      <!-- Fallback and actual stylesheet loading for fonts -->
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Alegreya+Sans:wght@700&family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=block" media="print" onload="this.media='all'" />
-      
-      <noscript>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Alegreya+Sans:wght@700&family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=block" />
-      </noscript>
-      
-      <!--ssr-head-->
-      <title>Korte.ph - Easy Court Booking</title>
-    </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="color-scheme" content="light" />
 
-    <body>
-      <div id="root"><!--ssr-outlet--></div>
-      <script type="module" src="/src/entry-client.tsx"></script>
-    </body>
-  </html>
-  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Preload critical hero banner to maximize LCP -->
+  <link rel="preload" as="image" href="/imgs/bannerbg-optimized.jpg" />
+
+  <!-- Load stylesheets immediately to avoid invisible text bugs -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Alegreya+Sans:wght@700&family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" />
+
+  <!--ssr-head-->
+  <title>Korte.ph - Easy Court Booking</title>
+</head>
+
+<body>
+  <div id="root"><!--ssr-outlet--></div>
+  <script type="module" src="/src/entry-client.tsx"></script>
+</body>
+
+</html>

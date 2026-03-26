@@ -2,11 +2,14 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Icons } from './ui/icons'
 
-export function Footer() {
+export function Footer({ className }: { className?: string }) {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-[#0A1E2D] py-6 text-white mt-auto">
+    <footer 
+      className={`bg-[#0A1E2D] py-8 md:py-10 text-white mt-auto w-full ${className || ''}`}
+      style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}
+    >
       <div className="mx-auto w-full max-w-[1300px] px-6 md:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
