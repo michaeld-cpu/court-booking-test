@@ -885,9 +885,17 @@ export function HomePage({
         ].join(':')
 
         if (selectedCity === 'Current Location' && (!latitude || !longitude)) {
+          if (isActive) {
+            setIsLoadingCourts(false)
+            setHasLoadedCourts(true)
+          }
           return
         }
         if (selectedCity !== 'All Locations' && (!latitude || !longitude)) {
+          if (isActive) {
+            setIsLoadingCourts(false)
+            setHasLoadedCourts(true)
+          }
           return
         }
 
@@ -917,86 +925,74 @@ export function HomePage({
           setHasLoadedCourts(false)
         }
 
-        const response = await api.get('/api/venues/availability', {
-          params: {
-            start,
-            end,
-            latitude,
-            longitude,
-          },
-        })
-
-        const venues = Array.isArray(response.data)
-          ? response.data
-          : (response.data?.data ?? [])
-        if (!Array.isArray(venues)) {
-          return
-        }
-
-        const mappedOperators: Operator[] = []
-        const mappedCourts: Court[] = []
-
-        venues.forEach((venue: any) => {
-          const operatorId = `venue-${venue.id}`
-          const city = deriveCity(venue.address)
-          const operatorName = venue.name ?? 'Unknown Venue'
-
-          const normalizedAddress = normalizeAddress(venue.address)
-
-          const coordPair = Array.isArray(venue.coordinates?.coordinates)
-            ? venue.coordinates.coordinates
-            : null
-          const derivedCoordinates = {
-            lat:
-              coordPair?.[1] ?? venue.latitude ?? userLocation?.latitude ?? 0,
-            lng:
-              coordPair?.[0] ?? venue.longitude ?? userLocation?.longitude ?? 0,
-          }
-
-          mappedOperators.push({
-            id: operatorId,
-            name: operatorName,
-            location: normalizedAddress,
-            city,
-            isCovered: venue.is_covered ?? undefined,
-            description: venue.description ?? '',
-            amenities: [],
-            rating: 0,
-            phone: venue.contact_number ?? '',
-            email: '',
-            operatingHours: 'Contact venue for hours',
-            image: resolveVenueBannerUrl(getVenueBannerUrl(venue, true), operatorId),
-            profileImage: resolveVenueBannerUrl(
-              getVenueBannerUrl(venue, false),
-              `${operatorId}-profile`,
-            ),
-            coordinates: derivedCoordinates,
-            socialMedia: {
-              facebook: venue.facebook_link ?? undefined,
+        try {
+          const response = await api.get('/api/venues/availability', {
+            params: {
+              start,
+              end,
+              latitude,
+              longitude,
             },
           })
 
-          if (Array.isArray(venue.courts)) {
-            venue.courts.forEach((court: any) => {
-              const courtName = `Court ${court.number ?? court.id}`
-              const totalSlots = Number(court.slots_summary?.total_slots ?? 0)
-              const availableSlots = Number(
-                court.slots_summary?.available_slots ?? 0,
-              )
-              const normalizedAvailableSlotCount = Math.max(
-                0,
-                availableSlots - 1,
-              )
-              const basePrice = Number(
-                court.price_per_hour ?? court.pricePerHour ?? court.price ?? 0,
-              )
-              const purposeLabel = court.purpose ?? court.type ?? 'Others'
+          const venues = Array.isArray(response.data)
+            ? response.data
+            : (response.data?.data ?? [])
+          if (!Array.isArray(venues) || venues.length === 0) {
+            throw new Error('No venues from API')
+          }
+
+          const mappedOperators: Operator[] = []
+          const mappedCourts: Court[] = []
+
+          venues.forEach((venue: any) => {
+            const operatorId = `venue-${venue.id}`
+            const city = deriveCity(venue.address)
+            const operatorName = venue.name ?? 'Unknown Venue'
+
+            const normalizedAddress = normalizeAddress(venue.address)
+
+            const coordPair = Array.isArray(venue.coordinates?.coordinates)
+              ? venue.coordinates.coordinates
+              : null
+            const derivedCoordinates = {
+              lat: coordPair ? coordPair[1] : null,
+              lng: coordPair ? coordPair[0] : null,
+            }
+
+            const operator: Operator = {
+              id: operatorId,
+              name: operatorName,
+              location: normalizedAddress,
+              city: city,
+              description: venue.description || '',
+              amenities: [
+                ...(venue.indoor ? ['Indoor'] : ['Outdoor']),
+                ...(venue.is_covered ? ['Covered'] : []),
+              ],
+              rating: Number(venue.rating) || 4.5,
+              phone: venue.phone || '',
+              email: venue.email || '',
+              operatingHours: '8:00 AM - 10:00 PM',
+              image: getVenueBannerUrl(venue, false),
+              profileImage: venue.profile_image || '',
+              coordinates: derivedCoordinates,
+              isCovered: venue.is_covered ? 'covered' : 'outdoor',
+            }
+            mappedOperators.push(operator)
+
+            const courts = Array.isArray(venue.courts) ? venue.courts : []
+            courts.forEach((court: any) => {
+              const totalSlots = Number(court.total_slots) || 12
+              const availableSlots = Number(court.available_slots) || totalSlots
+              const basePrice = Number(court.price) || 300
+              const normalizedAvailableSlotCount =
+                Number(court.available_slots) ?? totalSlots
+
               mappedCourts.push({
-                id: `court-${court.id}`,
-                name: courtName,
-                type: court.type ?? purposeLabel,
-                purpose: purposeLabel,
-                isCovered: venue.is_covered ?? undefined,
+                id: String(court.id),
+                name: court.name ?? `Court ${court.id}`,
+                type: court.type ?? 'basketball',
                 operatorId,
                 operatorName,
                 location: normalizedAddress,
@@ -1016,23 +1012,30 @@ export function HomePage({
                 ),
               })
             })
+          })
+
+          if (isActive) {
+            setAvailableOperators(mappedOperators)
+            setAvailableCourts(mappedCourts)
+            setHasLoadedCourts(true)
+            if (isPageViewOnly && mappedCourts.length > 0) {
+              writeAvailabilityCache(availabilityCacheKey, {
+                operators: mappedOperators,
+                courts: mappedCourts,
+                updatedAt: Date.now(),
+              })
+            }
           }
-        })
+        } catch (apiError) {
+          // Fallback to mock data if API fails or returns nothing
+          console.warn('[HomePage] API fetch failed, using mock data fallback', apiError)
+          if (isActive) {
+            const initialOperators = operators || []
+            const initialCourts = mockCourts || []
 
-        if (!isActive) {
-          return
-        }
-
-        if (isActive) {
-          setAvailableOperators(mappedOperators)
-          setAvailableCourts(mappedCourts)
-          setHasLoadedCourts(true)
-          if (isPageViewOnly && mappedCourts.length > 0) {
-            writeAvailabilityCache(availabilityCacheKey, {
-              operators: mappedOperators,
-              courts: mappedCourts,
-              updatedAt: Date.now(),
-            })
+            setAvailableOperators(initialOperators)
+            setAvailableCourts(initialCourts)
+            setHasLoadedCourts(true)
           }
         }
       } catch (error) {
@@ -1041,6 +1044,9 @@ export function HomePage({
         })
         if (isActive) {
           setHasLoadedCourts(true)
+          // Ensure we at least show mock data even on top-level crash
+          setAvailableOperators(operators || [])
+          setAvailableCourts(mockCourts || [])
         }
       } finally {
         if (isActive) {
@@ -2127,8 +2133,12 @@ export function HomePage({
                         <div className="absolute bottom-0 left-0 right-0 p-5 pt-10 flex w-full items-end justify-between gap-4">
                           <div className="min-w-0">
                             <div
-                              className="truncate text-3xl font-semibold uppercase tracking-tight text-white drop-shadow-md font-bebas"
-                              style={{ letterSpacing: '1px' }}
+                              className="line-clamp-1 text-3xl font-semibold uppercase tracking-tight text-white font-bebas"
+                              style={{ 
+                                letterSpacing: '1px',
+                                textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                                fontFamily: "var(--font-bebas), 'Bebas Neue', 'Arial Black', sans-serif"
+                              }}
                             >
                               {operatorGroup.operatorName}
                             </div>
@@ -2162,7 +2172,10 @@ export function HomePage({
                           <div className="min-w-0 ml-2 flex flex-1 items-center gap-2">
                             <div className="min-w-0">
                               <div
-                                className="truncate text-lg font-semibold font-alegreya"
+                                className="line-clamp-1 text-lg font-semibold font-alegreya"
+                                style={{
+                                  fontFamily: "var(--font-alegreya), 'Alegreya Sans', 'Helvetica Neue', Arial, sans-serif"
+                                }}
                               >
                                 {operatorGroup.operatorName}
                               </div>
