@@ -12,8 +12,8 @@ export const operators: Operator[] = [
     phone: '+63 935 123 4567',
     email: 'info@dumaguesportshub.com',
     operatingHours: '8:00 AM - 10:00 PM',
-    image: 'https://images.unsplash.com/photo-1759352642316-25f20e12bab4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBmYWNpbGl0eSUyMGJ1aWxkaW5nfGVufDF8fHx8MTc2NjEwNjI0N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    profileImage: 'https://images.unsplash.com/photo-1629507208649-70919ca33793?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHByb2Zlc3Npb25hbCUyMHBvcnRyYWl0fGVufDF8fHx8MTc2NjMyODQwOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1759352642316-25f20e12bab4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBmYWNpbGl0eSUyMGJ1aWxkaW5nfGVufDF8fHx8MTc2NjExMTYwNXww&ixlib=rb-4.1.0&q=60&w=640&utm_source=figma&utm_medium=referral',
+    profileImage: 'https://images.unsplash.com/photo-1629507208649-70919ca33793?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHByb2Zlc3Npb25hbCUyMHBvcnRyYWl0fGVufDF8fHx8MTc2NjM2NjQwOXww&ixlib=rb-4.1.0&q=60&w=256&utm_source=figma&utm_medium=referral',
     coordinates: {
       lat: 9.3068,
       lng: 123.3054
@@ -35,8 +35,8 @@ export const operators: Operator[] = [
     phone: '+63 935 234 5678',
     email: 'valencia.sports@email.com',
     operatingHours: '8:00 AM - 9:00 PM',
-    image: 'https://images.unsplash.com/photo-1705593136686-d5f32b611aa9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBjb21wbGV4JTIwZXh0ZXJpb3J8ZW58MXx8fHwxNzY2MTI5ODMyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    profileImage: 'https://images.unsplash.com/photo-1660463527860-b66aebd362c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBtYW5hZ2VyJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzY2MzgyNDQ5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1705593136686-d5f32b611aa9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBjb21wbGV4JTIwZXh0ZXJpb3J8ZW58MXx8fHwxNzY2MTM3MDI5fDA&ixlib=rb-4.1.0&q=60&w=640&utm_source=figma&utm_medium=referral',
+    profileImage: 'https://images.unsplash.com/photo-1660463527860-b66aebd362c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjBtYW5hZ2VyJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzY2MzkyMDM5fDA&ixlib=rb-4.1.0&q=60&w=256&utm_source=figma&utm_medium=referral',
     coordinates: {
       lat: 9.3155,
       lng: 123.2920
@@ -57,8 +57,8 @@ export const operators: Operator[] = [
     phone: '+63 935 345 6789',
     email: 'notc@tennis.ph',
     operatingHours: '8:00 AM - 8:00 PM',
-    image: 'https://images.unsplash.com/photo-1726035165266-90169b3896b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZW5uaXMlMjBjbHViJTIwYnVpbGRpbmd8ZW58MXx8fHwxNzY2MTI5ODMyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    profileImage: 'https://images.unsplash.com/photo-1637559508411-e6d65573efff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhdGhsZXRpYyUyMGRpcmVjdG9yJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzY2MzgyNDUwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1726035165266-90169b3896b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZW5uaXMlMjBjbHViJTIwYnVpbGRpbmd8ZW58MXx8fHwxNzY2MTM3MDI5fDA&ixlib=rb-4.1.0&q=60&w=640&utm_source=figma&utm_medium=referral',
+    profileImage: 'https://images.unsplash.com/photo-1637559508411-e6d65573efff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhdGhsZXRpYyUyMGRpcmVjdG9yJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzY2MzkzNzUyfDA&ixlib=rb-4.1.0&q=60&w=256&utm_source=figma&utm_medium=referral',
     coordinates: {
       lat: 9.3091,
       lng: 123.3080
@@ -80,8 +80,8 @@ export const operators: Operator[] = [
     phone: '+63 932 456 7890',
     email: 'info@cebusportsarena.com',
     operatingHours: '7:00 AM - 11:00 PM',
-    image: 'https://images.unsplash.com/photo-1759722127760-ed26284e96e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzcG9ydHMlMjBjb21wbGV4JTIwZXh0ZXJpb3J8ZW58MXx8fHwxNzY2MTMwNTQ3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    profileImage: 'https://images.unsplash.com/photo-1627426046997-0a5f323cf88a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNpbGl0eSUyMG1hbmFnZXIlMjBoZWFkc2hvdHxlbnwxfHx8fDE3NjYzODI0NTB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1759722127760-ed26284e96e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzcG9ydHMlMjBjb21wbGV4JTIwZXh0ZXJpb3J8ZW58MXx8fHwxNzY2MTM3MDI5fDA&ixlib=rb-4.1.0&q=60&w=640&utm_source=figma&utm_medium=referral',
+    profileImage: 'https://images.unsplash.com/photo-1627426046997-0a5f323cf88a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNpbGl0eSUyMG1hbmFnZXIlMjBoZWFkc2hvdHxlbnwxfHx8fDE3NjYzOTM3NTJ8MA&ixlib=rb-4.1.0&q=60&w=256&utm_source=figma&utm_medium=referral',
     coordinates: {
       lat: 10.3157,
       lng: 123.8854
@@ -102,8 +102,8 @@ export const operators: Operator[] = [
     phone: '+63 917 123 4567',
     email: 'hello@manilappb.com',
     operatingHours: '6:00 AM - 11:00 PM',
-    image: 'https://images.unsplash.com/photo-1761644273884-83839f8f22e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwaWNrbGViYWxsJTIwZmFjaWxpdHklMjBpbmRvb3J8ZW58MXx8fHwxNzY2MTMwNTQ0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    profileImage: 'https://images.unsplash.com/photo-1706025090996-63717544be2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMGFzaWFufGVufDF8fHx8MTc2NjM4MjQ1MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1761644273884-83839f8f22e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwaWNrbGViYWxsJTIwZmFjaWxpdHklMjBpbmRvb3J8ZW58MXx8fHwxNzY2MTM3MDI5fDA&ixlib=rb-4.1.0&q=60&w=640&utm_source=figma&utm_medium=referral',
+    profileImage: 'https://images.unsplash.com/photo-1706025090996-63717544be2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMGFzaWFufGVufDF8fHx8MTc2NjM5Mzc1Mnww&ixlib=rb-4.1.0&q=60&w=256&utm_source=figma&utm_medium=referral',
     coordinates: {
       lat: 14.5515,
       lng: 121.0491
@@ -125,8 +125,8 @@ export const operators: Operator[] = [
     phone: '+63 928 345 6789',
     email: 'contact@davaobadminton.ph',
     operatingHours: '7:00 AM - 10:00 PM',
-    image: 'https://images.unsplash.com/photo-1726035165266-90169b3896b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWRtaW50b24lMjBjZW50ZXIlMjBidWlsZGluZ3xlbnwxfHx8fDE3NjYxMzA1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    profileImage: 'https://images.unsplash.com/photo-1758887261865-a2b89c0f7ac5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMG93bmVyJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzY2MzgyNDUxfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1726035165266-90169b3896b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWRtaW50b24lMjBjZW50ZXIlMjBidWlsZGluZ3xlbnwxfHx8fDE3NjYxMzc1NTl8MA&ixlib=rb-4.1.0&q=60&w=640&utm_source=figma&utm_medium=referral',
+    profileImage: 'https://images.unsplash.com/photo-1758887261865-a2b89c0f7ac5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMG93bmVyJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzY2MzkyMjYyfDA&ixlib=rb-4.1.0&q=60&w=256&utm_source=figma&utm_medium=referral',
     coordinates: {
       lat: 7.0731,
       lng: 125.6128

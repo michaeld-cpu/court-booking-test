@@ -1,0 +1,1 @@
+import{a as t,r as a,v as n}from"./index-Dd6Szb5d.js";function r(){const e=t();return a.useEffect(()=>{n.warning("Payment cancelled",{description:"You cancelled the payment. Complete it from your bookings anytime."}),e("/bookings",{replace:!0})},[e]),null}export{r as PaymentCancelled};

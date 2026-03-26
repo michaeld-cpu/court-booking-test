@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { mockCourts, operators } from '../data/mockData'
 import { SearchBar } from '../components/SearchBar'
 import { Court, TimeSlot, Operator, CartItem } from '../types'
-import { BookingModal } from '../components/BookingModal'
+const BookingModal = React.lazy(() => import('../components/BookingModal').then(module => ({ default: module.BookingModal })))
 import { ImageWithFallback } from '../components/figma/ImageWithFallback'
 import { Card, CardContent } from '../components/ui/card'
 import {
@@ -22,7 +22,7 @@ import {
 import { toast } from '@/app/lib/toast'
 import { Icons } from '../components/ui/icons'
 import { CourtCard } from '../components/CourtCard'
-import { VenueMapView } from '../components/VenueMapView'
+const VenueMapView = React.lazy(() => import('../components/VenueMapView').then(module => ({ default: module.VenueMapView })))
 import { api } from '../lib/api'
 import { addDays, addHours, format, isSameDay } from 'date-fns'
 import { Button } from '../components/ui/button'
@@ -1429,7 +1429,7 @@ export function HomePage({
         {/* Title Card */}
         <div className="bg-[#0D1F35] rounded-[1rem] p-8 pb-10 flex flex-col space-y-2.5 relative overflow-hidden border border-white/5">
           {/* Subtle accent light */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#C8F542]/5 blur-[80px] rounded-full pointer-events-none" />
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#C8F542]/10 to-transparent rounded-full pointer-events-none" />
 
           <div className="text-[#C8F542] text-[10px] font-regular tracking-[0.25em] uppercase opacity-90">
             Book Your Game
@@ -1584,14 +1584,15 @@ export function HomePage({
       {/* Desktop Header Banner - Original Style */}
       <header
         className="hidden sm:flex relative z-0 flex-col overflow-hidden text-white sm:mx-0 mt-6 md:mt-8 min-[1300px]:mt-10 rounded-lg min-h-[350px]"
-        style={{
-          backgroundImage: `url(${bannerImages[currentImageIndex]})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
       >
+        <ImageWithFallback
+          src={bannerImages[currentImageIndex]}
+          alt="Banner"
+          className="absolute inset-0 w-full h-full object-cover"
+          priority
+        />
         {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-[#0F273A]/90 backdrop-blur-[4px]"></div>
+        <div className="absolute inset-0 bg-[#0F273A]/90 pointer-events-none"></div>
 
         {/* Top Content: Main Title & Text */}
         <div className="relative flex-1 flex flex-col justify-center items-center px-4 pt-10 pb-10 text-center">
@@ -1810,23 +1811,25 @@ export function HomePage({
               className="overflow-hidden rounded-none border-y border-x-0 border-gray-200 bg-white md:rounded-lg md:border md:shadow-sm"
               style={mobileMapHeight ? { height: `${mobileMapHeight}px` } : undefined}
             >
-              <VenueMapView
-                key={mobileMapHeight ? `mobile-map-${mobileMapHeight}` : 'map-default'}
-                center={mapCenter}
-                venues={operatorsWithCoordinates}
-                onCenterChange={handleMapCenterChange}
-                initialZoom={12}
-                heightClassName={mobileMapHeight ? 'h-full' : 'h-[320px] sm:h-[420px]'}
-                onVenueClick={(venue) => {
-                  handleOperatorClick(
-                    venue.operatorId,
-                    operatorById.get(venue.operatorId),
-                    displayedCourtsByOperator.find(
-                      (group) => group.operatorId === venue.operatorId,
-                    )?.courts,
-                  )
-                }}
-              />
+              <React.Suspense fallback={<div className={mobileMapHeight ? 'h-full bg-gray-100 animate-pulse' : 'h-[320px] sm:h-[420px] bg-gray-100 animate-pulse'} />}>
+                <VenueMapView
+                  key={mobileMapHeight ? `mobile-map-${mobileMapHeight}` : 'map-default'}
+                  center={mapCenter}
+                  venues={operatorsWithCoordinates}
+                  onCenterChange={handleMapCenterChange}
+                  initialZoom={12}
+                  heightClassName={mobileMapHeight ? 'h-full' : 'h-[320px] sm:h-[420px]'}
+                  onVenueClick={(venue) => {
+                    handleOperatorClick(
+                      venue.operatorId,
+                      operatorById.get(venue.operatorId),
+                      displayedCourtsByOperator.find(
+                        (group) => group.operatorId === venue.operatorId,
+                      )?.courts,
+                    )
+                  }}
+                />
+              </React.Suspense>
             </div>
 
 
@@ -2080,6 +2083,7 @@ export function HomePage({
                             ? 'blur-md scale-110'
                             : 'group-hover:scale-105'
                             }`}
+                          priority={index < 2}
                         />
 
                         {/* Gradient overlay for text readability */}
@@ -2092,14 +2096,14 @@ export function HomePage({
                         )}
                         <div className="absolute top-4 right-4 flex items-center gap-3">
                           <button
-                            className="bg-black/40 backdrop-blur-sm rounded-full p-2 flex items-center justify-center shadow-sm hover:bg-black/60 transition-colors"
+                            className="bg-black/70 rounded-full p-2 flex items-center justify-center shadow-sm hover:bg-black/80 transition-colors"
                             onClick={handleShareClick}
                             aria-label="Share"
                           >
                             <Share2 className="size-4 text-white" />
                           </button>
                           <button
-                            className="bg-black/40 backdrop-blur-sm rounded-full p-2 flex items-center justify-center shadow-sm hover:bg-black/60 transition-colors"
+                            className="bg-black/70 rounded-full p-2 flex items-center justify-center shadow-sm hover:bg-black/80 transition-colors"
                             onClick={(e) => {
                               e.stopPropagation()
                               onToggleBookmark(
@@ -2272,20 +2276,24 @@ export function HomePage({
       </section>
 
       {/* Booking Modal */}
-      <BookingModal
-        court={selectedCourt}
-        date={selectedDate}
-        timeFrom=""
-        timeTo=""
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        onConfirm={handleAddToCartFromModal}
-        onPayNow={handlePayNowFromModal}
-        onDateChange={handleBookingDateChange}
-        isLoadingSlots={isLoadingSlots}
-        hasPendingBookings={hasPendingBookings}
-        cartItems={cartItems}
-      />
+      <React.Suspense fallback={null}>
+        {isBookingModalOpen && selectedCourt && (
+          <BookingModal
+            court={selectedCourt}
+            date={selectedDate}
+            timeFrom=""
+            timeTo=""
+            isOpen={isBookingModalOpen}
+            onClose={() => setIsBookingModalOpen(false)}
+            onConfirm={handleAddToCartFromModal}
+            onPayNow={handlePayNowFromModal}
+            onDateChange={handleBookingDateChange}
+            isLoadingSlots={isLoadingSlots}
+            hasPendingBookings={hasPendingBookings}
+            cartItems={cartItems}
+          />
+        )}
+      </React.Suspense>
 
       <Dialog
         open={isLocationPromptOpen}

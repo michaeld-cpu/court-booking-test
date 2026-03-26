@@ -1,5 +1,5 @@
 export const LOCAL_VENUE_BANNERS = [
-  '/imgs/bannerbg.png',
+  '/imgs/bannerbg-optimized.jpg',
 ]
 
 const toSeedHash = (seed: string) => {

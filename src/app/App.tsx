@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
-import { OperatorPage } from './pages/OperatorPage';
-import { MyBookings } from './pages/MyBookings';
-import { MyBookmarks } from './pages/MyBookmarks';
-import { ContactUs } from './pages/ContactUs';
-import { TermsPage } from './pages/TermsPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { PaymentSuccess } from './pages/PaymentSuccess';
-import { PaymentFailed } from './pages/PaymentFailed';
-import { PaymentCancelled } from './pages/PaymentCancelled';
-import { NotFoundPage } from './pages/NotFoundPage';
-import { ServerErrorPage } from './pages/ServerErrorPage';
+const OperatorPage = React.lazy(() => import('./pages/OperatorPage').then(module => ({ default: module.OperatorPage })));
+const MyBookings = React.lazy(() => import('./pages/MyBookings').then(module => ({ default: module.MyBookings })));
+const MyBookmarks = React.lazy(() => import('./pages/MyBookmarks').then(module => ({ default: module.MyBookmarks })));
+const ContactUs = React.lazy(() => import('./pages/ContactUs').then(module => ({ default: module.ContactUs })));
+const TermsPage = React.lazy(() => import('./pages/TermsPage').then(module => ({ default: module.TermsPage })));
+const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage').then(module => ({ default: module.PrivacyPage })));
+const PaymentSuccess = React.lazy(() => import('./pages/PaymentSuccess').then(module => ({ default: module.PaymentSuccess })));
+const PaymentFailed = React.lazy(() => import('./pages/PaymentFailed').then(module => ({ default: module.PaymentFailed })));
+const PaymentCancelled = React.lazy(() => import('./pages/PaymentCancelled').then(module => ({ default: module.PaymentCancelled })));
+const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
+const ServerErrorPage = React.lazy(() => import('./pages/ServerErrorPage').then(module => ({ default: module.ServerErrorPage })));
+
 import { Cart } from './components/Cart';
 import { BookingSummaryModal } from './components/BookingSummaryModal';
 import { Footer } from './components/Footer';
@@ -809,34 +810,41 @@ export function AppContent() {
   }, [syncBookingIndicators]);
 
   return (
-      <div
-        className={`min-h-svh bg-gray-50 ${
-          isPaymentRoute || isLoginRequired
-            ? 'pb-0'
-            : 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0'
-        }`}
-      >
-        <Toaster />
-        
-        {/* Header */}
-        {!isPaymentRoute && (
-          <div className={isLoginRequired ? 'md:hidden' : ''}>
-            <Header 
-              cartCount={cartSlotCount} 
-              onCartClick={handleCartClick}
-              onLoginClick={() => setIsLoginModalOpen(true)}
-              hasPendingBookings={hasPendingBookings}
-              hasConfirmedBookings={hasConfirmedBookings}
-            />
-          </div>
-        )}
+    <div
+      className={`min-h-svh bg-gray-50 ${
+        isPaymentRoute || isLoginRequired
+          ? 'pb-0'
+          : 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0'
+      }`}
+    >
+      <Toaster />
 
-        <main className="mx-auto w-full max-w-[1300px] px-4 md:px-8">
+      {/* Header */}
+      {!isPaymentRoute && (
+        <div className={isLoginRequired ? 'md:hidden' : ''}>
+          <Header
+            cartCount={cartSlotCount}
+            onCartClick={handleCartClick}
+            onLoginClick={() => setIsLoginModalOpen(true)}
+            hasPendingBookings={hasPendingBookings}
+            hasConfirmedBookings={hasConfirmedBookings}
+          />
+        </div>
+      )}
+
+      <main className="mx-auto w-full max-w-[1300px] px-4 md:px-8">
+        <React.Suspense
+          fallback={
+            <div className="min-h-[60vh] flex items-center justify-center">
+              <div className="size-8 border-2 border-gray-200 border-t-[#C8F542] rounded-full animate-spin"></div>
+            </div>
+          }
+        >
           <Routes>
-            <Route 
-              path="/" 
+            <Route
+              path="/"
               element={
-                <HomePage 
+                <HomePage
                   onAddToCart={handleAddToCart}
                   onPayNow={handlePayNow}
                   bookmarkedOperatorIds={bookmarkedOperatorIds}
@@ -847,12 +855,12 @@ export function AppContent() {
                   hasPendingBookings={hasPendingBookings}
                   cartItems={cart}
                 />
-              } 
+              }
             />
-            <Route 
-              path="/operator/:operatorId" 
+            <Route
+              path="/operator/:operatorId"
               element={
-                <OperatorPage 
+                <OperatorPage
                   onAddToCart={handleAddToCart}
                   onPayNow={handlePayNow}
                   bookmarkedOperatorIds={bookmarkedOperatorIds}
@@ -861,12 +869,12 @@ export function AppContent() {
                   hasPendingBookings={hasPendingBookings}
                   cartItems={cart}
                 />
-              } 
+              }
             />
-            <Route 
-              path="/venue/:venueSlug" 
+            <Route
+              path="/venue/:venueSlug"
               element={
-                <OperatorPage 
+                <OperatorPage
                   onAddToCart={handleAddToCart}
                   onPayNow={handlePayNow}
                   bookmarkedOperatorIds={bookmarkedOperatorIds}
@@ -875,68 +883,64 @@ export function AppContent() {
                   hasPendingBookings={hasPendingBookings}
                   cartItems={cart}
                 />
-              } 
+              }
             />
-            <Route 
-              path="/bookings" 
+            <Route
+              path="/bookings"
               element={
                 <ProtectedRoute onLoginClick={() => setIsLoginModalOpen(true)}>
-                  <MyBookings 
+                  <MyBookings
                     bookings={bookings}
                     onBookingsSync={handleBookingsSync}
                   />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/bookmarks" 
+            <Route
+              path="/bookmarks"
               element={
                 <ProtectedRoute onLoginClick={() => setIsLoginModalOpen(true)}>
-                  <MyBookmarks 
+                  <MyBookmarks
                     bookmarkedOperatorIds={bookmarkedOperatorIds}
                     bookmarkedOperators={bookmarkedOperators}
                     onToggleBookmark={handleToggleBookmark}
                   />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/contact-us" 
-              element={
-                <ContactUs />
-              } 
+            <Route
+              path="/contact-us"
+              element={<ContactUs />}
             />
-            <Route 
-              path="/terms" 
-              element={
-                <TermsPage />
-              } 
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+
+            <Route
+              path="/payment/successful"
+              element={<PaymentSuccess />}
             />
-            <Route 
-              path="/privacy" 
-              element={
-                <PrivacyPage />
-              } 
-            />
-            <Route path="/payment/successful" element={<PaymentSuccess />} />
             <Route path="/payment/failed" element={<PaymentFailed />} />
             <Route path="/payment/cancelled" element={<PaymentCancelled />} />
-            <Route path="/__test/error-boundary" element={<ErrorBoundaryTestPage />} />
+            <Route
+              path="/__test/error-boundary"
+              element={<ErrorBoundaryTestPage />}
+            />
             <Route path="/500" element={<ServerErrorPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </main>
+        </React.Suspense>
+      </main>
 
-        {/* Cart */}
-        <Cart
-          items={cart}
-          isOpen={isCartOpen}
-          onClose={() => setIsCartOpen(false)}
-          onRemoveItem={handleRemoveFromCart}
-          onRemoveSlot={handleRemoveSlotFromCart}
-          onCheckout={handleCartProceed}
-          hasPendingBookings={hasPendingBookings}
-        />
+      {/* Cart */}
+      <Cart
+        items={cart}
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        onRemoveItem={handleRemoveFromCart}
+        onRemoveSlot={handleRemoveSlotFromCart}
+        onCheckout={handleCartProceed}
+        hasPendingBookings={hasPendingBookings}
+      />
 
         <BookingSummaryModal
           isOpen={isCartSummaryOpen}
