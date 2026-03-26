@@ -988,11 +988,13 @@ export function HomePage({
               const basePrice = Number(court.price) || 300
               const normalizedAvailableSlotCount =
                 Number(court.available_slots) ?? totalSlots
+              const purposeLabel = court.purpose ?? court.type ?? 'pickleball'
 
               mappedCourts.push({
                 id: String(court.id),
                 name: court.name ?? `Court ${court.id}`,
-                type: court.type ?? 'basketball',
+                type: court.type ?? purposeLabel,
+                purpose: purposeLabel,
                 operatorId,
                 operatorName,
                 location: normalizedAddress,
