@@ -68,7 +68,7 @@ export function Header({
 
   return (
     <header
-      className="bg-white border-b border-slate-200 sticky top-0 z-[1100] block"
+      className="bg-white fixed top-0 left-0 right-0 z-[2000] block w-full"
     >
       <div className="mx-auto w-full max-w-[1300px] px-4 md:px-8 py-3">
         <nav className="flex items-center justify-between h-14">
@@ -169,96 +169,102 @@ export function Header({
             {/* Hamburger Menu Button - Mobile Only */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-slate-600 hover:text-slate-900 p-2.5 -mr-2 bg-slate-50 rounded-full transition-colors active:bg-slate-100"
+              className="md:hidden flex items-center justify-center size-10 rounded-full bg-white transition-all active:scale-95 border border-slate-100/50"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <Icons.close className="size-6" />
+                <Icons.close className="size-5 text-slate-900" />
               ) : (
-                <Icons.menu className="size-6" />
+                <Icons.menu className="size-5 text-slate-900" />
               )}
             </button>
           </div>
         </nav>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-slate-100 mt-4 py-4">
-            <div className="flex flex-col space-y-1">
-              {navigationLinks.map(({ to, icon: Icon, label }) => (
+          <div className="md:hidden absolute top-[68px] right-4 w-[220px] bg-white rounded-[1rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100/50 z-[1200] overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+            <div className="flex flex-col">
+              {/* Profile Section (Visible if logged in) */}
+              {isAuthenticated && (
+                <div className="p-4.5 flex items-center gap-2.5 border-b border-slate-50">
+                  <div className="size-9 rounded-full bg-gray-900 text-white flex items-center justify-center font-semibold text-sm shrink-0">
+                    {user?.name?.charAt(0) || mobileNumber?.charAt(0) || 'M'}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-semibold text-slate-900 truncate leading-tight text-[13px]">
+                      {user?.name || 'User'}
+                    </div>
+                    <div className="text-[10px] text-slate-500 truncate mt-0.5">
+                      @{user?.name?.toLowerCase().replace(/\s+/g, '') || 'user'}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-1 px-1.5 py-2 flex flex-col gap-1.5">
                 <Link
-                  key={to}
-                  to={to}
-                  onClick={(event) => {
-                    handleNavClick(event, to);
+                  to="/"
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-4 px-3.5 py-2.5 rounded-xl text-slate-900 hover:bg-slate-50 transition-colors"
+                >
+                  <Icons.court className="size-[18px] text-slate-900" strokeWidth={1.5} />
+                  <span className="font-semibold text-[13px]">Courts</span>
+                </Link>
+
+                <Link
+                  to="/bookings"
+                  onClick={(e) => {
+                    handleNavClick(e, '/bookings');
                     handleLinkClick();
                   }}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-semibold ${isActive(to)
-                    ? 'text-slate-900 bg-slate-100/80'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                    }`}
+                  className="flex items-center gap-4 px-3.5 py-2.5 rounded-xl text-slate-900 hover:bg-slate-50 transition-colors"
                 >
-                  <span className="relative">
-                    <Icon className="size-[20px]" strokeWidth={2.5} />
-                    {to === '/bookings' && (hasPendingBookings || hasConfirmedBookings) && (
-                      <span
-                        className={`absolute -top-1 -left-1 size-2 rounded-full ring-2 ring-white ${hasPendingBookings ? 'bg-red-500' : 'bg-emerald-500'
-                          }`}
-                      />
+                  <div className="relative">
+                    <Icons.booking className="size-[18px] text-slate-900" strokeWidth={1.5} />
+                    {(hasPendingBookings || hasConfirmedBookings) && (
+                      <span className={`absolute -top-0.5 -right-0.5 size-1.5 rounded-full ring-[1.5px] ring-white ${hasPendingBookings ? 'bg-red-500' : 'bg-emerald-500'}`} />
                     )}
-                  </span>
-                  <span>{label}</span>
+                  </div>
+                  <span className="font-semibold text-[13px]">My Bookings</span>
                 </Link>
-              ))}
 
-              {/* Cart in Mobile Menu */}
-              <button
-                onClick={() => {
-                  onCartClick();
-                  handleLinkClick();
-                }}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 w-full text-left"
-              >
-                <div className="relative">
-                  <Icons.cart className="size-[18px]" strokeWidth={2.5} />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[#C8F542] text-black font-extrabold rounded-full min-w-[16px] h-[16px] flex items-center justify-center text-[10px] px-0.5">
-                      {cartCount}
-                    </span>
-                  )}
-                </div>
-                <span>Cart</span>
-              </button>
+                <Link
+                  to="/bookmarks"
+                  onClick={(e) => {
+                    handleNavClick(e, '/bookmarks');
+                    handleLinkClick();
+                  }}
+                  className="flex items-center gap-4 px-3.5 py-2.5 rounded-xl text-slate-900 hover:bg-slate-50 transition-colors"
+                >
+                  <Icons.save className="size-[18px] text-slate-900" strokeWidth={1.5} />
+                  <span className="font-semibold text-[13px]">Saved</span>
+                </Link>
+              </div>
 
-              {/* Auth in Mobile Menu */}
-              <div className="border-t border-slate-100 pt-3 mt-3 px-2">
+              {/* Action Section */}
+              <div className="border-t border-slate-100 p-1 px-1.5 py-2 bg-slate-50/30 flex flex-col gap-0.5">
                 {isAuthenticated ? (
-                  <>
-                    <div className="px-3 py-3 text-sm text-slate-500 bg-slate-50 rounded-xl mb-2">
-                      {user?.name && <div className="font-semibold text-slate-900 mb-1">{user.name}</div>}
-                      <div>{mobileNumber}</div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        handleLinkClick();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors font-semibold"
-                    >
-                      <Icons.logout className="size-[20px]" strokeWidth={2.5} />
-                      <span>Logout</span>
-                    </button>
-                  </>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      handleLinkClick();
+                    }}
+                    className="w-full flex items-center gap-4 px-3.5 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Icons.logout className="size-[18px] rotate-180" strokeWidth={1.5} />
+                    <span className="font-semibold text-[13px]">Sign Out</span>
+                  </button>
                 ) : (
                   <button
                     onClick={() => {
                       onLoginClick();
                       handleLinkClick();
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors font-semibold"
+                    className="w-full flex items-center gap-4 px-3.5 py-2.5 rounded-xl text-slate-900 hover:bg-slate-50 transition-colors"
                   >
-                    <Icons.user className="size-[20px]" strokeWidth={2.5} />
-                    <span>Login</span>
+                    <Icons.user className="size-[18px] text-slate-900" strokeWidth={1.5} />
+                    <span className="font-semibold text-[13px]">Login</span>
                   </button>
                 )}
               </div>

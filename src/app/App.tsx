@@ -811,7 +811,7 @@ export function AppContent() {
 
   return (
     <div
-      className="min-h-dvh flex flex-col bg-gray-50 overflow-x-hidden"
+      className="min-h-dvh flex flex-col bg-gray-50 pt-[72px] md:pt-[80px]"
     >
       <Toaster />
 
