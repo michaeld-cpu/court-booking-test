@@ -81,7 +81,7 @@ export function Header({
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center"
             >
-              <Icons.logo className="h-8 md:h-9 w-auto text-slate-900" />
+              <Icons.logo className="h-10 md:h-10 w-auto text-slate-900" />
             </Link>
 
             {/* Desktop Navigation links */}
