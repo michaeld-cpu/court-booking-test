@@ -79,12 +79,9 @@ export function Header({
             <Link
               to="/"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3"
+              className="flex items-center"
             >
-              {/* Logo SVG Placeholder */}
-              <div className="w-35 h-35 flex items-center justify-center text-slate-800">
-                <Icons.logo />
-              </div>
+              <Icons.logo className="h-8 md:h-9 w-auto text-slate-900" />
             </Link>
 
             {/* Desktop Navigation links */}
