@@ -2223,7 +2223,7 @@ export function HomePage({
           <div className="flex-1 p-8 md:p-12 lg:p-14 space-y-8">
             <div className="space-y-4">
               <h2
-                className="text-4xl md:text-5xl lg:text-5xl font-bold text-white leading-none uppercase font-bebas"
+                className="text-5xl md:text-5xl lg:text-5xl font-bold text-white leading-none uppercase font-bebas"
                 style={{ letterSpacing: '0.02em' }}
               >
                 Are you a court operator?
@@ -2254,7 +2254,7 @@ export function HomePage({
           <div className="w-full md:w-[320px] bg-[#C8F542] py-12 px-6 md:p-10 flex flex-col items-center justify-center text-center relative overflow-hidden group">
             <div className="relative w-full max-w-[180px] sm:max-w-[200px] flex flex-col items-center">
               <div className="relative w-[140px] sm:w-[160px] aspect-[4/5] border border-black/30 rounded-[1rem] p-1 pt-4 sm:pt-5 flex flex-col items-center justify-start bg-transparent transition-transform">
-                <div className="text-6xl sm:text-7xl font-bold text-black leading-none font-bebas">
+                <div className="text-7xl sm:text-7xl font-bold text-black leading-none font-bebas">
                   40+
                 </div>
                 {/* Label */}
