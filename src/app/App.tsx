@@ -18,7 +18,7 @@ import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { LoginModal } from './components/LoginModal';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { BottomNav } from './components/BottomNav';
+
 import { AppErrorBoundary } from './components/AppErrorBoundary';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { mockCourts } from './data/mockData';
@@ -981,17 +981,7 @@ export function AppContent() {
           </div>
         )}
 
-        {!isPaymentRoute && !isLoginRequired && isAuthenticated && (
-          <BottomNav
-            cartCount={cartSlotCount}
-            isCartOpen={isCartOpen}
-            onCartClick={handleCartClick}
-            onLoginClick={() => setIsLoginModalOpen(true)}
-            onMenuClick={() => setIsCartOpen(false)}
-            hasPendingBookings={hasPendingBookings}
-            hasConfirmedBookings={hasConfirmedBookings}
-          />
-        )}
+
       </div>
   );
 }

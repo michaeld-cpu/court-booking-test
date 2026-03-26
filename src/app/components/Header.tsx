@@ -68,12 +68,7 @@ export function Header({
 
   return (
     <header
-      className={`bg-white border-b border-slate-200 sticky top-0 z-[1100] ${isAuthenticated
-        ? location.pathname === '/'
-          ? 'block md:block'
-          : 'hidden md:block'
-        : 'block'
-        }`}
+      className="bg-white border-b border-slate-200 sticky top-0 z-[1100] block"
     >
       <div className="mx-auto w-full max-w-[1300px] px-4 md:px-8 py-3">
         <nav className="flex items-center justify-between h-14">

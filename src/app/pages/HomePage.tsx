@@ -283,7 +283,7 @@ export function HomePage({
   const [isLoadingSlots, setIsLoadingSlots] = useState(false)
   const [isDesktopDatePickerOpen, setIsDesktopDatePickerOpen] = useState(false)
   const [isMobileDatePickerOpen, setIsMobileDatePickerOpen] = useState(false)
-  const [isMobileFilterPinned, setIsMobileFilterPinned] = useState(false)
+
   const [isLocationPromptOpen, setIsLocationPromptOpen] = useState(false)
   const [mobileMapHeight, setMobileMapHeight] = useState<number | null>(null)
   const [availableLocations, setAvailableLocations] = useState<
@@ -326,8 +326,7 @@ export function HomePage({
     courtType: 'courtbook_selected_court_type',
   }
   const mapViewportRef = useRef<HTMLDivElement | null>(null)
-  const mobileFilterSentinelRef = useRef<HTMLDivElement | null>(null)
-  const mobileFilterScrollRef = useRef<HTMLDivElement | null>(null)
+
   const hasHydratedInitialAvailabilityRef = useRef(false)
 
   useEffect(() => {
@@ -416,25 +415,7 @@ export function HomePage({
     }
   }, [viewMode, viewModeStorageKey])
 
-  useEffect(() => {
-    const sentinel = mobileFilterSentinelRef.current
-    if (!sentinel) return
 
-    if (window.innerWidth >= 640) {
-      setIsMobileFilterPinned(false)
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsMobileFilterPinned(!entry.isIntersecting)
-      },
-      { threshold: 0 }
-    )
-
-    observer.observe(sentinel)
-    return () => observer.disconnect()
-  }, [])
 
   const getVenueBannerUrl = (venue: any, preferOptimized: boolean) => {
     const banner = venue?.banner ?? venue?.image ?? venue?.images?.[0]
@@ -1443,9 +1424,166 @@ export function HomePage({
 
   return (
     <>
-      {/* Header Banner */}
+      {/* Mobile Header Banner - Layered Variant */}
+      <header className="flex sm:hidden flex-col -mx-4 px-4 pt-2 pb-6 space-y-4">
+        {/* Title Card */}
+        <div className="bg-[#0D1F35] rounded-[1rem] p-8 pb-10 flex flex-col space-y-2.5 relative overflow-hidden border border-white/5">
+          {/* Subtle accent light */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#C8F542]/5 blur-[80px] rounded-full pointer-events-none" />
+
+          <div className="text-[#C8F542] text-[10px] font-regular tracking-[0.25em] uppercase opacity-90">
+            Book Your Game
+          </div>
+          <h1
+            className="text-[50px] font-medium leading-[0.95] text-white tracking-wide"
+            style={{
+              fontFamily: 'Bebas Neue, sans-serif',
+              letterSpacing: '0.02em',
+            }}
+          >
+            FIND YOUR <span className="text-[#C8F542]">COURT</span>
+          </h1>
+          <p className="text-gray-400 text-[13px] leading-relaxed font-regular"
+            style={{ fontFamily: 'DM sans, sans-serif' }}>
+            Browse and book courts near you. Play pickleball, badminton, tennis and more access the Philippines.
+          </p>
+        </div>
+
+        {/* Filter Card */}
+        <div className="bg-white rounded-[1rem] shadow-sm sm:shadow-md border border-gray-200 overflow-hidden divide-y divide-gray-50">
+          {/* Filter 1: City */}
+          <div className="flex items-center gap-4 p-5 py-4.5 hover:bg-gray-50/50 transition-colors">
+            <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
+              <MapPin className="size-5 text-gray-500" />
+            </div>
+            <div className="flex-1 flex flex-col items-start min-w-0">
+              <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider mb-0.5">Location</span>
+              <Select
+                value={selectedCity}
+                onValueChange={(value) => {
+                  if (value === 'Current Location') {
+                    requestUserLocation(undefined, {
+                      fallbackToDumaguete: false,
+                      showPromptOnError: true,
+                    })
+                    return
+                  }
+                  setSelectedCity(value)
+                  if (value === 'All Locations') {
+                    setSelectedLocationCoords(null)
+                    setHasUserLocation(false)
+                    setUserLocation(null)
+                    setIsLocationResolved(true);
+                    return
+                  }
+                  const selectedLocation = availableLocations.find(
+                    (location) => location.name === value,
+                  )
+                  if (selectedLocation) {
+                    setSelectedLocationCoords({
+                      lat: Number(selectedLocation.latitude),
+                      lng: Number(selectedLocation.longitude),
+                    })
+                    setHasUserLocation(false)
+                    setIsLocationResolved(true)
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full h-auto p-0 border-0 bg-transparent text-gray-900 text-[15px] font-medium shadow-none focus:ring-0 [&>svg]:hidden text-left truncate">
+                  <SelectValue placeholder="Select city" />
+                </SelectTrigger>
+                <SelectContent className="z-[1400]">
+                  <SelectItem value="Current Location">
+                    {hasUserLocation
+                      ? 'Current Location'
+                      : 'Current Location'}
+                  </SelectItem>
+                  {availableLocations.map((location) => (
+                    <SelectItem key={location.name} value={location.name}>
+                      {location.description || location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <ChevronDown className="size-5 text-gray-300" />
+          </div>
+
+          {/* Filter 2: Date */}
+          <div className="flex items-center gap-4 p-5 py-4.5 hover:bg-gray-50/50 transition-colors">
+            <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
+              <Calendar className="size-5 text-gray-500" />
+            </div>
+            <div className="flex-1 flex flex-col items-start min-w-0">
+              <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Date</span>
+              <Popover
+                open={isMobileDatePickerOpen}
+                onOpenChange={setIsMobileDatePickerOpen}
+              >
+                <PopoverTrigger asChild>
+                  <button className="w-full text-left text-gray-900 text-[15px] font-medium truncate">
+                    {isSameDay(selectedDate, new Date()) ? 'Today' : format(selectedDate, 'MMM d')}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="z-[1400] w-auto p-0"
+                  align="start"
+                >
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => {
+                      if (!date) return
+                      setSelectedDate(date)
+                      setIsMobileDatePickerOpen(false)
+                    }}
+                    disabled={{ before: new Date() }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <ChevronDown className="size-5 text-gray-300" />
+          </div>
+
+          {/* Filter 3: Court Type */}
+          <div className="flex items-center gap-4 p-5 py-4.5 hover:bg-gray-50/50 transition-colors">
+            <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
+              <LayoutGrid className="size-5 text-gray-500" />
+            </div>
+            <div className="flex-1 flex flex-col items-start min-w-0">
+              <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider mb-0.5">Court Type</span>
+              <Select
+                value={selectedCourtType}
+                onValueChange={setSelectedCourtType}
+              >
+                <SelectTrigger className="w-full h-auto p-0 border-0 bg-transparent text-gray-900 text-[15px] font-medium shadow-none focus:ring-0 [&>svg]:hidden text-left truncate">
+                  <SelectValue placeholder="Select court type" />
+                </SelectTrigger>
+                <SelectContent className="z-[1400]">
+                  <SelectItem value="All Courts">All Courts</SelectItem>
+                  {Array.from(
+                    new Set(
+                      availableCourts.map(
+                        (court) => court.purpose ?? court.type ?? 'Others',
+                      ),
+                    ),
+                  ).map((purpose) => (
+                    <SelectItem key={purpose} value={purpose}>
+                      {purpose.charAt(0).toUpperCase() + purpose.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <ChevronDown className="size-5 text-gray-300" />
+          </div>
+        </div>
+      </header>
+
+      {/* Desktop Header Banner - Original Style */}
       <header
-        className="relative z-0 flex flex-col overflow-hidden text-white -mx-4 sm:mx-0 mt-0 sm:mt-6 md:mt-8 min-[1300px]:mt-10 rounded-none sm:rounded-lg min-h-[280px] sm:min-h-[350px] md:min-h-[350px]"
+        className="hidden sm:flex relative z-0 flex-col overflow-hidden text-white sm:mx-0 mt-6 md:mt-8 min-[1300px]:mt-10 rounded-lg min-h-[350px]"
         style={{
           backgroundImage: `url(${bannerImages[currentImageIndex]})`,
           backgroundSize: 'cover',
@@ -1456,16 +1594,16 @@ export function HomePage({
         <div className="absolute inset-0 bg-[#0F273A]/90 backdrop-blur-[4px]"></div>
 
         {/* Top Content: Main Title & Text */}
-        <div className="relative flex-1 flex flex-col justify-center items-center px-4 pt-8 sm:pt-10 pb-6 sm:pb-10 text-center">
-          <div className="w-full max-w-3xl space-y-3 sm:space-y-4">
+        <div className="relative flex-1 flex flex-col justify-center items-center px-4 pt-10 pb-10 text-center">
+          <div className="w-full max-w-3xl space-y-4">
             {/* Pre-title */}
-            <div className="text-[#C8F542] text-[10px] sm:text-xs md:text-sm font-regular tracking-[0.2em] uppercase mb-1 sm:mb-2 px-2 sm:p-4">
+            <div className="text-[#C8F542] text-xs md:text-sm font-regular tracking-[0.2em] uppercase mb-2 p-4">
               Book Your Game
             </div>
 
             {/* Title */}
             <h1
-              className="text-3xl sm:text-5xl md:text-7xl lg:text-[80px] font-bold text-white drop-shadow-md leading-none"
+              className="text-5xl md:text-7xl lg:text-[80px] font-bold text-white drop-shadow-md leading-none"
               style={{
                 fontFamily: 'Bebas Neue, sans-serif',
                 letterSpacing: '0.02em',
@@ -1475,7 +1613,7 @@ export function HomePage({
             </h1>
 
             {/* Subtitle */}
-            <p className="text-gray-300 text-xs sm:text-sm md:text-base lg:text-md max-w-xl mx-auto font-regular mt-2 sm:mt-4 px-4 sm:px-0"
+            <p className="text-gray-300 text-sm md:text-base lg:text-md max-w-xl mx-auto font-regular mt-4 px-0"
               style={{
                 fontFamily: 'DM sans, sans-serif',
                 letterSpacing: '0.02em',
@@ -1487,10 +1625,10 @@ export function HomePage({
         </div>
 
         {/* Bottom Content: Search Bar and Filters */}
-        <div className="relative w-full bg-[#0D2032]/80 backdrop-blur-md border-t border-white/5 py-3 sm:py-5">
+        <div className="relative w-full bg-[#0D2032]/80 backdrop-blur-md border-t border-white/5 py-5">
           <div className="flex items-center justify-center max-w-md mx-auto divide-x divide-white/10 px-2">
             {/* Filter 1: City */}
-            <div className="flex-1 px-1 sm:px-2">
+            <div className="flex-1 px-2">
               <Select
                 value={selectedCity}
                 onValueChange={(value) => {
@@ -1522,9 +1660,9 @@ export function HomePage({
                   }
                 }}
               >
-                <SelectTrigger className="w-full h-auto py-1 border-0 bg-transparent text-gray-200 hover:text-white px-1 sm:px-2 gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shadow-none focus:ring-0 [&>svg]:opacity-50">
-                  <span className="flex items-center gap-1.5 sm:gap-2 flex-1">
-                    <MapPin className="size-3.5 sm:size-4 text-[#C8F542]" />
+                <SelectTrigger className="w-full h-auto py-1 border-0 bg-transparent text-gray-200 hover:text-white px-2 gap-2 text-sm font-medium shadow-none focus:ring-0 [&>svg]:opacity-50">
+                  <span className="flex items-center gap-2 flex-1">
+                    <MapPin className="size-4 text-[#C8F542]" />
                     <SelectValue placeholder="Select city" />
                   </span>
                 </SelectTrigger>
@@ -1544,7 +1682,7 @@ export function HomePage({
             </div>
 
             {/* Filter 2: Date */}
-            <div className="flex-1 px-1 sm:px-2">
+            <div className="flex-1 px-2">
               <Popover
                 open={isDesktopDatePickerOpen}
                 onOpenChange={setIsDesktopDatePickerOpen}
@@ -1552,11 +1690,11 @@ export function HomePage({
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-full h-auto py-1 justify-start rounded-none border-0 bg-transparent hover:bg-transparent px-1 sm:px-2 text-xs sm:text-sm font-medium text-gray-200 hover:text-white focus:ring-0"
+                    className="w-full h-auto py-1 justify-start rounded-none border-0 bg-transparent hover:bg-transparent px-2 text-sm font-medium text-gray-200 hover:text-white focus:ring-0"
                   >
-                    <Calendar className="size-3.5 sm:size-4 text-[#C8F542] mr-1.5 sm:mr-2" />
+                    <Calendar className="size-4 text-[#C8F542] mr-2" />
                     <span className="truncate">{renderDateLabel(selectedDate)}</span>
-                    <ChevronDown className="ml-auto size-3.5 sm:size-4 opacity-50" />
+                    <ChevronDown className="ml-auto size-4 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
@@ -1579,14 +1717,14 @@ export function HomePage({
             </div>
 
             {/* Filter 3: Court Type */}
-            <div className="flex-1 px-1 sm:px-2">
+            <div className="flex-1 px-2">
               <Select
                 value={selectedCourtType}
                 onValueChange={setSelectedCourtType}
               >
-                <SelectTrigger className="w-full h-auto py-1 border-0 bg-transparent text-gray-200 hover:text-white px-1 sm:px-2 gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shadow-none focus:ring-0 [&>svg]:opacity-50">
-                  <span className="flex items-center gap-1.5 sm:gap-2 flex-1">
-                    <LayoutGrid className="size-3.5 sm:size-4 text-[#C8F542]" />
+                <SelectTrigger className="w-full h-auto py-1 border-0 bg-transparent text-gray-200 hover:text-white px-2 gap-2 text-sm font-medium shadow-none focus:ring-0 [&>svg]:opacity-50">
+                  <span className="flex items-center gap-2 flex-1">
+                    <LayoutGrid className="size-4 text-[#C8F542]" />
                     <SelectValue placeholder="Select court type" />
                   </span>
                 </SelectTrigger>
@@ -1610,161 +1748,6 @@ export function HomePage({
         </div>
       </header>
 
-      <div ref={mobileFilterSentinelRef} className="h-px sm:hidden" aria-hidden="true" />
-
-      <section
-        className={`sticky top-0 z-[1100] px-0 py-3 backdrop-blur-sm sm:hidden overflow-visible border-b ${isMobileFilterPinned
-          ? 'border-neutral-800 bg-neutral-950/95'
-          : 'border-gray-200 bg-gradient-to-b from-gray-100/95 to-white/95'
-          }`}
-      >
-        <div className="w-full">
-          <div
-            ref={mobileFilterScrollRef}
-            className="flex items-center gap-3 overflow-x-auto px-5 pr-12 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-          >
-            <Select
-              value={selectedCity}
-              onValueChange={(value) => {
-                if (value === 'Current Location') {
-                  requestUserLocation(undefined, {
-                    fallbackToDumaguete: false,
-                    showPromptOnError: true,
-                  })
-                  return
-                }
-                setSelectedCity(value)
-                if (value === 'All Locations') {
-                  setSelectedLocationCoords(null)
-                  setHasUserLocation(false)
-                  setUserLocation(null)
-                  setIsLocationResolved(true)
-                  return
-                }
-                const selectedLocation = availableLocations.find(
-                  (location) => location.name === value,
-                )
-                if (selectedLocation) {
-                  setSelectedLocationCoords({
-                    lat: Number(selectedLocation.latitude),
-                    lng: Number(selectedLocation.longitude),
-                  })
-                  setHasUserLocation(false)
-                  setIsLocationResolved(true)
-                }
-              }}
-            >
-              <SelectTrigger
-                className={`!h-10 !min-h-[40px] !max-h-[40px] !w-auto shrink-0 rounded-md border-0 px-1 text-sm font-medium shadow-none [&>svg]:hidden ${isMobileFilterPinned
-                  ? 'bg-transparent text-white'
-                  : 'bg-transparent text-gray-900'
-                  }`}
-              >
-                <span className="flex items-center gap-2">
-                  <MapPin
-                    className={`size-4 ${isMobileFilterPinned ? 'text-white/85' : 'text-gray-700'
-                      }`}
-                  />
-                  <SelectValue placeholder="Select city" />
-                </span>
-              </SelectTrigger>
-              <SelectContent className="z-[1400]">
-                <SelectItem value="Current Location">
-                  {hasUserLocation ? 'Current Location' : 'Current Location'}
-                </SelectItem>
-                {availableLocations.map((location) => (
-                  <SelectItem key={location.name} value={location.name}>
-                    {location.description || location.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Popover
-              open={isMobileDatePickerOpen}
-              onOpenChange={setIsMobileDatePickerOpen}
-            >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`!h-10 !min-h-[40px] !max-h-[40px] !w-auto shrink-0 justify-start rounded-md border-0 px-1 text-sm font-medium shadow-none ${isMobileFilterPinned
-                    ? 'bg-transparent text-white'
-                    : 'bg-transparent text-gray-900'
-                    }`}
-                >
-                  <Calendar
-                    className={`mr-0.5 size-4 ${isMobileFilterPinned ? 'text-white/85' : 'text-gray-700'
-                      }`}
-                  />
-                  <span className="truncate">{renderDateLabel(selectedDate)}</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="z-[1400] w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => {
-                    if (!date) return
-                    setSelectedDate(date)
-                    setIsMobileDatePickerOpen(false)
-                  }}
-                  disabled={{ before: new Date() }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
-            <Select
-              value={selectedCourtType}
-              onValueChange={setSelectedCourtType}
-            >
-              <SelectTrigger
-                className={`!h-10 !min-h-[40px] !max-h-[40px] !w-auto shrink-0 rounded-md border-0 px-1 text-sm font-medium shadow-none [&>svg]:hidden ${isMobileFilterPinned
-                  ? 'bg-transparent text-white'
-                  : 'bg-transparent text-gray-900'
-                  }`}
-              >
-                <span className="flex items-center gap-2">
-                  <LayoutGrid
-                    className={`size-4 ${isMobileFilterPinned ? 'text-white/85' : 'text-gray-700'
-                      }`}
-                  />
-                  <SelectValue placeholder="Select court type" />
-                </span>
-              </SelectTrigger>
-              <SelectContent className="z-[1400]">
-                <SelectItem value="All Courts">All Courts</SelectItem>
-                {Array.from(
-                  new Set(
-                    availableCourts.map(
-                      (court) => court.purpose ?? court.type ?? 'Others',
-                    ),
-                  ),
-                ).map((purpose) => (
-                  <SelectItem key={purpose} value={purpose}>
-                    {purpose.charAt(0).toUpperCase() + purpose.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-        </div>
-        <div
-          className={`pointer-events-none absolute inset-y-0 right-0 w-12 ${isMobileFilterPinned
-            ? 'bg-gradient-to-l from-neutral-950/95 to-transparent'
-            : 'bg-gradient-to-l from-white/95 to-transparent'
-            }`}
-          aria-hidden="true"
-        />
-        <div
-          className={`pointer-events-none absolute inset-y-0 left-0 w-12 ${isMobileFilterPinned
-            ? 'bg-gradient-to-r from-neutral-950/95 to-transparent'
-            : 'bg-gradient-to-r from-white/95 to-transparent'
-            }`}
-          aria-hidden="true"
-        />
-      </section>
 
       {/* Main Content */}
       <div className="pb-0 md:pb-1 pt-4.5 md:pt-10">
@@ -2226,7 +2209,7 @@ export function HomePage({
       >
         <div className="relative overflow-hidden rounded-2xl bg-[#0D2032] flex flex-col md:flex-row">
           <div className="absolute inset-0 pointer-events-none opacity-[0.08] z-0 flex items-center justify-center overflow-hidden">
-            <Icons.brandAccent className="w-[180%] md:w-full h-auto text-white scale-100 md:scale-[0.6] rotate-[-12deg] md:rotate-0 transition-transform duration-500" />
+            <Icons.brandAccent className="w-[180%] md:w-full h-auto text-white scale-100 md:scale-[0.6]transition-transform duration-500" />
           </div>
           {/* Left Content */}
           <div className="flex-1 p-8 md:p-12 lg:p-14 space-y-8">
