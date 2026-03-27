@@ -1286,14 +1286,38 @@ export function HomePage({
     if (distance < 0.0003) {
       return
     }
+
+    // Try to find the nearest operational city from availableLocations
+    let nearestCity = 'Current Location'
+    let minDistance = 0.05 // approx 5km threshold
+
+    if (availableLocations.length > 0) {
+      availableLocations.forEach((loc) => {
+        const d =
+          Math.abs(Number(loc.latitude) - next.lat) +
+          Math.abs(Number(loc.longitude) - next.lng)
+        if (d < minDistance) {
+          minDistance = d
+          nearestCity = loc.name
+        }
+      })
+    }
+
     setSelectedLocationCoords(next)
-    setSelectedCity('Current Location')
+    setSelectedCity(nearestCity)
     setHasUserLocation(false)
     setUserLocation({
       latitude: next.lat,
       longitude: next.lng,
     })
     setIsLocationResolved(true)
+  }
+
+  const handleRecenter = () => {
+    requestUserLocation(undefined, {
+      fallbackToDumaguete: true, // If GPS fails, at least go somewhere valid
+      showPromptOnError: true,
+    })
   }
 
   const fetchCourtSlots = async (court: Court, date: Date) => {
@@ -1825,6 +1849,7 @@ export function HomePage({
                   center={mapCenter}
                   venues={operatorsWithCoordinates}
                   onCenterChange={handleMapCenterChange}
+                  onRecenter={handleRecenter}
                   initialZoom={12}
                   heightClassName={mobileMapHeight ? 'h-full' : 'h-[320px] sm:h-[420px]'}
                   onVenueClick={(venue) => {
