@@ -130,14 +130,20 @@
 
   html,
   body {
-    height: 100%;
-    overflow-y: auto;
     position: relative;
   }
 
   body {
     @apply bg-background text-foreground;
     font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Completely prevent scrollbar from hiding globally to keep native behavior */
+  html body[data-scroll-locked] {
+    overflow-y: visible !important;
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+    pointer-events: auto !important;
   }
 
   /**

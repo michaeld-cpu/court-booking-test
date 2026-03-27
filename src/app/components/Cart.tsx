@@ -44,18 +44,17 @@ export function Cart({
   return (
     <>
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-x-0 top-0 bottom-[59px] md:bottom-0 bg-black/50 z-[1120]"
         onClick={onClose}
       />
-      
+
       {/* Cart Sidebar */}
       <div className="fixed right-0 top-0 bottom-[59px] md:bottom-0 w-full md:w-[400px] bg-[#f3f4f6] shadow-xl z-[1130] flex flex-col">
         {/* Header */}
         <div
-          className={`items-center justify-between gap-3 bg-neutral-950 px-6 py-4 text-white sm:py-5 md:py-4 border-b border-neutral-800 ${
-            items.length === 0 ? 'hidden md:flex' : 'flex'
-          }`}
+          className={`items-center justify-between gap-3 bg-neutral-950 px-6 py-4 text-white sm:py-5 md:py-4 border-b border-neutral-800 ${items.length === 0 ? 'hidden md:flex' : 'flex'
+            }`}
         >
           <h2
             className="text-xl font-semibold text-white"
@@ -110,7 +109,7 @@ export function Cart({
                     : [`${item.timeSlotFrom} - ${item.timeSlotTo}`];
                 const perSlotPrice =
                   slotLabels.length > 0 ? item.price / slotLabels.length : item.price;
-                
+
                 return (
                   <div key={item.id} className={itemCardClass}>
                     <div className="bg-white px-4 py-4 border-b border-gray-200">
@@ -190,8 +189,8 @@ export function Cart({
                 ₱{formatCurrency(totalPrice, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
-            <Button 
-              className="w-full" 
+            <Button
+              className="w-full"
               size="lg"
               onClick={onCheckout}
               disabled={hasPendingBookings}
