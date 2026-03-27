@@ -129,6 +129,14 @@ export function AppContent() {
   const [bookmarkedOperators, setBookmarkedOperators] = useState<Operator[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Close the cart on mobile when navigating, since it takes up the full screen
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsCartOpen(false);
+    }
+  }, [location.pathname]);
+
   const [isCartSummaryOpen, setIsCartSummaryOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -824,6 +832,7 @@ export function AppContent() {
             onLoginClick={() => setIsLoginModalOpen(true)}
             hasPendingBookings={hasPendingBookings}
             hasConfirmedBookings={hasConfirmedBookings}
+            onCloseCart={() => setIsCartOpen(false)}
           />
         </div>
       )}

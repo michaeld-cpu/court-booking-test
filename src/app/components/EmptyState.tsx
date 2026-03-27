@@ -2,7 +2,7 @@ import React from 'react';
 
 interface EmptyStateProps {
   icon: React.ReactNode;
-  title: string;
+  title: React.ReactNode;
   description: React.ReactNode;
   action?: React.ReactNode;
   wrapperClassName?: string;

@@ -45,12 +45,12 @@ export function Cart({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-x-0 top-0 bottom-[59px] md:bottom-0 bg-black/50 z-[1120]"
+        className="fixed inset-x-0 top-0 bottom-0 bg-black/50 z-[1120]"
         onClick={onClose}
       />
 
       {/* Cart Sidebar */}
-      <div className="fixed right-0 top-0 bottom-[59px] md:bottom-0 w-full md:w-[400px] bg-[#f3f4f6] shadow-xl z-[1130] flex flex-col">
+      <div className="fixed right-0 top-0 bottom-0 w-full md:w-[400px] bg-[#f3f4f6] shadow-xl z-[1130] flex flex-col">
         {/* Header */}
         <div
           className={`items-center justify-between gap-3 bg-neutral-950 px-6 py-4 text-white sm:py-5 md:py-4 border-b border-neutral-800 ${items.length === 0 ? 'hidden md:flex' : 'flex'
@@ -78,11 +78,15 @@ export function Cart({
             <EmptyState
               wrapperClassName="mt-6 min-h-full flex items-center justify-center py-0"
               icon={
-                <div className="rounded-full bg-amber-100 p-4">
-                  <ShoppingCart className="size-8 text-amber-600" />
+                <div className="rounded-full bg-[#E5E5E5] p-4">
+                  <ShoppingCart className="size-8 text-[#BEBEBE]" />
                 </div>
               }
-              title="No items in cart"
+              title={
+                <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontWeight: 'semibold', fontSize: '2rem' }}>
+                  No items in cart
+                </span>
+              }
               description={
                 <>
                   Add court slots to your cart <br />to continue checkout.
