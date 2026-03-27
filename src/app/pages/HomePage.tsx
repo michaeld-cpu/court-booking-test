@@ -1505,7 +1505,7 @@ export function HomePage({
                 <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
               </div>
             </SelectTrigger>
-            <SelectContent className="z-[3000]">
+            <SelectContent className="z-[1400]">
               <SelectItem value="Current Location">
                 {hasUserLocation
                   ? 'Current Location'
@@ -1539,7 +1539,7 @@ export function HomePage({
               </button>
             </PopoverTrigger>
             <PopoverContent
-              className="z-[3000] w-auto p-0"
+              className="z-[1400] w-auto p-0"
               align="end"
             >
               <CalendarComponent
@@ -1575,7 +1575,7 @@ export function HomePage({
                 <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
               </div>
             </SelectTrigger>
-            <SelectContent className="z-[3000]">
+            <SelectContent className="z-[1400]">
               <SelectItem value="All Courts">All Courts</SelectItem>
               {Array.from(
                 new Set(
@@ -1616,10 +1616,10 @@ export function HomePage({
 
             {/* Title */}
             <h1
-              className="text-6xl md:text-7xl lg:text-[90px] font-medium text-white drop-shadow-md leading-none"
+              className="text-5xl md:text-7xl lg:text-[80px] font-bold text-white drop-shadow-md leading-none"
               style={{
                 fontFamily: 'Bebas Neue, sans-serif',
-                letterSpacing: '-0.01em',
+                letterSpacing: '0.02em',
               }}
             >
               FIND YOUR <span className="text-[#C8F542]">COURT</span>
@@ -1679,7 +1679,7 @@ export function HomePage({
                     <SelectValue placeholder="Select city" />
                   </span>
                 </SelectTrigger>
-                <SelectContent className="z-[3000]">
+                <SelectContent className="z-[1400]">
                   <SelectItem value="Current Location">
                     {hasUserLocation
                       ? 'Current Location'
@@ -1711,7 +1711,7 @@ export function HomePage({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="z-[3000] w-auto p-0"
+                  className="z-[1400] w-auto p-0"
                   align="start"
                 >
                   <CalendarComponent
@@ -1741,7 +1741,7 @@ export function HomePage({
                     <SelectValue placeholder="Select court type" />
                   </span>
                 </SelectTrigger>
-                <SelectContent className="z-[3000]">
+                <SelectContent className="z-[1400]">
                   <SelectItem value="All Courts">All Courts</SelectItem>
                   {Array.from(
                     new Set(
@@ -2136,7 +2136,7 @@ export function HomePage({
                           <div className="min-w-0">
                             <div
                               className="line-clamp-1 text-3xl font-semibold uppercase tracking-tight text-white font-bebas"
-                              style={{
+                              style={{ 
                                 letterSpacing: '1px',
                                 textShadow: '0 2px 4px rgba(0,0,0,0.5)',
                                 fontFamily: "var(--font-bebas), 'Bebas Neue', 'Arial Black', sans-serif"
