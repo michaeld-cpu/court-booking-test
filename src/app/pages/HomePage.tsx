@@ -1029,14 +1029,10 @@ export function HomePage({
             }
           }
         } catch (apiError) {
-          // Fallback to mock data if API fails or returns nothing
-          console.warn('[HomePage] API fetch failed, using mock data fallback', apiError)
+          console.warn('[HomePage] API fetch failed or returned no data', apiError)
           if (isActive) {
-            const initialOperators = operators || []
-            const initialCourts = mockCourts || []
-
-            setAvailableOperators(initialOperators)
-            setAvailableCourts(initialCourts)
+            setAvailableOperators([])
+            setAvailableCourts([])
             setHasLoadedCourts(true)
           }
         }
@@ -1046,9 +1042,9 @@ export function HomePage({
         })
         if (isActive) {
           setHasLoadedCourts(true)
-          // Ensure we at least show mock data even on top-level crash
-          setAvailableOperators(operators || [])
-          setAvailableCourts(mockCourts || [])
+          // No fallback to mock data even on top-level crash
+          setAvailableOperators([])
+          setAvailableCourts([])
         }
       } finally {
         if (isActive) {
@@ -1505,7 +1501,7 @@ export function HomePage({
                 <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
               </div>
             </SelectTrigger>
-            <SelectContent className="z-[1400]">
+            <SelectContent className="z-[3000]">
               <SelectItem value="Current Location">
                 {hasUserLocation
                   ? 'Current Location'
@@ -1539,7 +1535,7 @@ export function HomePage({
               </button>
             </PopoverTrigger>
             <PopoverContent
-              className="z-[1400] w-auto p-0"
+              className="z-[3000] w-auto p-0"
               align="end"
             >
               <CalendarComponent
@@ -1575,7 +1571,7 @@ export function HomePage({
                 <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
               </div>
             </SelectTrigger>
-            <SelectContent className="z-[1400]">
+            <SelectContent className="z-[3000]">
               <SelectItem value="All Courts">All Courts</SelectItem>
               {Array.from(
                 new Set(
@@ -1616,10 +1612,10 @@ export function HomePage({
 
             {/* Title */}
             <h1
-              className="text-5xl md:text-7xl lg:text-[80px] font-bold text-white drop-shadow-md leading-none"
+              className="text-6xl md:text-7xl lg:text-[90px] font-medium text-white drop-shadow-md leading-none"
               style={{
                 fontFamily: 'Bebas Neue, sans-serif',
-                letterSpacing: '0.02em',
+                letterSpacing: '-0.01em',
               }}
             >
               FIND YOUR <span className="text-[#C8F542]">COURT</span>
@@ -1632,7 +1628,7 @@ export function HomePage({
                 letterSpacing: '0.02em',
               }}>
               Browse and book courts near you. Play pickleball, badminton,
-              tennis and more across the Negros Oriental.
+              tennis and more across the Philippines.
             </p>
           </div>
         </div>
@@ -1679,7 +1675,7 @@ export function HomePage({
                     <SelectValue placeholder="Select city" />
                   </span>
                 </SelectTrigger>
-                <SelectContent className="z-[1400]">
+                <SelectContent className="z-[3000]">
                   <SelectItem value="Current Location">
                     {hasUserLocation
                       ? 'Current Location'
@@ -1711,7 +1707,7 @@ export function HomePage({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="z-[1400] w-auto p-0"
+                  className="z-[3000] w-auto p-0"
                   align="start"
                 >
                   <CalendarComponent
@@ -1741,7 +1737,7 @@ export function HomePage({
                     <SelectValue placeholder="Select court type" />
                   </span>
                 </SelectTrigger>
-                <SelectContent className="z-[1400]">
+                <SelectContent className="z-[3000]">
                   <SelectItem value="All Courts">All Courts</SelectItem>
                   {Array.from(
                     new Set(
@@ -1765,50 +1761,50 @@ export function HomePage({
       {/* Main Content */}
       <div className="pb-0 md:pb-1 pt-4.5 md:pt-10">
         <div className="mb-4 md:mb-6 px-0 flex flex-row items-center justify-between">
-          {availableCourts.length > 0 ? (
-            <>
-              <h2 className="text-sm sm:text-base font-semibold">
-                {`${availableCourts.length} Court${availableCourts.length !== 1 ? 's' : ''}`}
-              </h2>
-              <div className="hidden md:flex items-center gap-1.5 bg-white border border-gray-100 pt-2 pb-2 shadow-sm p-1 rounded-lg">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('grid')}
-                  className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'grid'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-500 hover:bg-gray-100'
-                    }`}
-                  aria-label="Grid view"
-                >
-                  <PanelBottom className="size-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('list')}
-                  className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'list'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-500 hover:bg-gray-100'
-                    }`}
-                  aria-label="List view"
-                >
-                  <List className="size-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('map')}
-                  className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'map'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-500 hover:bg-gray-100'
-                    }`}
-                  aria-label="Map view"
-                >
-                  <MapIcon className="size-4" />
-                </button>
-              </div>
-            </>
-          ) : (
-            <>&nbsp;</>
-          )}
+          <>
+            <h2 className="text-sm sm:text-base font-semibold">
+              {hasLoadedCourts
+                ? (availableCourts.length > 0 || viewMode === 'map')
+                  ? `${availableCourts.length} Court${availableCourts.length !== 1 ? 's' : ''}`
+                  : <>&nbsp;</>
+                : 'Loading courts...'}
+            </h2>
+            <div className="hidden md:flex items-center gap-1.5 bg-white border border-gray-100 pt-2 pb-2 shadow-sm p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'grid'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                aria-label="Grid view"
+              >
+                <PanelBottom className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'list'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                aria-label="List view"
+              >
+                <List className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('map')}
+                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'map'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                aria-label="Map view"
+              >
+                <MapIcon className="size-4" />
+              </button>
+            </div>
+          </>
         </div>
 
         {viewMode === 'map' ? (
@@ -2136,7 +2132,7 @@ export function HomePage({
                           <div className="min-w-0">
                             <div
                               className="line-clamp-1 text-3xl font-semibold uppercase tracking-tight text-white font-bebas"
-                              style={{ 
+                              style={{
                                 letterSpacing: '1px',
                                 textShadow: '0 2px 4px rgba(0,0,0,0.5)',
                                 fontFamily: "var(--font-bebas), 'Bebas Neue', 'Arial Black', sans-serif"
