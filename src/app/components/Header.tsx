@@ -24,6 +24,7 @@ interface HeaderProps {
   onLoginClick: () => void;
   hasPendingBookings?: boolean;
   hasConfirmedBookings?: boolean;
+  onCloseCart?: () => void;
 }
 
 export function Header({
@@ -32,6 +33,7 @@ export function Header({
   onLoginClick,
   hasPendingBookings,
   hasConfirmedBookings,
+  onCloseCart,
 }: HeaderProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -64,6 +66,7 @@ export function Header({
 
   const handleLinkClick = () => {
     setIsMobileMenuOpen(false);
+    onCloseCart?.();
   };
 
   return (
@@ -240,6 +243,28 @@ export function Header({
                   <Icons.save className="size-[18px] text-slate-900" strokeWidth={1.5} />
                   <span className="font-semibold text-[13px]">Saved</span>
                 </Link>
+
+                <button
+                  onClick={() => {
+                    handleLinkClick();
+                    if (isAuthenticated) {
+                      onCartClick();
+                    } else {
+                      onLoginClick();
+                    }
+                  }}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-900 hover:bg-slate-50 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <Icons.cart className="size-[18px] text-slate-900" strokeWidth={1.5} />
+                    <span className="font-semibold text-[13px]">Cart</span>
+                  </div>
+                  {cartCount > 0 && (
+                    <span className="bg-[#C8F542] text-black font-extrabold rounded-full min-w-[20px] h-[20px] flex items-center justify-center text-[11px] px-1">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
               </div>
 
               {/* Action Section */}

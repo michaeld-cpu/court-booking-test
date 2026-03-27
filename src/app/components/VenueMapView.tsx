@@ -59,7 +59,7 @@ const loadGoogleMapsScript = (apiKey: string) => {
     document.body.appendChild(script)
   })
 
-  ;(window as any)[globalKey] = promise
+    ; (window as any)[globalKey] = promise
   return promise
 }
 
@@ -460,7 +460,7 @@ export function VenueMapView({
         safeInvalidateLeafletSize(leafletMapRef.current)
       }
       if (googleMapRef.current && (window as any).google?.maps) {
-        ;(window as any).google.maps.event.trigger(googleMapRef.current, 'resize')
+        ; (window as any).google.maps.event.trigger(googleMapRef.current, 'resize')
       }
     })
 
@@ -510,7 +510,7 @@ export function VenueMapView({
             e.stopPropagation()
             onRecenter()
           }}
-          className="absolute bottom-6 right-3 z-[1000] flex size-10 items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
+          className="absolute bottom-6 right-3 z-[1000] mb-2 flex size-10 items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
           aria-label="Recenter to my location"
         >
           <Locate className="size-5 text-gray-700" />

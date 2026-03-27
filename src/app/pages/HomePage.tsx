@@ -1288,7 +1288,7 @@ export function HomePage({
     }
 
     // Try to find the nearest operational city from availableLocations
-    let nearestCity = 'Current Location'
+    let nearestCity = `lat:${next.lat.toFixed(4)}, lng:${next.lng.toFixed(4)}`
     let minDistance = 0.05 // approx 5km threshold
 
     if (availableLocations.length > 0) {
@@ -1526,11 +1526,14 @@ export function HomePage({
               </div>
             </SelectTrigger>
             <SelectContent className="z-[3000]">
-              <SelectItem value="Current Location">
-                {hasUserLocation
-                  ? 'Current Location'
-                  : 'Current Location'}
-              </SelectItem>
+              {(!availableLocations.some((loc) => loc.name === selectedCity) &&
+                selectedCity !== 'All Locations') && (
+                  <SelectItem value={selectedCity.startsWith('lat:') ? selectedCity : 'Current Location'}>
+                    {selectedCity.startsWith('lat:')
+                      ? selectedCity
+                      : 'Current Location'}
+                  </SelectItem>
+                )}
               {availableLocations.map((location) => (
                 <SelectItem key={location.name} value={location.name}>
                   {location.description || location.name}
@@ -1700,11 +1703,14 @@ export function HomePage({
                   </span>
                 </SelectTrigger>
                 <SelectContent className="z-[3000]">
-                  <SelectItem value="Current Location">
-                    {hasUserLocation
-                      ? 'Current Location'
-                      : 'Current Location'}
-                  </SelectItem>
+                  {(!availableLocations.some((loc) => loc.name === selectedCity) &&
+                    selectedCity !== 'All Locations') && (
+                      <SelectItem value={selectedCity.startsWith('lat:') ? selectedCity : 'Current Location'}>
+                        {selectedCity.startsWith('lat:')
+                          ? selectedCity
+                          : 'Current Location'}
+                      </SelectItem>
+                    )}
                   {availableLocations.map((location) => (
                     <SelectItem key={location.name} value={location.name}>
                       {location.description || location.name}
