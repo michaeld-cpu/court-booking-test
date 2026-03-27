@@ -1029,14 +1029,10 @@ export function HomePage({
             }
           }
         } catch (apiError) {
-          // Fallback to mock data if API fails or returns nothing
-          console.warn('[HomePage] API fetch failed, using mock data fallback', apiError)
+          console.warn('[HomePage] API fetch failed or returned no data', apiError)
           if (isActive) {
-            const initialOperators = operators || []
-            const initialCourts = mockCourts || []
-
-            setAvailableOperators(initialOperators)
-            setAvailableCourts(initialCourts)
+            setAvailableOperators([])
+            setAvailableCourts([])
             setHasLoadedCourts(true)
           }
         }
@@ -1046,9 +1042,9 @@ export function HomePage({
         })
         if (isActive) {
           setHasLoadedCourts(true)
-          // Ensure we at least show mock data even on top-level crash
-          setAvailableOperators(operators || [])
-          setAvailableCourts(mockCourts || [])
+          // No fallback to mock data even on top-level crash
+          setAvailableOperators([])
+          setAvailableCourts([])
         }
       } finally {
         if (isActive) {
@@ -1290,14 +1286,38 @@ export function HomePage({
     if (distance < 0.0003) {
       return
     }
+
+    // Try to find the nearest operational city from availableLocations
+    let nearestCity = 'Current Location'
+    let minDistance = 0.05 // approx 5km threshold
+
+    if (availableLocations.length > 0) {
+      availableLocations.forEach((loc) => {
+        const d =
+          Math.abs(Number(loc.latitude) - next.lat) +
+          Math.abs(Number(loc.longitude) - next.lng)
+        if (d < minDistance) {
+          minDistance = d
+          nearestCity = loc.name
+        }
+      })
+    }
+
     setSelectedLocationCoords(next)
-    setSelectedCity('Current Location')
+    setSelectedCity(nearestCity)
     setHasUserLocation(false)
     setUserLocation({
       latitude: next.lat,
       longitude: next.lng,
     })
     setIsLocationResolved(true)
+  }
+
+  const handleRecenter = () => {
+    requestUserLocation(undefined, {
+      fallbackToDumaguete: true, // If GPS fails, at least go somewhere valid
+      showPromptOnError: true,
+    })
   }
 
   const fetchCourtSlots = async (court: Court, date: Date) => {
@@ -1632,7 +1652,7 @@ export function HomePage({
                 letterSpacing: '0.02em',
               }}>
               Browse and book courts near you. Play pickleball, badminton,
-              tennis and more across the Negros Oriental.
+              tennis and more across the Philippines.
             </p>
           </div>
         </div>
@@ -1765,50 +1785,50 @@ export function HomePage({
       {/* Main Content */}
       <div className="pb-0 md:pb-1 pt-4.5 md:pt-10">
         <div className="mb-4 md:mb-6 px-0 flex flex-row items-center justify-between">
-          {availableCourts.length > 0 ? (
-            <>
-              <h2 className="text-sm sm:text-base font-semibold">
-                {`${availableCourts.length} Court${availableCourts.length !== 1 ? 's' : ''}`}
-              </h2>
-              <div className="hidden md:flex items-center gap-1.5 bg-white border border-gray-100 pt-2 pb-2 shadow-sm p-1 rounded-lg">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('grid')}
-                  className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'grid'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-500 hover:bg-gray-100'
-                    }`}
-                  aria-label="Grid view"
-                >
-                  <PanelBottom className="size-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('list')}
-                  className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'list'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-500 hover:bg-gray-100'
-                    }`}
-                  aria-label="List view"
-                >
-                  <List className="size-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('map')}
-                  className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'map'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-500 hover:bg-gray-100'
-                    }`}
-                  aria-label="Map view"
-                >
-                  <MapIcon className="size-4" />
-                </button>
-              </div>
-            </>
-          ) : (
-            <>&nbsp;</>
-          )}
+          <>
+            <h2 className="text-sm sm:text-base font-semibold">
+              {hasLoadedCourts
+                ? (availableCourts.length > 0 || viewMode === 'map')
+                  ? `${availableCourts.length} Court${availableCourts.length !== 1 ? 's' : ''}`
+                  : <>&nbsp;</>
+                : 'Loading courts...'}
+            </h2>
+            <div className="hidden md:flex items-center gap-1.5 bg-white border border-gray-100 pt-2 pb-2 shadow-sm p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'grid'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                aria-label="Grid view"
+              >
+                <PanelBottom className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'list'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                aria-label="List view"
+              >
+                <List className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('map')}
+                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'map'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                aria-label="Map view"
+              >
+                <MapIcon className="size-4" />
+              </button>
+            </div>
+          </>
         </div>
 
         {viewMode === 'map' ? (
@@ -1829,6 +1849,7 @@ export function HomePage({
                   center={mapCenter}
                   venues={operatorsWithCoordinates}
                   onCenterChange={handleMapCenterChange}
+                  onRecenter={handleRecenter}
                   initialZoom={12}
                   heightClassName={mobileMapHeight ? 'h-full' : 'h-[320px] sm:h-[420px]'}
                   onVenueClick={(venue) => {

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { Locate } from 'lucide-react'
 import { toast } from '@/app/lib/toast'
 
 export interface VenueMapItem {
@@ -18,6 +19,7 @@ interface VenueMapViewProps {
   venues: VenueMapItem[]
   onCenterChange: (coords: { lat: number; lng: number }) => void
   onVenueClick: (venue: VenueMapItem) => void
+  onRecenter?: () => void
   heightClassName?: string
   showDragHint?: boolean
   initialZoom?: number
@@ -66,6 +68,7 @@ export function VenueMapView({
   venues,
   onCenterChange,
   onVenueClick,
+  onRecenter,
   heightClassName = 'h-[320px] sm:h-[420px]',
   showDragHint = true,
   initialZoom = 13,
@@ -499,6 +502,19 @@ export function VenueMapView({
         <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
           Drag map to update location and reload venues
         </div>
+      )}
+
+      {onRecenter && isMapReady && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onRecenter()
+          }}
+          className="absolute bottom-6 right-3 z-[1000] flex size-10 items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
+          aria-label="Recenter to my location"
+        >
+          <Locate className="size-5 text-gray-700" />
+        </button>
       )}
     </div>
   )

@@ -6,7 +6,7 @@ export const operators: Operator[] = [
     name: 'Dumaguete Sports Hub',
     location: 'Rizal Boulevard',
     city: 'Dumaguete City',
-    description: 'Premier sports facility in Dumaguete offering basketball, pickleball, and badminton courts. We provide top-notch facilities with excellent amenities for athletes and sports enthusiasts.',
+    description: 'Premier sports facility in Dumaguete offering professional pickleball courts. We provide top-notch facilities with excellent amenities for athletes and sports enthusiasts.',
     amenities: ['Parking', 'Restrooms', 'Water Station', 'Covered Courts', 'Equipment Rental', 'LED Lighting', 'Scoreboard', 'Locker Rooms'],
     rating: 4.8,
     phone: '+63 935 123 4567',
@@ -23,11 +23,32 @@ export const operators: Operator[] = [
       instagram: 'https://instagram.com/dumaguesportshub',
       twitter: 'https://twitter.com/dumaguesportshub'
     }
+  },
+  {
+    id: 'op5',
+    name: 'Manila Pickleball Hub',
+    location: 'BGC, Taguig',
+    city: 'Metro Manila',
+    description: 'Premium pickleball facility in BGC with multiple indoor courts, pro shop, and cafe. The ultimate destination for pickleball enthusiasts in Metro Manila.',
+    amenities: ['Indoor', '4 Courts', 'Parking', 'Pro Shop', 'Cafe', 'Locker Rooms', 'Equipment Rental', 'Air Conditioning'],
+    rating: 4.9,
+    phone: '+63 917 123 4567',
+    email: 'hello@manilappb.com',
+    operatingHours: '6:00 AM - 11:00 PM',
+    image: 'https://images.unsplash.com/photo-1761644273884-83839f8f22e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwaWNrbGViYWxsJTIwZmFjaWxpdHklMjBpbmRvb3J8ZW58MXx8fHwxNzY2MTM3MDI5fDA&ixlib=rb-4.1.0&q=60&w=640&utm_source=figma&utm_medium=referral',
+    profileImage: 'https://images.unsplash.com/photo-1706025090996-63717544be2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMGFzaWFufGVufDF8fHx8MTc2NjM5Mzc1Mnww&ixlib=rb-4.1.0&q=60&w=256&utm_source=figma&utm_medium=referral',
+    coordinates: {
+      lat: 14.5515,
+      lng: 121.0491
+    },
+    socialMedia: {
+      facebook: 'https://facebook.com/manilapickleballhub',
+      instagram: 'https://instagram.com/manilapickleballhub',
+      twitter: 'https://twitter.com/manilapickleballhub'
+    }
   }
 ];
-
 export const mockCourts: Court[] = [
-
   {
     id: '3',
     name: 'Court A',
@@ -81,7 +102,88 @@ export const mockCourts: Court[] = [
       { id: 's11', time: '06:00 PM', available: true, price: 350 },
       { id: 's12', time: '07:00 PM', available: true, price: 350 },
     ],
-  }
+  },
+  {
+    id: '10',
+    name: 'Court 1',
+    type: 'pickleball',
+    operatorId: 'op5',
+    operatorName: 'Manila Pickleball Hub',
+    location: 'BGC, Taguig',
+    city: 'Metro Manila',
+    image: 'pickleball court',
+    amenities: ['Indoor', '4 Courts', 'Parking', 'Pro Shop', 'Cafe'],
+    rating: 4.9,
+    pricePerHour: 450,
+    availableSlots: [
+      { id: 's1', time: '08:00 AM', available: true, price: 450 },
+      { id: 's2', time: '09:00 AM', available: true, price: 450 },
+      { id: 's3', time: '10:00 AM', available: true, price: 450 },
+      { id: 's4', time: '11:00 AM', available: true, price: 450 },
+      { id: 's5', time: '12:00 PM', available: true, price: 500 },
+      { id: 's6', time: '01:00 PM', available: false, price: 500 },
+      { id: 's7', time: '02:00 PM', available: true, price: 500 },
+      { id: 's8', time: '03:00 PM', available: true, price: 500 },
+      { id: 's9', time: '04:00 PM', available: true, price: 550 },
+      { id: 's10', time: '05:00 PM', available: true, price: 550 },
+      { id: 's11', time: '06:00 PM', available: true, price: 550 },
+      { id: 's12', time: '07:00 PM', available: true, price: 550 },
+    ],
+  },
+  {
+    id: '10b',
+    name: 'Court 2',
+    type: 'pickleball',
+    operatorId: 'op5',
+    operatorName: 'Manila Pickleball Hub',
+    location: 'BGC, Taguig',
+    city: 'Metro Manila',
+    image: 'pickleball court',
+    amenities: ['Indoor', 'Air Conditioning', 'Parking', 'Locker Rooms', 'Equipment Rental'],
+    rating: 4.8,
+    pricePerHour: 450,
+    availableSlots: [
+      { id: 's1', time: '08:00 AM', available: true, price: 450 },
+      { id: 's2', time: '09:00 AM', available: false, price: 450 },
+      { id: 's3', time: '10:00 AM', available: true, price: 450 },
+      { id: 's4', time: '11:00 AM', available: true, price: 450 },
+      { id: 's5', time: '12:00 PM', available: true, price: 500 },
+      { id: 's6', time: '01:00 PM', available: true, price: 500 },
+      { id: 's7', time: '02:00 PM', available: true, price: 500 },
+      { id: 's8', time: '03:00 PM', available: false, price: 500 },
+      { id: 's9', time: '04:00 PM', available: true, price: 550 },
+      { id: 's10', time: '05:00 PM', available: true, price: 550 },
+      { id: 's11', time: '06:00 PM', available: true, price: 550 },
+      { id: 's12', time: '07:00 PM', available: true, price: 550 },
+    ],
+  },
+  {
+    id: '10c',
+    name: 'Court 3',
+    type: 'pickleball',
+    operatorId: 'op5',
+    operatorName: 'Manila Pickleball Hub',
+    location: 'BGC, Taguig',
+    city: 'Metro Manila',
+    image: 'pickleball court',
+    amenities: ['Indoor', 'Air Conditioning', 'Parking', 'Pro Shop', 'Cafe'],
+    rating: 4.9,
+    pricePerHour: 450,
+    availableSlots: [
+      { id: 's1', time: '08:00 AM', available: true, price: 450 },
+      { id: 's2', time: '09:00 AM', available: true, price: 450 },
+      { id: 's3', time: '10:00 AM', available: false, price: 450 },
+      { id: 's4', time: '11:00 AM', available: true, price: 450 },
+      { id: 's5', time: '12:00 PM', available: true, price: 500 },
+      { id: 's6', time: '01:00 PM', available: true, price: 500 },
+      { id: 's7', time: '02:00 PM', available: true, price: 500 },
+      { id: 's8', time: '03:00 PM', available: true, price: 500 },
+      { id: 's9', time: '04:00 PM', available: false, price: 550 },
+      { id: 's10', time: '05:00 PM', available: true, price: 550 },
+      { id: 's11', time: '06:00 PM', available: true, price: 550 },
+      { id: 's12', time: '07:00 PM', available: true, price: 550 },
+    ],
+  },
 ];
 
-export const cities = ['Dumaguete City'];
+export const cities = ['Dumaguete City', 'Metro Manila'];
