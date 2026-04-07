@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { operators } from '../data/mockData';
+import { mockCourts, operators } from '../data/mockData';
 import { Card } from '../components/ui/card';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
-import { Bookmark, ChevronRight, ListFilter, MapPin, Share2 } from 'lucide-react';
+import { ArrowUpRight, Bookmark, ChevronRight, ListFilter, MapPin, Share2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Operator } from '../types';
+import { Operator, Court } from '../types';
 import {
   Select,
   SelectContent,
@@ -42,6 +42,32 @@ export function MyBookmarks({
   };
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<'date_added' | 'name'>(getStoredSortBy);
+  const [cachedCourts, setCachedCourts] = useState<Court[]>([]);
+
+  useEffect(() => {
+    try {
+      const courtsMap = new Map<string, Court>();
+      const AVAILABILITY_CACHE_KEY_PREFIX = 'courtbook_home_availability:';
+      
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key?.startsWith(AVAILABILITY_CACHE_KEY_PREFIX)) {
+          const raw = sessionStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed?.courts)) {
+              parsed.courts.forEach((court: Court) => {
+                courtsMap.set(court.id, court);
+              });
+            }
+          }
+        }
+      }
+      setCachedCourts(Array.from(courtsMap.values()));
+    } catch (e) {
+      console.error('Failed to load cached courts in MyBookmarks', e);
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -144,131 +170,131 @@ export function MyBookmarks({
 
   if (resolvedBookmarkedOperators.length === 0) {
     return (
-      <EmptyState
-        icon={
-          <div className="rounded-full bg-blue-100 p-4">
-            <Bookmark className="size-8 text-blue-600" />
+      <div className="mx-auto flex min-h-[70vh] w-full max-w-[1300px] flex-col items-center justify-center px-4 md:px-0">
+        <Card className="flex w-full max-w-5xl flex-col items-center justify-center bg-white p-10 md:p-16 text-center border-gray-100 shadow-sm rounded-xl">
+          <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100/80">
+            <Bookmark className="size-8 text-gray-400" />
           </div>
-        }
-        title="No saved venues yet"
-        description={
-          <>
-            Save your favorite venues by<br />clicking the bookmark icon.
-          </>
-        }
-        action={
-          <Button asChild className="w-full sm:w-auto">
-            <Link to="/">Browse Courts</Link>
+          <h2 className="mb-0 text-3xl font-bold font-bebas uppercase tracking-widest text-gray-900">
+            No Saved Venues
+          </h2>
+          <p className="mb-4 max-w-sm text-sm font-medium leading-relaxed text-gray-500">
+            Tap the bookmark icon on any venue to save it<br className="hidden sm:block" /> here for quick access later.
+          </p>
+          <Button
+            asChild
+            className="h-12 rounded-full bg-[#C8F542] px-8 text-sm font-bold text-gray-900 hover:bg-[#b8e33b] shadow-sm transition-all"
+          >
+            <Link to="/" className="flex items-center gap-2">
+              Browse Courts
+              <ArrowUpRight className="size-4" />
+            </Link>
           </Button>
-        }
-      />
+        </Card>
+      </div>
     );
   }
 
   return (
-    <div className="pt-0 md:pt-4 pb-0 md:pb-8 min-h-svh">
-      <div className="mb-0 md:mb-3 flex items-center justify-between gap-3 py-4 sm:py-5 md:py-2 lg:py-2 bg-neutral-900 text-white sm:px-0 sm:bg-transparent sm:text-inherit">
-        <h1
-          className="text-xl md:text-2xl font-semibold text-white sm:text-inherit font-alegreya"
-          style={{ letterSpacing: '0.02em' }}
-        >
+    <div className="pt-4 md:pt-4 pb-0 md:pb-8 min-h-svh">
+      <div className="mx-auto w-full max-w-[1300px] mb-6 flex items-center justify-between px-4 md:px-0 py-2 border-b border-gray-100 sm:border-none">
+        <h1 className="text-2xl md:text-3xl font-bold font-bebas uppercase tracking-wide text-gray-900">
           Saved
         </h1>
-        <Select
-          value={sortBy}
-          onValueChange={(value: 'date_added' | 'name') => setSortBy(value)}
-        >
-          <SelectTrigger className="size-10 shrink-0 justify-center rounded-full border border-white/20 bg-transparent p-0 text-white shadow-none [&>svg]:hidden sm:h-9 sm:w-fit sm:min-w-0 sm:justify-end sm:rounded-md sm:border sm:border-border sm:bg-transparent sm:px-3 sm:text-sm sm:text-secondary-foreground sm:hover:bg-secondary/80">
-            <span className="inline-flex items-center justify-center sm:hidden">
-              <ListFilter className="size-4 text-white/85" />
-            </span>
-            <span className="hidden items-center justify-end gap-1.5 whitespace-nowrap sm:flex">
-              <ListFilter className="mr-1 size-3.5 text-muted-foreground" />
-              <SelectValue />
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="date_added">
-              Date Added
-            </SelectItem>
-            <SelectItem value="name">
-              Name
-            </SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
-        {sortedBookmarkedOperators.map((operator, index) => (
-          <Card
-            key={operator.id}
-            className={`overflow-hidden border-0 sm:border rounded-none sm:rounded-lg flex flex-col gap-0 shadow-sm hover:shadow-lg transition-shadow ${
-              index === sortedBookmarkedOperators.length - 1
-                ? 'mb-3 md:mb-0'
-                : ''
-            }`}
-          >
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => handleOperatorClick(operator)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  handleOperatorClick(operator)
-                }
-              }}
-              className="relative h-42 sm:h-45 lg:h-50 overflow-hidden cursor-pointer group"
-            >
-              <ImageWithFallback
-                src={resolveVenueBannerUrl(operator.image, operator.id)}
-                alt={operator.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute top-3 right-3 flex items-center gap-2">
-                <button
-                  className="bg-black/60 backdrop-blur-sm rounded-full p-2 flex items-center justify-center shadow-md hover:bg-black/70 transition-colors"
-                  onClick={(event) => void handleShareClick(event, operator)}
-                  aria-label="Share"
-                >
-                  <Share2 className="size-4 text-white" />
-                </button>
-                <button
-                  className="bg-black/60 backdrop-blur-sm rounded-full p-2 flex items-center justify-center shadow-md hover:bg-black/70 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onToggleBookmark(operator.id, operator)
-                  }}
-                  aria-label="Bookmark"
-                >
-                  <Bookmark className="size-4 fill-yellow-400 text-yellow-400" />
-                </button>
-              </div>
-            </div>
+      <div className="mx-auto w-full max-w-[1300px] px-4 md:px-0 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {sortedBookmarkedOperators.map((operator) => {
+          const venuesCourts = [
+            ...mockCourts.filter((c: Court) => c.operatorId === operator.id),
+            ...cachedCourts.filter((c: Court) => c.operatorId === operator.id)
+          ];
+          
+          // Use a Map to deduplicate courts by ID in case they exist in both mock and cache
+          const uniqueCourts = Array.from(
+            venuesCourts.reduce((map, court) => map.set(court.id, court), new Map<string, Court>()).values()
+          );
 
-            <div className="bg-gradient-to-b from-gray-100 to-white px-6 pt-4 pb-2.5">
-              <button
-                onClick={() => handleOperatorClick(operator)}
-                className="flex w-full min-w-0 items-center justify-between gap-2 text-left transition-colors hover:text-blue-600"
-              >
-                <div className="min-w-0">
-                  <div
-                    className="truncate text-lg md:text-xl font-semibold font-alegreya"
-                  >
-                    {operator.name}
+          const courtsCount = uniqueCourts.length;
+          const minPrice = uniqueCourts.length > 0 
+            ? Math.min(...uniqueCourts.map((c: Court) => c.pricePerHour))
+            : 0;
+          
+          const isCovered = operator.amenities?.some(a => 
+            a.toLowerCase().includes('covered') || a.toLowerCase().includes('indoor')
+          );
+
+          return (
+            <Card
+              key={operator.id}
+              onClick={() => handleOperatorClick(operator)}
+              className="group cursor-pointer overflow-hidden border-gray-100 bg-white shadow-sm transition-all hover:shadow-md rounded-xl"
+            >
+              <div className="relative aspect-[16/9] w-full overflow-hidden">
+                <ImageWithFallback
+                  src={resolveVenueBannerUrl(operator.image, operator.id)}
+                  alt={operator.name}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 transition-opacity" />
+                
+                {isCovered && (
+                  <div className="absolute top-4 left-4">
+                    <div className="bg-[#C8F542] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#000000]">
+                      Covered
+                    </div>
                   </div>
-                  <div className="mb-2 mt-1 flex items-center gap-1">
-                    <MapPin className="size-3.5 flex-shrink-0 text-gray-500" />
-                    <p className="truncate text-left text-xs text-gray-600">
+                )}
+
+                <div className="absolute top-4 right-4 flex items-center gap-2">
+                  <button
+                    className="flex size-9 items-center justify-center rounded-full bg-black/30 backdrop-blur-md text-white transition-all hover:bg-black/50"
+                    onClick={(event) => void handleShareClick(event, operator)}
+                  >
+                    <Share2 className="size-4" />
+                  </button>
+                  <button
+                    className="flex size-9 items-center justify-center rounded-full bg-black/30 backdrop-blur-md text-[#C8F542] transition-all hover:bg-black/50"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onToggleBookmark(operator.id, operator)
+                    }}
+                  >
+                    <Bookmark className="size-4 fill-current" />
+                  </button>
+                </div>
+
+                <div className="absolute bottom-5 left-5 right-5">
+                  <h3 className="mb-1 text-2xl font-bold font-bebas uppercase tracking-wider text-white">
+                    {operator.name}
+                  </h3>
+                  <div className="flex items-center gap-1 text-white/90">
+                    <MapPin className="size-3 text-[#C8F542]" />
+                    <p className="truncate text-[10px] font-medium uppercase tracking-wider">
                       {operator.location}
                     </p>
                   </div>
                 </div>
-                <ChevronRight className="size-4 shrink-0 text-gray-500 -mr-1" />
-              </button>
-            </div>
-          </Card>
-        ))}
+              </div>
+
+              <div className="flex items-center justify-between px-5 py-3.5">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    {courtsCount} {courtsCount === 1 ? 'Court' : 'Courts'} Available
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-bold text-gray-400 capitalize">From</span>
+                    <span className="text-base font-bold text-gray-900">₱{minPrice}</span>
+                    <span className="text-[11px] font-bold text-gray-500">/hr</span>
+                  </div>
+                </div>
+                <div className="flex size-10 items-center justify-center rounded-full bg-black text-white transition-all group-hover:bg-[#C8F542] group-hover:text-black">
+                  <ChevronRight className="size-5 transform rotate-[-45deg]" />
+                </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   )

@@ -13,6 +13,7 @@ import { Court, TimeSlot } from '../types';
 import { format, isSameDay, parse } from 'date-fns';
 import type { CartItem } from '../types';
 import { DynamicClock } from './DynamicClock';
+import { Icons } from './ui/icons';
 import { BookingSummaryModal } from './BookingSummaryModal';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar as CalendarComponent } from './ui/calendar';
@@ -525,7 +526,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
     <>
       <Dialog open={isOpen && !isSummaryModalOpen} onOpenChange={handleClose}>
         <DialogContent
-          className="top-auto left-0 right-0 bottom-0 z-[1400] max-w-full translate-x-0 translate-y-0 rounded-t-2xl rounded-b-none border-0 p-5 pt-4 max-h-[92dvh] overflow-hidden flex flex-col data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom [&>[data-slot='dialog-close']]:hidden sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0 sm:[&>[data-slot='dialog-close']]:inline-flex sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto sm:max-w-lg sm:max-h-[90vh] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:p-6"
+          className="top-auto left-0 right-0 bottom-0 z-[1400] max-w-full translate-x-0 translate-y-0 rounded-t-2xl rounded-b-none border-0 p-0 !bg-gray-900 max-h-[80vh] overflow-hidden flex flex-col gap-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom [&>[data-slot='dialog-close']]:hidden sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0 sm:[&>[data-slot='dialog-close']]:inline-flex sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto sm:max-w-lg sm:max-h-[90vh] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:p-0"
           onTouchStart={handleSheetTouchStart}
           onTouchMove={handleSheetTouchMove}
           onTouchEnd={handleSheetTouchEnd}
@@ -540,35 +541,51 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
         >
           <div
             data-sheet-handle="true"
-            className="mx-auto mb-1.5 h-1.5 w-10 rounded-full bg-gray-300 touch-none sm:hidden"
+            className="mx-auto mt-3 mb-1.5 h-1.5 w-10 rounded-full bg-gray-500 touch-none sm:hidden shrink-0"
           />
-          <DialogHeader className="pb-4 border-b">
+          {/* Dark Header */}
+          <DialogHeader className="pb-5 pt-2 px-5 bg-gray-900 relative shrink-0">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="absolute top-4 right-4 flex items-center justify-center size-8 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors z-10"
+              aria-label="Close"
+            >
+              <X className="size-4" />
+            </button>
             <DialogTitle
-              className="md:text-2xl text-lg"
-              style={{ fontFamily: 'Alegreya Sans, sans-serif', letterSpacing: '0.02em' }}
+              className="md:text-2xl text-xl font-bold uppercase tracking-wide text-white pt-3"
+              style={{ fontFamily: "'Bebas Neue', 'Alegreya Sans', sans-serif", letterSpacing: '0.04em' }}
             >
               {court.operatorName}
             </DialogTitle>
             <DialogDescription className="sr-only">
               Select booking date and available time slots.
             </DialogDescription>
-            <div className="flex items-center justify-between -mt-2 gap-3">
-              <div className="min-w-0 text-sm text-gray-600">
-                <p className="truncate font-semibold">
+            <div className="flex items-center justify-between mt-2 gap-3">
+              <div className="min-w-0 flex items-center gap-1.5 text-sm text-white/70">
+                {court.purpose?.toLowerCase().includes('pickle') ? (
+                  <Icons.pickleball className="size-4 text-[#C8F542]" />
+                ) : (
+                  <DynamicClock time="12:00 PM" className="size-4 text-[#C8F542]" />
+                )}
+                <p className="truncate font-medium">
                   {(court.purpose ?? 'Others').charAt(0).toUpperCase() +
                     (court.purpose ?? 'Others').slice(1)} {court.name}
                 </p>
               </div>
-              <div className="flex items-center gap-2 shrink-0 text-sm text-gray-600">
-                <Calendar className="size-3.5" />
+              <div className="flex items-center gap-1.5 shrink-0">
                 <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1 bg-transparent text-sm transition-colors hover:text-gray-900"
+                      className="inline-flex items-center gap-1.5 rounded-md bg-white/10 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/20"
                     >
-                      {format(date, 'EEE, MMM dd, yyyy')}
-                      <ChevronDown className="size-3.5 text-gray-500" />
+                      <Calendar className="size-3.5 text-[#C8F542]" />
+                      {isSameDay(date, new Date())
+                        ? `Today – ${format(date, 'MMM dd, yyyy')}`
+                        : format(date, 'EEE, MMM dd, yyyy')}
+                      <ChevronDown className="size-3 text-white/60" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="z-[1500] w-auto p-0" align="end">
@@ -591,14 +608,10 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
 
           <div
             ref={scrollContainerRef}
-            className="flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-0 -my-4  mx-[-3px]"
+            className="flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-0 bg-white px-5 sm:px-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400"
           >
-              <div
-                className="pointer-events-none sticky top-0 -mb-6 h-4 bg-gradient-to-b from-white  to-transparent"
-                aria-hidden="true"
-              />
               {/* Time Range Selection */}
-              <div className="px-1 pt-6 pb-6">
+              <div className="pt-6 pb-6">
               {/* <div className="flex items-center justify-between mb-3"> */}
                 {/* <h4 className="font-semibold text-sm">Select Time Slots</h4> */}
                 {/* <button
@@ -614,7 +627,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                   isLoadingSlots ? 'opacity-45 pointer-events-none' : 'opacity-100'
                 }`}
               >
-                {(['', 'Morning', 'Afternoon', 'Evening'] as TimeGroup[]).map((group, groupIndex) => {
+                {(['Morning', 'Afternoon', 'Evening'] as TimeGroup[]).map((group, groupIndex) => {
                   const ranges = groupedTimeRanges[group];
                   if (ranges.length === 0) {
                     return null;
@@ -649,7 +662,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                             disabled={isLoadingSlots || (!range.available && !isAlreadyInCart)}
                               className={`w-full px-3 py-2 rounded-lg text-sm transition-all text-left ${
                               isSelected
-                                ? 'bg-blue-50 text-blue-700'
+                                ? 'bg-gray-900 text-white'
                                 : !range.available
                                 ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                                 : 'bg-gray-50 hover:bg-gray-100'
@@ -658,7 +671,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2 flex-1">
                                 {isSelected ? (
-                                  <Check className="size-4 flex-shrink-0 text-blue-600" />
+                                  <Check className="size-4 flex-shrink-0 text-white" />
                                 ) : (
                                   <DynamicClock time={range.startSlot.time} className="size-4 flex-shrink-0" />
                                 )}
@@ -674,16 +687,11 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                 })}
               </div>
               </div>
-              <div
-                className="pointer-events-none sticky bottom-0 -mt-6 h-6 bg-gradient-to-t from-white via-white/90 to-transparent"
-                aria-hidden="true"
-              />
           </div>
 
           {/* Sticky Booking Summary and Actions */}
           <div
-            className="bg-white space-y-3"
-        
+            className="bg-white space-y-3 px-5 pb-5 pt-3 sm:px-6 sm:pb-6 shrink-0"
           >
             {/* Booking Summary */}
             {bookingDetails ? (
@@ -728,16 +736,16 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                 <Button
                   onClick={handleConfirmBooking}
                   disabled={!bookingDetails}
-                  className="w-full gap-2"
+                  className="w-full h-12 gap-2 rounded-lg border-gray-300 text-sm font-semibold"
                   variant="outline"
                 >
                   <ShoppingCart className="size-4" />
-                  Add to Cart
+                  Add to cart
                 </Button>
                 <Button
                   onClick={handleOpenSummary}
                   disabled={!bookingDetails}
-                  className="w-full"
+                  className="w-full h-12 rounded-lg bg-gray-900 text-sm font-semibold hover:bg-gray-800"
                 >
                   Checkout
                 </Button>

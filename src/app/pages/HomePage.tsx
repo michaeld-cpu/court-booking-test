@@ -968,7 +968,7 @@ export function HomePage({
               description: venue.description || '',
               amenities: [
                 ...(venue.indoor ? ['Indoor'] : ['Outdoor']),
-                ...(venue.is_covered ? ['Covered'] : []),
+                ...(String(venue.is_covered ?? '').toLowerCase() === 'covered' ? ['Covered'] : []),
               ],
               rating: Number(venue.rating) || 4.5,
               phone: venue.phone || '',
@@ -977,7 +977,7 @@ export function HomePage({
               image: getVenueBannerUrl(venue, false),
               profileImage: venue.profile_image || '',
               coordinates: derivedCoordinates,
-              isCovered: venue.is_covered ? 'covered' : 'outdoor',
+              isCovered: venue.is_covered ?? undefined,
             }
             mappedOperators.push(operator)
 
@@ -2156,7 +2156,7 @@ export function HomePage({
                             aria-label="Bookmark"
                           >
                             <Bookmark
-                              className={`size-4 text-white ${bookmarkedOperatorIds.includes(operatorGroup.operatorId) ? 'fill-white' : ''}`}
+                              className={`size-4 ${bookmarkedOperatorIds.includes(operatorGroup.operatorId) ? 'fill-[#C8F542] text-[#C8F542]' : 'text-white'}`}
                             />
                           </button>
                         </div>
@@ -2240,7 +2240,7 @@ export function HomePage({
                             aria-label="Bookmark"
                           >
                             <Bookmark
-                              className={`size-5 ${bookmarkedOperatorIds.includes(operatorGroup.operatorId) ? 'fill-yellow-500 text-yellow-500' : 'text-gray-700'}`}
+                              className={`size-5 ${bookmarkedOperatorIds.includes(operatorGroup.operatorId) ? 'fill-[#C8F542] text-[#C8F542]' : 'text-gray-700'}`}
                             />
                           </button>
                         </div>

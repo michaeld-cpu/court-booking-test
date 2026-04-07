@@ -18,6 +18,7 @@ import {
   Check,
   Globe,
   ChevronDown,
+  X,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Icons } from '../components/ui/icons';
@@ -125,6 +126,7 @@ export function OperatorPage({
   const [preselectedTimeSlot, setPreselectedTimeSlot] = useState<string | null>(null);
   const [selectedSlots, setSelectedSlots] = useState<Record<string, Record<string, string[]>>>({});
   const [expandedCourtId, setExpandedCourtId] = useState<string | null>(null);
+  const [isFloatingExpanded, setIsFloatingExpanded] = useState(false);
   const selectionLimit = maxSlotSelection;
   const mobileDateBarRef = useRef<HTMLElement | null>(null);
   const mobileDateSentinelRef = useRef<HTMLDivElement | null>(null);
@@ -636,7 +638,12 @@ export function OperatorPage({
 
   const handleFloatingPanelClick = () => {
     if (!totals.hasSelections) return;
-    setIsSummaryModalOpen(true);
+    setIsFloatingExpanded((prev) => !prev);
+  };
+
+  const handleClearAllSlots = () => {
+    setSelectedSlots({});
+    setIsFloatingExpanded(false);
   };
 
   const handleSummaryConfirm = () => {
@@ -1145,7 +1152,7 @@ export function OperatorPage({
               aria-label="Bookmark"
             >
               <Bookmark
-                className={`size-5 ${bookmarkedOperatorIds.includes(operator.id) ? 'fill-yellow-400 text-yellow-400' : 'text-white'}`}
+                className={`size-5 ${bookmarkedOperatorIds.includes(operator.id) ? 'fill-[#C8F542] text-[#C8F542]' : 'text-white'}`}
               />
             </button>
           </div>
@@ -1624,24 +1631,100 @@ export function OperatorPage({
         </DialogContent>
       </Dialog>
 
-      {/* Floating Cart Pill */}
+      {/* Floating Cart Pill / Expanded Summary */}
       {totals.hasSelections && (
-        <button
-          onClick={handleFloatingPanelClick}
-          className="hidden md:flex fixed bottom-6 right-6 items-center gap-3 bg-gray-900 text-white rounded-full shadow-2xl pl-4 pr-3 py-3 hover:bg-gray-800 transition-all hover:scale-105 cursor-pointer z-50"
-        >
-          <div className="relative">
-            <Icons.cart className="size-5 text-white" />
-            <span className="absolute -top-2 -right-2 flex items-center justify-center size-4 rounded-full bg-[#C8E64A] text-[10px] font-bold text-gray-900">
-              {totals.totalHours}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-base font-bold">₱{formatCurrency(totals.totalPrice)}</span>
-            <span className="text-sm text-gray-300">{totals.totalHours} slot{totals.totalHours !== 1 ? 's' : ''} · View</span>
-          </div>
-          <ChevronDown className="size-4 text-gray-400 rotate-180" />
-        </button>
+        <div className="hidden md:flex flex-col items-end fixed bottom-6 right-6 z-50">
+          {/* Expanded Booking Summary */}
+          {isFloatingExpanded && (
+            <div className="mb-3 w-[380px] rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 bg-gray-900 rounded-t-2xl">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[15px] font-bold text-white" style={{ fontFamily: "'Alegreya Sans', sans-serif" }}>Booking Summary</span>
+                  <span className="flex items-center justify-center size-6 rounded-full bg-[#C8F542] text-[11px] font-bold text-gray-900">
+                    {totals.totalHours}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleClearAllSlots(); }}
+                    className="text-[13px] font-medium text-gray-400 hover:text-white transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    onClick={() => setIsFloatingExpanded(false)}
+                    className="p-0.5 text-gray-400 hover:text-white transition-colors"
+                  >
+                    <ChevronDown className="size-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Slot List */}
+              <div className="border-t border-gray-100 px-5 py-3 space-y-1 max-h-[240px] overflow-y-auto">
+                {(() => {
+                  const details = calculateBookingDetails();
+                  return details.bookingsByCourtAndDate.flatMap((group) =>
+                    group.ranges.map((range, rangeIdx) => (
+                      <div
+                        key={`${group.court.id}-${group.date}-${rangeIdx}`}
+                        className="flex items-center justify-between py-2"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center size-9 rounded-lg bg-gray-900">
+                            <Clock className="size-4 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">{range.label}</p>
+                            <p className="text-[11px] text-gray-500">
+                              {(group.court.purpose ?? group.court.type ?? 'Court').charAt(0).toUpperCase() + (group.court.purpose ?? group.court.type ?? 'Court').slice(1)} {group.court.name}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-sm font-bold text-gray-900">₱{formatCurrency(range.price)}</span>
+                      </div>
+                    ))
+                  );
+                })()}
+              </div>
+
+              {/* Footer: Total + Book */}
+              <div className="border-t border-gray-100 px-5 py-4 bg-gray-50/60 flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-medium text-gray-400">Total · {totals.totalHours} slot{totals.totalHours !== 1 ? 's' : ''}</p>
+                  <p className="text-lg font-bold text-gray-900">₱{formatCurrency(totals.totalPrice)}</p>
+                </div>
+                <button
+                  onClick={() => { setIsFloatingExpanded(false); setIsSummaryModalOpen(true); }}
+                  className="px-6 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  Book
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Collapsed Pill - hidden when expanded */}
+          {!isFloatingExpanded && (
+          <button
+            onClick={handleFloatingPanelClick}
+            className="flex items-center gap-3 bg-gray-900 text-white rounded-full shadow-2xl pl-4 pr-3 py-3 transition-all cursor-pointer"
+          >
+            <div className="relative flex items-center justify-center size-10 rounded-full bg-[#C8F542]">
+              <Icons.cart className="size-5 text-gray-900" />
+              <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center size-5 rounded-full bg-white ring-2 ring-gray-900 text-[10px] font-bold text-gray-900">
+                {totals.totalHours}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold">₱{formatCurrency(totals.totalPrice)}</span>
+              <span className="text-sm text-gray-400">{totals.totalHours} slot{totals.totalHours !== 1 ? 's' : ''} · View</span>
+            </div>
+            <ChevronDown className={`size-4 text-gray-400 transition-transform ${isFloatingExpanded ? '' : 'rotate-180'}`} />
+          </button>
+          )}
+        </div>
       )}
     </div>
   )
