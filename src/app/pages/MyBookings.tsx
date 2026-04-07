@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Booking } from '../types';
-import { Calendar, ChevronDown, Globe, ListFilter, Phone } from 'lucide-react';
+import { Calendar, ChevronDown, Globe, ListFilter, Phone, User, Clock, Share2, CheckCircle2, XCircle, PlayCircle, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '../components/ui/card';
 import { api } from '../lib/api';
@@ -105,6 +105,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   const [cancellingBookingId, setCancellingBookingId] = useState<string | null>(
     null,
   );
+  const [filterStatus, setFilterStatus] = useState<'all' | 'confirmed' | 'cancelled' | 'pending'>('all');
   const handledExpiredPendingKeysRef = useRef<Set<string>>(new Set());
 
   const normalizeAddress = (address?: string | null) => {
@@ -287,6 +288,24 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
     fetchBookings({ background: true });
   }, [displayBookings, now, fetchBookings]);
 
+  const getStatusMeta = (booking: Booking) => {
+    const normalizedStatus = (booking.status ?? 'pending')
+      .toString()
+      .toLowerCase();
+    const isPending = normalizedStatus === 'pending';
+    const isConfirmed = normalizedStatus === 'confirmed';
+    const isExpired =
+      isPending &&
+      !isConfirmed &&
+      Boolean(booking.expiresAfterTs) &&
+      new Date(booking.expiresAfterTs as string).getTime() + PENDING_COUNTDOWN_EXTENSION_MS < now;
+    const statusLabel = (isExpired ? 'expired' : normalizedStatus)
+      .toString()
+      .replace(/_/g, ' ')
+      .toLowerCase();
+    return { normalizedStatus, statusLabel };
+  };
+
   const getPlayDatesForBooking = (booking: Booking) => {
     const slotDates = booking.bookingCourts
       ?.flatMap((bookingCourt) => bookingCourt.slots ?? [])
@@ -334,28 +353,44 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   }, [displayBookings]);
 
   const filteredBookings = useMemo(() => {
-    if (!calendarRange) {
-      return displayBookings;
+    let result = displayBookings;
+
+    // Status Filter
+    if (filterStatus !== 'all') {
+      result = result.filter((booking) => {
+        const { statusLabel } = getStatusMeta(booking);
+        // Map 'cancelled' and 'expired' to 'cancelled' if that's what the user wants, 
+        // or keep them separate. The screenshot shows Cancelled.
+        if (filterStatus === 'cancelled') {
+          return statusLabel === 'cancelled' || statusLabel === 'expired';
+        }
+        return statusLabel === filterStatus;
+      });
     }
 
-    return displayBookings.filter((booking) => {
-      if (calendarMode === 'booking') {
-        const bookingDate = getBookingDateForBooking(booking);
-        if (!bookingDate) return false;
-        return (
-          bookingDate.getTime() >= calendarRange.from.getTime() &&
-          bookingDate.getTime() <= calendarRange.to.getTime()
-        );
-      }
+    // Calendar Range Filter
+    if (calendarRange) {
+      result = result.filter((booking) => {
+        if (calendarMode === 'booking') {
+          const bookingDate = getBookingDateForBooking(booking);
+          if (!bookingDate) return false;
+          return (
+            bookingDate.getTime() >= calendarRange.from.getTime() &&
+            bookingDate.getTime() <= calendarRange.to.getTime()
+          );
+        }
 
-      const playDates = getPlayDatesForBooking(booking);
-      return playDates.some(
-        (date) =>
-          date.getTime() >= calendarRange.from.getTime() &&
-          date.getTime() <= calendarRange.to.getTime(),
-      );
-    });
-  }, [displayBookings, calendarMode, calendarRange]);
+        const playDates = getPlayDatesForBooking(booking);
+        return playDates.some(
+          (date) =>
+            date.getTime() >= calendarRange.from.getTime() &&
+            date.getTime() <= calendarRange.to.getTime(),
+        );
+      });
+    }
+
+    return result;
+  }, [displayBookings, calendarMode, calendarRange, filterStatus, now]);
 
   useEffect(() => {
     if (filteredBookings.length === 0) {
@@ -445,24 +480,6 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
   const roundMinutesToNearestHour = (minutes: number) =>
     Math.round(minutes / 60) * 60;
-
-  const getStatusMeta = (booking: Booking) => {
-    const normalizedStatus = (booking.status ?? 'pending')
-      .toString()
-      .toLowerCase();
-    const isPending = normalizedStatus === 'pending';
-    const isConfirmed = normalizedStatus === 'confirmed';
-    const isExpired =
-      isPending &&
-      !isConfirmed &&
-      Boolean(booking.expiresAfterTs) &&
-      new Date(booking.expiresAfterTs as string).getTime() + PENDING_COUNTDOWN_EXTENSION_MS < now;
-    const statusLabel = (isExpired ? 'expired' : normalizedStatus)
-      .toString()
-      .replace(/_/g, ' ')
-      .toLowerCase();
-    return { normalizedStatus, statusLabel };
-  };
 
   const getBookingCalendarDateRange = (booking: Booking) => {
     const allSlots =
@@ -859,84 +876,61 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
   return (
     <div className="pt-0 md:pt-4 pb-0 md:pb-8 min-h-svh">
-      <div className="mb-0 md:mb-3 flex items-center justify-between gap-3 bg-neutral-900 px-6 pr-4 py-4 text-white sm:bg-transparent sm:px-0 sm:py-5 sm:text-inherit md:py-2 lg:py-2">
+      <div className="mx-auto w-full max-w-[1300px] mb-2 md:mb-6 flex items-center justify-between px-4 md:px-0 pt-6 pb-4 sm:py-5 md:py-2 border-b border-gray-100 sm:border-none">
         <h1
-          className="text-lg md:text-xl font-semibold font-alegreya"
-          style={{ letterSpacing: '0.02em' }}
+          className="text-2xl md:text-3xl font-bold font-bebas uppercase tracking-wide text-gray-900"
         >
-          Bookings
+          My Bookings
         </h1>
-        <Select
-          value={groupBy}
-          onValueChange={(value: 'booking_date' | 'status') => setGroupBy(value)}
-        >
-          <SelectTrigger className="size-10 shrink-0 justify-center rounded-full border border-white/20 bg-transparent p-0 text-white shadow-none [&>svg]:hidden sm:h-9 sm:w-fit sm:min-w-0 sm:justify-end sm:rounded-md sm:border sm:border-border sm:bg-transparent sm:px-3 sm:text-sm sm:text-secondary-foreground sm:hover:bg-secondary/80">
-            <span className="inline-flex items-center justify-center sm:hidden">
-              <ListFilter className="size-4 text-white/85" />
-            </span>
-            <span className="hidden items-center justify-end gap-1.5 whitespace-nowrap sm:flex">
-              <ListFilter className="mr-1 size-3.5 text-muted-foreground" />
-              <SelectValue />
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="booking_date">
-              Booking Date
-            </SelectItem>
-            <SelectItem value="status">
-              Status
-            </SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
-      <div className="mx-auto w-full max-w-[1300px] px-0 sm:px-0 md:px-0">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:items-start">
+      <div className="mx-auto w-full max-w-[1300px]">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:items-start">
           <aside className="hidden md:block order-2 md:order-1 md:col-span-1 md:sticky md:top-20">
-            <div className="rounded-none border border-gray-200 bg-white p-4 shadow-sm sm:rounded-lg">
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-gray-900">Calendar</p>
-                <div className="inline-flex rounded-md border border-gray-200 bg-gray-50 p-0.5">
+            <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:rounded-lg">
+              <div className="mb-4 flex items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Calendar</p>
+                <div className="inline-flex rounded-md border border-gray-100 bg-gray-50/50 p-0.5">
                   <button
                     type="button"
-                    className={`rounded px-2 py-1 text-[11px] font-medium ${
+                    className={`rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tight transition-all ${
                       calendarMode === 'booking'
                         ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500'
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     onClick={() => setCalendarMode('booking')}
                   >
-                    Booking Date
+                    Booking
                   </button>
                   <button
                     type="button"
-                    className={`rounded px-2 py-1 text-[11px] font-medium ${
+                    className={`rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tight transition-all ${
                       calendarMode === 'play'
                         ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500'
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     onClick={() => setCalendarMode('play')}
                   >
-                    Play Date
+                    Play
                   </button>
                 </div>
               </div>
               <div className="w-full">
-                <div className="mb-2 flex items-center justify-between">
+                <div className="mb-4 flex items-center justify-between">
                   <button
                     type="button"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                     onClick={() => setCalendarMonth((prev) => addMonths(prev, -1))}
                     aria-label="Previous month"
                   >
                     ‹
                   </button>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-bold text-gray-900">
                     {format(calendarMonth, 'MMMM yyyy')}
                   </p>
                   <button
                     type="button"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                     onClick={() => setCalendarMonth((prev) => addMonths(prev, 1))}
                     aria-label="Next month"
                   >
@@ -944,9 +938,9 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-medium text-gray-500">
+                <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold uppercase tracking-wider text-gray-400">
                   {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((label) => (
-                    <div key={label} className="py-1">
+                    <div key={label} className="py-2">
                       {label}
                     </div>
                   ))}
@@ -959,536 +953,300 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                     const isOutsideMonth = !isSameMonth(day, calendarMonth);
                     const isSelected =
                       selectedCalendarDay && isSameDay(day, selectedCalendarDay);
+                    const isToday = isSameDay(day, new Date());
 
                     return (
                       <button
                         key={key}
                         type="button"
                         onClick={() => handleCalendarSelect(day)}
-                        className={`relative inline-flex h-9 items-center justify-center rounded-md text-sm transition-colors ${
+                        className={`relative inline-flex h-10 items-center justify-center rounded-md text-sm font-medium transition-all ${
                           isSelected
-                            ? 'bg-gray-900 text-white'
+                            ? 'bg-black text-white shadow-md transform scale-105'
                             : isOutsideMonth
-                              ? 'text-gray-300 hover:bg-gray-50'
-                              : 'text-gray-700 hover:bg-gray-100'
-                        }`}
+                              ? 'text-gray-300 hover:text-gray-400'
+                              : 'text-gray-700 hover:bg-gray-50'
+                        } ${isToday && !isSelected ? 'text-blue-600 font-bold' : ''}`}
                       >
                         {format(day, 'd')}
-                        {hasBooking && (
+                        {hasBooking && !isSelected && (
                           <span
-                            className={`absolute bottom-1 h-1.5 w-1.5 rounded-full ${
-                              isSelected ? 'bg-white' : 'bg-blue-500'
-                            }`}
+                            className="absolute bottom-1.5 h-1 w-4 rounded-full bg-black/10"
                           />
+                        )}
+                        {isSelected && (
+                          <span className="sr-only">(Selected)</span>
                         )}
                       </button>
                     );
                   })}
                 </div>
+                {calendarRange && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full mt-4 text-[11px] font-bold uppercase tracking-wider text-gray-400 hover:text-gray-900"
+                    onClick={() => {
+                      setSelectedCalendarDay(undefined);
+                      setCalendarRange(null);
+                    }}
+                  >
+                    Clear Filter
+                  </Button>
+                )}
               </div>
             </div>
           </aside>
 
-      <div
-        className={`order-1 md:order-2 md:col-span-2 mx-auto grid w-full grid-cols-1 gap-3 md:gap-4 ${
-          groupBy === 'status' ? 'mt-3 md:mt-0' : ''
-        }`}
-      >
-        {groupedBookingSections.length === 0 && (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-white px-4 py-8 text-center text-sm text-gray-500">
-            No bookings found for the selected date filter.
-          </div>
-        )}
-        {groupedBookingSections.map((section) => (
-          <React.Fragment key={section.key}>
-            {section.label && (
-              <p className="px-5 md:px-0 text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
-                {section.label}
-              </p>
-            )}
-            {section.items.map(({ booking, index }) => {
-          const bookingDate = new Date(booking.date)
-          const { normalizedStatus, statusLabel } = getStatusMeta(booking)
-          const statusText =
-            statusLabel.charAt(0).toUpperCase() + statusLabel.slice(1)
-          const statusStyles: Record<string, string> = {
-            pending:
-              'bg-amber-500/20 text-amber-700 border-amber-500/30',
-            confirmed:
-              'bg-emerald-500/20 text-emerald-700 border-emerald-500/30',
-            expired: 'bg-gray-100 text-gray-500 border-gray-200',
-            cancelled: 'bg-gray-500/20 text-gray-600 border-gray-500/30',
-            failed: 'bg-red-500/20 text-red-700 border-red-500/30',
-          }
-          const bookingCourts = booking.bookingCourts ?? []
-          const courtCount = bookingCourts.length > 0 ? bookingCourts.length : 1
-          const slotCount =
-            bookingCourts.length > 0
-              ? bookingCourts.reduce((total, bookingCourt) => {
-                  if (typeof bookingCourt.slot_count === 'number') {
-                    return total + bookingCourt.slot_count
-                  }
-                  return total + (bookingCourt.slots?.length ?? 0)
-                }, 0)
-              : 1
-          const remainingMs = booking.expiresAfterTs
-            ? new Date(booking.expiresAfterTs as string).getTime() +
-              PENDING_COUNTDOWN_EXTENSION_MS -
-              now
-            : null
-          const remainingSeconds = remainingMs
-            ? Math.max(0, Math.floor(remainingMs / 1000))
-            : 0
-          const venuePhone = String(booking.venueContactNumber ?? '').trim()
-          const venueWebsiteUrl = String(booking.venueWebsiteUrl ?? '').trim()
-          const venueFacebookLink = String(booking.venueFacebookLink ?? '').trim()
-          const venueLinkUrl =
-            venueWebsiteUrl && venueWebsiteUrl.toLowerCase() !== 'null'
-              ? venueWebsiteUrl
-              : venueFacebookLink && venueFacebookLink.toLowerCase() !== 'null'
-                ? venueFacebookLink
-                : ''
-          const countdown =
-            remainingMs && remainingMs > 0
-              ? `${String(Math.floor(remainingSeconds / 60)).padStart(2, '0')}:${String(remainingSeconds % 60).padStart(2, '0')}`
-              : null
-          const isPending = statusLabel === 'pending'
-          const continuePaymentLink = getPaymentLinkForBooking(booking.id)
-          const bookingHasPassed = getBookingCalendarDateRange(booking).end.getTime() <= now
-
-          return (
-            <Card
-              key={booking.id}
-              className={`overflow-hidden rounded-none sm:rounded-lg border-0 sm:border flex flex-col gap-0 transition-shadow  bg-white ${
-                index === displayBookings.length - 1
-                  ? 'shadow-sm hover:shadow-md mb-3 sm:mb-6'
-                  : 'shadow-sm hover:shadow-md'
-              }`}
-            >
-              <div className="mx-5 mt-5.5 flex items-center justify-between gap-2 text-xs -mb-1 ">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <Calendar className="size-3.5 flex-shrink-0" />
-                  Booking Date:
-                  <span className="capitalize">
-                    {format(bookingDate, 'MMM d, yyyy h:mma').toLowerCase()}
-                  </span>
-                </div>
-                <div
-                  className={`inline-flex items-center gap-2 rounded-full px-[8px] py-[2px] text-[11px] font-semibold whitespace-nowrap ${statusStyles[statusLabel] ?? 'bg-gray-900 text-white'}`}
+          <div className="order-1 md:order-2 md:col-span-2 flex flex-col gap-4">
+            {/* Status Tabs/Pills */}
+            <div className="sticky top-[64px] z-20 py-3 md:sticky md:top-20 -mr-4 pr-4 md:mr-0 md:pr-0">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar sm:pb-0">
+                <Select
+                  value={groupBy}
+                  onValueChange={(value: 'booking_date' | 'status') => setGroupBy(value)}
                 >
-                  {statusText}
-                </div>
+                  <SelectTrigger className="flex h-9 w-fit items-center gap-1.5 rounded-full border border-gray-100 bg-white px-4 py-1.5 text-xs font-bold text-gray-900 shadow-sm transition-all hover:border-gray-300 focus:ring-0 focus:ring-offset-0 ring-0 border-none outline-none ring-offset-0">
+                    <ListFilter className="size-3.5 text-gray-900" />
+                    <SelectValue placeholder="Group by" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border border-gray-100 bg-white p-1 shadow-lg ring-0">
+                    <SelectItem value="booking_date" className="rounded-lg py-2.5 text-xs font-bold uppercase tracking-wider text-gray-500 focus:bg-gray-50 focus:text-gray-900">
+                      Booking Date
+                    </SelectItem>
+                    <SelectItem value="status" className="rounded-lg py-2.5 text-xs font-bold uppercase tracking-wider text-gray-500 focus:bg-gray-50 focus:text-gray-900">
+                      Status
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {groupBy === 'status' && (
+                  <>
+                    {[
+                      { id: 'all', label: 'All' },
+                      { id: 'confirmed', label: 'Confirmed' },
+                      { id: 'cancelled', label: 'Cancelled' },
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setFilterStatus(tab.id as any)}
+                        className={`whitespace-nowrap rounded-full px-5 py-1.5 text-xs font-bold transition-all ${
+                          filterStatus === tab.id
+                            ? 'bg-black text-white shadow-md transform scale-105'
+                            : 'bg-white text-gray-400 border border-gray-100 hover:border-gray-300 hover:text-gray-600'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
+            </div>
 
-              <div className="grid transition-all duration-300 ease-in-out grid-rows-[1fr] opacity-100 pointer-events-auto ">
-                <div className="overflow-hidden">
-                  <CardContent className="px-5 sm:px-5 py-6 sm:py-6 md:py-6 flex-1 flex flex-col gap-0 transition-[padding] duration-300 ">
-                    <div className="rounded-lg border border-gray-200 bg-gray-50">
-                      <div className="rounded-t-lg border-b border-gray-200 px-5 py-4">
-                        <div className="grid grid-cols-1 gap-3 text-sm ">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="text-[10px] uppercase tracking-[0.08em] text-gray-500 mb-1">
-                                Venue
-                              </p>
-                              <Link
-                                to={`/operator/${booking.operatorId}`}
-                                className="truncate font-medium leading-none text-gray-800 hover:text-gray-900"
-                              >
+            <div className={`grid w-full grid-cols-1 gap-3 md:gap-4 ${
+              groupBy === 'status' ? 'mt-0' : ''
+            }`}>
+              {groupedBookingSections.length === 0 && (
+                <div className="rounded-lg border border-dashed border-gray-300 bg-white px-4 py-12 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 mb-3">
+                    <ListFilter className="size-6 text-gray-300" />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900">No results found</p>
+                  <p className="text-xs text-gray-500 mt-1">Try clearing your filters or select a different date.</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-4 text-xs"
+                    onClick={() => {
+                      setFilterStatus('all');
+                      setSelectedCalendarDay(undefined);
+                      setCalendarRange(null);
+                    }}
+                  >
+                    Reset all filters
+                  </Button>
+                </div>
+              )}
+              {groupedBookingSections.map((section) => (
+                <React.Fragment key={section.key}>
+                  {section.label && (
+                    <p className="px-5 md:px-0 text-xs font-semibold uppercase tracking-[0.12em] text-gray-500 mt-2 mb-1">
+                      {section.label}
+                    </p>
+                  )}
+                  {section.items.map(({ booking, index }) => {
+                    const bookingDate = new Date(booking.date);
+                    const { normalizedStatus, statusLabel } = getStatusMeta(booking);
+                    const statusText = statusLabel.charAt(0).toUpperCase() + statusLabel.slice(1);
+                    
+                    // Status Badge Config
+                    const statusConfig: Record<string, { bg: string, text: string, icon: any }> = {
+                      confirmed: { bg: 'bg-[#E8F5E9]', text: 'text-[#2E7D32]', icon: CheckCircle2 },
+                      cancelled: { bg: 'bg-[#FFEBEE]', text: 'text-[#C62828]', icon: XCircle },
+                      pending: { bg: 'bg-[#FFF8E1]', text: 'text-[#F57F17]', icon: PlayCircle },
+                      expired: { bg: 'bg-[#F5F5F5]', text: 'text-[#757575]', icon: Clock },
+                      failed: { bg: 'bg-[#FFEBEE]', text: 'text-[#C62828]', icon: AlertCircle },
+                    };
+                    const currentStatus = statusConfig[normalizedStatus] || statusConfig.expired;
+                    const StatusIcon = currentStatus.icon;
+
+                    const bookingCourts = booking.bookingCourts ?? [];
+                    const slotCount = bookingCourts.reduce((total, bookingCourt) => {
+                      if (typeof bookingCourt.slot_count === 'number') {
+                        return total + bookingCourt.slot_count;
+                      }
+                      return total + (bookingCourt.slots?.length ?? 0);
+                    }, 0);
+                    
+                    const firstSlotDate = bookingCourts[0]?.slots?.[0]?.date;
+                    const playDateLabel = firstSlotDate 
+                      ? format(new Date(firstSlotDate), 'EEE, MMM d, yyyy')
+                      : format(bookingDate, 'EEE, MMM d, yyyy');
+
+                    const remainingMs = booking.expiresAfterTs
+                      ? new Date(booking.expiresAfterTs as string).getTime() + PENDING_COUNTDOWN_EXTENSION_MS - now
+                      : null;
+                    const remainingSeconds = remainingMs ? Math.max(0, Math.floor(remainingMs / 1000)) : 0;
+                    const countdown = remainingSeconds
+                      ? `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')}`
+                      : null;
+                    
+                    const isBookingExpired = statusLabel === 'expired';
+                    const bookingHasPassed = !!getPlayDatesForBooking(booking).find(
+                      (date) => date.getTime() + 24 * 60 * 60 * 1000 < now,
+                    );
+                    const continuePaymentLink = getPaymentLinkForBooking(booking.id);
+                    const venuePhone = String(booking.venueContactNumber ?? '').trim();
+
+                    return (
+                      <Card
+                        key={booking.id}
+                        className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md"
+                      >
+                        {/* Header: Booked Date + Status */}
+                        <div className="flex items-center justify-between border-b border-gray-50 px-5 py-3">
+                          <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
+                            <Calendar className="size-3.5" />
+                            Booked {format(bookingDate, 'MMM d, yyyy h:mma').toLowerCase()}
+                          </div>
+                          {groupBy === 'status' && (
+                            <Badge
+                              variant="outline"
+                              className={`flex items-center gap-1 border-transparent bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${currentStatus.text}`}
+                            >
+                              <StatusIcon className="size-3" />
+                              {statusText}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <CardContent className="px-5 pb-5 pt-0">
+                          <div className="flex flex-col gap-3">
+                            {/* Venue & Court Info */}
+                            <div className="-mt-1">
+                              <h3 className="text-[2rem] font-bebas font-medium uppercase text-gray-900 leading-none">
                                 {booking.operatorName}
-                              </Link>
+                              </h3>
+                              <p className="mt-2 text-xs font-medium text-gray-500">
+                                {bookingCourts[0]?.court?.purpose || booking.courtType} Court {bookingCourts[0]?.court?.number || ''} {' · '} {playDateLabel}
+                              </p>
                             </div>
-                            {venuePhone &&
-                            venuePhone.toLowerCase() !== 'null' ? (
-                              <a
-                                href={`tel:${venuePhone}`}
-                                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full  bg-white/50 text-gray-700 hover:bg-gray-50 -mr-1"
-                                aria-label={`Call ${booking.operatorName}`}
-                                title={`Call ${booking.operatorName}`}
-                              >
-                                <Phone className="size-3.5" />
-                              </a>
-                            ) : venueLinkUrl ? (
-                              <a
-                                href={venueLinkUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/50 text-gray-700 hover:bg-gray-50 -mr-1"
-                                aria-label={`Open ${booking.operatorName} link`}
-                                title={`Open ${booking.operatorName} link`}
-                              >
-                                <Globe className="size-3.5" />
-                              </a>
-                            ) : null}
-                          </div>
-                        </div>
-                      </div>
-                      <div className=" border-b border-dashed border-gray-200 bg-gray-50 px-5 py-4">
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div className="min-w-0">
-                            <p className="text-[10px] uppercase tracking-[0.08em] text-gray-500 mb-1">
-                              Guest Name
-                            </p>
-                            <p className="truncate font-medium text-gray-800">
-                              {booking.guestName?.trim() || 'N/A'}
-                            </p>
-                          </div>
-                          <div className="min-w-0 text-right">
-                            <p className="text-[10px] uppercase tracking-[0.08em] text-gray-500 mb-1">
-                              Contact Number
-                            </p>
-                            <p className="truncate font-medium text-gray-800">
-                              {booking.contactNumber?.trim() || 'N/A'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="rounded-b-lg bg-gray-50 px-5 py-4">
-                        <div className="grid w-full gap-3">
-                          {booking.bookingCourts &&
-                            booking.bookingCourts.length > 0 && (
-                              <div className=" border-b border-gray-200">
-                                <div className="space-y-3">
-                                  {booking.bookingCourts.map((bookingCourt) => {
-                                    const purposeLabel =
-                                      bookingCourt.court?.purpose ??
-                                      bookingCourt.court?.type ??
-                                      booking.courtType ??
-                                      'others'
-                                    const courtNumber =
-                                      bookingCourt.court?.number ??
-                                      bookingCourt.court?.id ??
-                                      'Court'
-                                    const slots = bookingCourt.slots ?? []
-                                    const hasSlotSummary = slots.length > 0
-                                    const courtDateLabel = slots[0]?.date
-                                      ? format(
-                                          new Date(slots[0].date),
-                                          'EEE, MMM dd',
-                                        )
-                                      : bookingDate.toLocaleDateString(
-                                          'en-US',
-                                          {
-                                            weekday: 'short',
-                                            month: 'short',
-                                            day: 'numeric',
-                                          },
-                                        )
-                                    const orderedSlots = [...slots].sort(
-                                      (a, b) => {
-                                        const aStart =
-                                          toMinutesSinceMidnight(
-                                            a.start_time,
-                                          ) ?? 0
-                                        const bStart =
-                                          toMinutesSinceMidnight(
-                                            b.start_time,
-                                          ) ?? 0
-                                        return aStart - bStart
-                                      },
-                                    )
-                                    const slotSummaryItems = orderedSlots.map(
-                                      (slot) => {
-                                        const fromLabel = slot.start_time
-                                          ? formatSlotTime(slot.start_time)
-                                          : 'TBD'
-                                        const rangeLabel = slot.end_time
-                                          ? formatTimeRangeLabel(
-                                              fromLabel,
-                                              formatSlotTime(slot.end_time),
-                                            )
-                                          : fromLabel
-                                        return {
-                                          id: String(slot.id),
-                                          fromLabel,
-                                          label: rangeLabel,
-                                          price: Number(
-                                            slot.price ??
-                                              bookingCourt.court
-                                                ?.booking_price ??
-                                              0,
-                                          ),
-                                        }
-                                      },
-                                    )
-                                    const slotMinuteRanges = orderedSlots
-                                      .map((slot) => {
-                                        const startMinutes =
-                                          toMinutesSinceMidnight(
-                                            slot.start_time,
-                                          )
-                                        const endMinutes =
-                                          toMinutesSinceMidnight(slot.end_time)
-                                        if (
-                                          startMinutes === null ||
-                                          endMinutes === null
-                                        ) {
-                                          return null
-                                        }
-                                        return { startMinutes, endMinutes }
-                                      })
-                                      .filter(
-                                        (
-                                          range,
-                                        ): range is {
-                                          startMinutes: number
-                                          endMinutes: number
-                                        } => Boolean(range),
-                                      )
-                                      .sort(
-                                        (a, b) =>
-                                          a.startMinutes - b.startMinutes,
-                                      )
-                                    const hasMultipleSlots =
-                                      slotSummaryItems.length > 1
-                                    const firstRange = slotMinuteRanges[0]
-                                    const lastRange =
-                                      slotMinuteRanges[
-                                        slotMinuteRanges.length - 1
-                                      ]
-                                    const compactRangeLabel =
-                                      hasMultipleSlots &&
-                                      firstRange &&
-                                      lastRange
-                                        ? formatTimeRangeLabel(
-                                            minutesToTimeString(
-                                              roundMinutesToNearestHour(
-                                                firstRange.startMinutes,
-                                              ),
-                                            ),
-                                            minutesToTimeString(
-                                              roundMinutesToNearestHour(
-                                                lastRange.endMinutes,
-                                              ),
-                                            ),
-                                          )
-                                        : (slotSummaryItems[0]?.label ?? 'TBD')
-                                    const bookingCourtSlotsKey = `${booking.id}-${bookingCourt.id}`
-                                    const isCourtSlotsExpanded =
-                                      expandedBookingCourtSlots.has(
-                                        bookingCourtSlotsKey,
-                                      )
-                                    return (
-                                      <div
-                                        key={bookingCourt.id}
-                                        className="bg-transparent"
-                                      >
-                                        <div className="mb-0">
-                                          <strong className="font-semibold text-sm capitalize text-gray-800">
-                                            {purposeLabel} Court {courtNumber}
-                                          </strong>
-                                        </div>
-                                        <div className="pl-0.5">
-                                          {hasSlotSummary ? (
-                                            <button
-                                              type="button"
-                                              className={`flex w-full items-center justify-between gap-3 rounded-md px-1.5 py-1 text-sm ${
-                                                hasMultipleSlots
-                                                  ? 'hover:bg-gray-100'
-                                                  : 'cursor-default'
-                                              }`}
-                                              onClick={() => {
-                                                if (!hasMultipleSlots) {
-                                                  return
-                                                }
-                                                setExpandedBookingCourtSlots(
-                                                  (prev) => {
-                                                    const next = new Set(prev)
-                                                    if (
-                                                      next.has(
-                                                        bookingCourtSlotsKey,
-                                                      )
-                                                    ) {
-                                                      next.delete(
-                                                        bookingCourtSlotsKey,
-                                                      )
-                                                    } else {
-                                                      next.add(
-                                                        bookingCourtSlotsKey,
-                                                      )
-                                                    }
-                                                    return next
-                                                  },
-                                                )
-                                              }}
-                                              aria-label={
-                                                isCourtSlotsExpanded
-                                                  ? 'Hide all slots'
-                                                  : 'Show all slots'
-                                              }
-                                            >
-                                              <span className="text-sm font-semibold text-gray-700">
-                                                {courtDateLabel}
-                                              </span>
-                                              <span className="inline-flex items-center gap-2 whitespace-nowrap text-gray-700">
-                                                {compactRangeLabel}
-                                                {hasMultipleSlots && (
-                                                  <ChevronDown
-                                                    className={`size-3.5 text-gray-500 transition-transform ${
-                                                      isCourtSlotsExpanded
-                                                        ? 'rotate-180'
-                                                        : ''
-                                                    }`}
-                                                  />
-                                                )}
-                                              </span>
-                                            </button>
-                                          ) : (
-                                            <div className="flex items-center justify-between gap-3 px-1.5 py-1">
-                                              <span className="text-sm font-semibold text-gray-700">
-                                                {courtDateLabel}
-                                              </span>
-                                            </div>
-                                          )}
-                                        </div>
-                                        <div className="pl-1 pb-2 pt-1 space-y-1">
-                                          {hasSlotSummary && (
-                                            <div className="space-y-1">
-                                              {hasMultipleSlots &&
-                                                isCourtSlotsExpanded &&
-                                                slotSummaryItems.map(
-                                                  (slotItem) => (
-                                                    <div
-                                                      key={slotItem.id}
-                                                      className="flex items-center justify-between pl-4 py-0.5 text-sm"
-                                                    >
-                                                      <div className="flex items-center gap-2 text-gray-700 min-w-0">
-                                                        <DynamicClock
-                                                          time={
-                                                            slotItem.fromLabel
-                                                          }
-                                                          className="size-3.5 flex-shrink-0"
-                                                        />
-                                                        <span className="truncate">
-                                                          {slotItem.label}
-                                                        </span>
-                                                      </div>
-                                                      <span className="pl-2">
-                                                        ₱
-                                                        {formatCurrency(
-                                                          slotItem.price,
-                                                        )}
-                                                      </span>
-                                                    </div>
-                                                  ),
-                                                )}
-                                            </div>
-                                          )}
-                                        </div>
+
+                            {/* Guest Info */}
+                            <div className="flex items-center gap-4 text-xs font-medium text-gray-600">
+                              <div className="flex items-center gap-1.5">
+                                <User className="size-3.5 text-gray-400" />
+                                {booking.guestName || 'Paul Brett'}
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Phone className="size-3.5 text-gray-400" />
+                                {booking.contactNumber || 'n/a'}
+                              </div>
+                            </div>
+
+                            {/* Slots & Pricing (Gray Container) */}
+                            <div className="rounded-lg bg-gray-50/80 p-1">
+                              <div className="space-y-0.5">
+                                {bookingCourts.map((bc) => (
+                                  bc.slots?.map((slot, sIdx) => (
+                                    <div key={`${bc.id}-${sIdx}`} className="flex items-center justify-between px-3 py-2.5">
+                                      <div className="flex items-center gap-2.5 text-xs font-bold text-gray-700">
+                                        <Clock className="size-3.5 text-gray-400" />
+                                        {formatTimeRangeLabel(slot.start_time || '00:00:00', slot.end_time || '00:00:00')}
                                       </div>
-                                    )
-                                  })}
+                                      <div className="text-xs font-bold text-gray-700">
+                                        ₱{formatCurrency(Number(slot.price ?? 0))}
+                                      </div>
+                                    </div>
+                                  ))
+                                ))}
+                              </div>
+
+                              {/* Total Line inside Gray box */}
+                              <div className="mt-1 flex items-center justify-between border-t border-gray-200/50 px-3 py-3">
+                                <span className="text-xs font-semibold text-gray-500">
+                                  Total ({slotCount} Slot{slotCount !== 1 ? 's' : ''})
+                                </span>
+                                <span className="text-sm font-black text-gray-900">
+                                  ₱{formatCurrency(booking.price)}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Pending State Actions */}
+                            {statusLabel === 'pending' && (
+                              <div className="flex flex-col gap-2 mt-1">
+                                <div className="flex gap-2">
+                                  {continuePaymentLink ? (
+                                    <Button className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest" asChild>
+                                      <a href={continuePaymentLink} target="_blank" rel="noreferrer">Continue to Payment</a>
+                                    </Button>
+                                  ) : (
+                                    <Button className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest" onClick={() => toast.error('Payment link not found')}>
+                                      Pay Now
+                                    </Button>
+                                  )}
+                                  <Button 
+                                    variant="outline" 
+                                    className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest border-gray-200"
+                                    onClick={() => handleCancelBooking(booking)}
+                                    disabled={cancellingBookingId === booking.id}
+                                  >
+                                    {cancellingBookingId === booking.id ? 'Cancelling...' : 'Cancel'}
+                                  </Button>
+                                </div>
+                                <div className="text-center py-1.5 bg-amber-50 rounded-lg">
+                                  <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest animate-pulse">
+                                    {isBookingExpired ? 'Expired' : `Holds for ${countdown ?? '00:00'}`}
+                                  </span>
                                 </div>
                               </div>
                             )}
-                        </div>
 
-                        <div className="mt-auto pt-3 mb-[-1] flex items-center justify-between text-sm text-gray-800">
-                          <span className="font-semibold">
-                            Total ({slotCount} Slot{slotCount !== 1 ? 's' : ''})
-                          </span>
-                          <strong className="text-sm">
-                            ₱{formatCurrency(booking.price)}
-                          </strong>
-                        </div>
-                      </div>
-                    </div>
-
-                    {statusLabel === 'pending' && (
-                      <div className="space-y-2 mt-5">
-                        {(() => {
-                          const isCancellingThisBooking =
-                            cancellingBookingId === booking.id
-                          return (
-                            <>
-                              {continuePaymentLink ? (
-                                <Button
+                            {/* Footer Action: Share */}
+                            {statusLabel === 'confirmed' && (
+                              <div className="mt-1 border-t border-gray-100 pt-4 flex justify-center">
+                                <button
                                   type="button"
-                                  size="lg"
-                                  className="w-full"
-                                  disabled={isCancellingThisBooking}
-                                  asChild
+                                  onClick={() => handleShareVenue(booking)}
+                                  className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors"
                                 >
-                                  <a
-                                    href={continuePaymentLink}
-                                    rel="noreferrer"
-                                  >
-                                    Continue to Payment
-                                  </a>
-                                </Button>
-                              ) : (
-                                <Button
-                                  type="button"
-                                  size="lg"
-                                  className="w-full"
-                                  disabled={isCancellingThisBooking}
-                                  onClick={() =>
-                                    toast.error('Payment link not found', {
-                                      description:
-                                        'Please complete the booking again to get a payment link.',
-                                    })
-                                  }
-                                >
-                                  Continue to Payment
-                                </Button>
-                              )}
-                              <Button
-                                type="button"
-                                size="lg"
-                                variant="outline"
-                                className="mt-2 w-full"
-                                disabled={isCancellingThisBooking}
-                                onClick={() => handleCancelBooking(booking)}
-                              >
-                                {isCancellingThisBooking
-                                  ? 'Cancelling...'
-                                  : 'Cancel Booking'}
-                              </Button>
-                              <p className="text-xs text-center text-orange-500 mt-2">
-                                Reservation held for{' '}
-                                {isCancellingThisBooking
-                                  ? '--:--'
-                                  : (countdown ?? '00:00')}
-                              </p>
-                            </>
-                          )
-                        })()}
-                      </div>
-                    )}
-                    {statusLabel === 'confirmed' && (
-                      <div className="mt-5 grid grid-cols-2 gap-2">
-                        {!bookingHasPassed && (
-                          <Button
-                            type="button"
-                            size="lg"
-                            className="w-full"
-                            onClick={() => handleAddToCalendar(booking)}
-                          >
-                            Add to Calendar
-                          </Button>
-                        )}
-                        <Button
-                          type="button"
-                          size="lg"
-                          className={`w-full ${bookingHasPassed ? 'col-span-2' : ''}`}
-                          variant="outline"
-                          onClick={() => handleShareVenue(booking)}
-                        >
-                          Share Venue
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </div>
-              </div>
-            </Card>
-          )
-            })}
-          </React.Fragment>
-        ))}
-      </div>
+                                  <Share2 className="size-3.5" />
+                                  Share Venue
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

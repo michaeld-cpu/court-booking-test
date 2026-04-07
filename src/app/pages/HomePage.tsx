@@ -1006,7 +1006,7 @@ export function HomePage({
                 amenities: [],
                 rating: 0,
                 pricePerHour: basePrice,
-                availableSlotCount: normalizedAvailableSlotCount,
+                availableSlotCount: Number(court.available_slots) || totalSlots,
                 availableSlots: buildSlotsFromSummary(
                   totalSlots,
                   availableSlots,
@@ -1880,8 +1880,8 @@ export function HomePage({
                     key={`map-venue-skeleton-${index}`}
                     className="flex items-center justify-between gap-3 border-b border-gray-200 py-3 last:border-b-0"
                   >
-                    <div className="min-w-0 flex flex-1 items-center gap-2.5">
-                      <div className="size-4 rounded-full bg-gray-200 animate-pulse" />
+                    <div className="min-w-0 flex flex-1 items-center gap-3.5">
+                      <div className="size-8 rounded-lg bg-gray-200 animate-pulse" />
                       <div className="min-w-0 flex-1">
                         <div className="h-4 w-2/3 rounded bg-gray-200 animate-pulse" />
                         <div className="mt-2 h-3 w-1/2 rounded bg-gray-200 animate-pulse" />
@@ -1911,8 +1911,10 @@ export function HomePage({
                     }
                     className="flex w-full items-center justify-between gap-3 border-b border-gray-200 py-3 text-left transition-colors hover:bg-gray-50/60 last:border-b-0"
                   >
-                    <div className="min-w-0 flex items-center gap-2.5 flex-1">
-                      <MapPin className="size-4 shrink-0 text-red-500" />
+                    <div className="min-w-0 flex items-center gap-3.5 flex-1">
+                      <div className="bg-gray-900 flex items-center justify-center size-8 rounded-lg shrink-0">
+                        <MapPin className="size-4 text-[#C8F542]" />
+                      </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-gray-900">
                           {operatorGroup.operatorName}
@@ -1927,11 +1929,12 @@ export function HomePage({
                         {operatorGroup.courts.reduce(
                           (total, court) =>
                             total +
-                            (typeof court.availableSlotCount === 'number'
+                            (typeof court.availableSlotCount === 'number' &&
+                            !Number.isNaN(court.availableSlotCount)
                               ? court.availableSlotCount
-                              : court.availableSlots.filter(
-                                (slot) => slot.available,
-                              ).length),
+                              : (court.availableSlots || []).filter(
+                                  (slot: any) => slot.available,
+                                ).length),
                           0,
                         )}
                       </p>
