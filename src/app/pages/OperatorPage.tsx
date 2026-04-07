@@ -834,6 +834,279 @@ export function OperatorPage({
     navigate('/');
   };
 
+  const renderCourt = (court: Court) => {
+    // Generate time ranges for this court
+    const timeRanges: Array<{
+      id: string;
+      startSlot: TimeSlot;
+      endSlot: TimeSlot;
+      label: string;
+      available: boolean;
+      price: number;
+    }> = [];
+    for (let i = 0; i < court.availableSlots.length - 1; i++) {
+      const startSlot = court.availableSlots[i];
+      const endSlot = court.availableSlots[i + 1];
+      timeRanges.push({
+        id: `range-${i}`,
+        startSlot,
+        endSlot,
+        label: formatTimeRangeLabel(startSlot.time, endSlot.time),
+        available: startSlot.available,
+        price: startSlot.price,
+      });
+    }
+
+    const availableSlotsCount = timeRanges.filter(
+      (range) => range.available,
+    ).length;
+    const selectedCountForCourt = Object.values(
+      selectedSlots[court.id] ?? {},
+    ).reduce((total, slots) => total + slots.length, 0);
+    const cartLabelsByDate = new Map<string, Set<string>>();
+    const normalizedCourtId = normalizeText(court.id);
+    const normalizedCourtName = normalizeText(court.name);
+    const normalizedOperatorId = normalizeVenueKey(
+      court.operatorId,
+    );
+    const normalizedOperatorName = normalizeText(
+      court.operatorName,
+    );
+    cartItems.forEach((item) => {
+      const itemCourtId = normalizeText(item.courtId);
+      const itemCourtName = normalizeText(item.courtName);
+      const itemOperatorId = normalizeVenueKey(item.operatorId);
+      const itemOperatorName = normalizeText(item.operatorName);
+      const isSameCourtById =
+        normalizedCourtId.length > 0 &&
+        itemCourtId.length > 0 &&
+        itemCourtId === normalizedCourtId;
+      const isSameCourtByName =
+        normalizedCourtName.length > 0 &&
+        itemCourtName.length > 0 &&
+        itemCourtName === normalizedCourtName &&
+        ((normalizedOperatorId.length > 0 &&
+          itemOperatorId.length > 0 &&
+          itemOperatorId === normalizedOperatorId) ||
+          (normalizedOperatorName.length > 0 &&
+            itemOperatorName.length > 0 &&
+            itemOperatorName === normalizedOperatorName));
+      if (!isSameCourtById && !isSameCourtByName) return;
+      const itemDate =
+        item.date instanceof Date
+          ? item.date
+          : new Date(item.date);
+      if (Number.isNaN(itemDate.getTime())) return;
+      const dateKey = format(itemDate, 'yyyy-MM-dd');
+      if (!cartLabelsByDate.has(dateKey)) {
+        cartLabelsByDate.set(dateKey, new Set<string>());
+      }
+      item.timeSlots?.forEach((slotLabel) => {
+        if (slotLabel) {
+          cartLabelsByDate.get(dateKey)?.add(slotLabel);
+        }
+      });
+    });
+
+    const rawPurpose = String(
+      court.purpose ?? court.type ?? 'Others',
+    );
+    const purposeKey =
+      rawPurpose
+        .toLowerCase()
+        .replace(/\bcourts?\b/g, '')
+        .replace(/\s+/g, ' ')
+        .trim() || 'others';
+    const purposeText =
+      purposeKey.charAt(0).toUpperCase() + purposeKey.slice(1);
+    const purposeIcon = courtTypeIcons[purposeKey];
+
+    const isCourtExpanded = expandedCourtId === court.id;
+
+    return (
+      <div
+        key={court.id}
+        className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
+      >
+        {/* Court Header – Accordion Toggle */}
+        <button
+          type="button"
+          onClick={() => {
+            // On mobile, open booking modal; on desktop, toggle accordion
+            if (window.innerWidth < 768) {
+              handleBookCourt(court);
+            } else {
+              setExpandedCourtId(prev => (prev === court.id ? null : court.id));
+            }
+          }}
+          className="w-full bg-white py-3 sm:py-4 px-5 sm:px-4 border-0 md:border-b md:border-gray-200 text-left hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className="w-10 h-10 flex items-center justify-center shrink-0"
+              >
+                {(purposeKey === 'pickleball' || purposeKey === 'pickle') ? (
+                  <Icons.pickleball className="size-7 text-gray-900" />
+                ) : purposeIcon && (
+                  <img
+                    src={purposeIcon}
+                    alt={`${purposeText} icon`}
+                    className="size-7"
+                    loading="lazy"
+                  />
+                )}
+              </div>
+              <div>
+                <h3 className="font-medium text-sm truncate">
+                  {purposeText} {court.name}
+                </h3>
+                <p className="mt-[2px] text-xs text-gray-500">
+                  {availableSlotsCount} slot{availableSlotsCount !== 1 ? 's' : ''} available
+                </p>
+              </div>
+            </div>
+            <ChevronDown
+              className={`hidden md:block size-5 text-gray-400 transition-transform duration-200 shrink-0 ${isCourtExpanded ? 'rotate-180' : ''}`}
+            />
+          </div>
+        </button>
+
+        {/* Time Slots – Accordion Body */}
+        {isCourtExpanded && (
+          <div className="hidden md:block p-4">
+            {selectedDates
+              .sort((a, b) => a.getTime() - b.getTime())
+              .map((date, dateIndex) => {
+                const dateStr = format(date, 'yyyy-MM-dd');
+                return (
+                  <div
+                    key={dateStr}
+                    className={
+                      dateIndex > 0
+                        ? 'mt-4 pt-4 border-t border-gray-200'
+                        : ''
+                    }
+                  >
+                    {selectedDates.length > 1 && (
+                      <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                        {format(date, 'EEE, MMM dd')}
+                      </h4>
+                    )}
+                    <div className="space-y-4">
+                      {(
+                        ['', 'Morning', 'Afternoon', 'Evening'] as const
+                      ).map((label, labelIndex) => {
+                        const groupedRanges = timeRanges.filter(
+                          (range) =>
+                            getTimeGroup(range.startSlot.time) ===
+                            label,
+                        );
+                        if (groupedRanges.length === 0) {
+                          return null;
+                        }
+                        return (
+                          <div
+                            key={`${dateStr}-${label}`}
+                            className={`space-y-2 ${labelIndex > 0 ? 'pt-3' : ''}`}
+                          >
+                            {label ? (
+                              <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+                                {label}
+                              </div>
+                            ) : null}
+                            <div className="grid grid-cols-1 gap-2">
+                              {groupedRanges.map((range) => {
+                                const isAlreadyInCart =
+                                  cartLabelsByDate
+                                    .get(dateStr)
+                                    ?.has(range.label) ?? false;
+                                const isSelected =
+                                  isAlreadyInCart ||
+                                  selectedSlots[court.id]?.[
+                                    dateStr
+                                  ]?.includes(range.id);
+                                const isLimitReached =
+                                  !isAlreadyInCart &&
+                                  !selectedSlots[court.id]?.[
+                                    dateStr
+                                  ]?.includes(range.id) &&
+                                  selectedCountForCourt >=
+                                  selectionLimit;
+
+                                return (
+                                  <button
+                                    key={`${dateStr}-${range.id}`}
+                                    onClick={() => {
+                                      if (isAlreadyInCart) {
+                                        toast.info(
+                                          'Already added to cart',
+                                          {
+                                            description:
+                                              'Check your cart to manage this slot.',
+                                          },
+                                        );
+                                        return;
+                                      }
+                                      if (range.available) {
+                                        toggleTimeSlot(
+                                          court.id,
+                                          dateStr,
+                                          range.id,
+                                        );
+                                      }
+                                    }}
+                                    disabled={
+                                      (!range.available &&
+                                        !isAlreadyInCart) ||
+                                      isLimitReached
+                                    }
+                                    className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all text-left ${isSelected
+                                      ? 'bg-gray-900 text-white'
+                                      : !range.available ||
+                                        isLimitReached
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-gray-50 hover:bg-gray-100'
+                                      }`}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      {isSelected ? (
+                                        <Check className="size-4 flex-shrink-0" />
+                                      ) : (
+                                        <DynamicClock
+                                          time={
+                                            range.startSlot.time
+                                          }
+                                          className="size-4 flex-shrink-0"
+                                        />
+                                      )}
+                                      <span className="font-medium whitespace-nowrap">
+                                        {range.label}
+                                      </span>
+                                    </div>
+                                    {(range.available ||
+                                      isAlreadyInCart) && (
+                                        <span className={`font-semibold ${isSelected ? 'text-white' : ''}`}>
+                                          ₱{formatCurrency(range.price)}
+                                        </span>
+                                      )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -1206,9 +1479,9 @@ export function OperatorPage({
                     mode="single"
                     selected={selectedDates[0]}
                     onSelect={(date) => {
-                      if (!date) return
-                      setSelectedDates([date])
-                      setIsDesktopDatePickerOpen(false)
+                      if (!date) return;
+                      setSelectedDates([date]);
+                      setIsDesktopDatePickerOpen(false);
                     }}
                     disabled={{ before: getMinimumBookableDate() }}
                     initialFocus
@@ -1246,285 +1519,31 @@ export function OperatorPage({
               </div>
             ) : operatorCourts.length > 0 ? (
               <div
-                className={`-mx-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 md:gap-5 lg:gap-6 items-start transition-opacity duration-200 ${isLoadingCourts ? 'opacity-45 pointer-events-none' : 'opacity-100'
+                className={`transition-opacity duration-200 ${isLoadingCourts ? 'opacity-45 pointer-events-none' : 'opacity-100'
                   }`}
               >
-                {operatorCourts.map((court) => {
-                  // Generate time ranges for this court
-                  const timeRanges: Array<{
-                    id: string
-                    startSlot: TimeSlot
-                    endSlot: TimeSlot
-                    label: string
-                    available: boolean
-                    price: number
-                  }> = []
-                  for (let i = 0; i < court.availableSlots.length - 1; i++) {
-                    const startSlot = court.availableSlots[i]
-                    const endSlot = court.availableSlots[i + 1]
-                    timeRanges.push({
-                      id: `range-${i}`,
-                      startSlot,
-                      endSlot,
-                      label: formatTimeRangeLabel(startSlot.time, endSlot.time),
-                      available: startSlot.available,
-                      price: startSlot.price,
-                    })
-                  }
+                {/* Mobile View: Single Column Stacking */}
+                <div className="flex flex-col gap-4 sm:hidden">
+                  {operatorCourts.map((court) => renderCourt(court))}
+                </div>
 
-                  const availableSlotsCount = timeRanges.filter(
-                    (range) => range.available,
-                  ).length
-                  const selectedCountForCourt = Object.values(
-                    selectedSlots[court.id] ?? {},
-                  ).reduce((total, slots) => total + slots.length, 0)
-                  const cartLabelsByDate = new Map<string, Set<string>>()
-                  const normalizedCourtId = normalizeText(court.id)
-                  const normalizedCourtName = normalizeText(court.name)
-                  const normalizedOperatorId = normalizeVenueKey(
-                    court.operatorId,
-                  )
-                  const normalizedOperatorName = normalizeText(
-                    court.operatorName,
-                  )
-                  cartItems.forEach((item) => {
-                    const itemCourtId = normalizeText(item.courtId)
-                    const itemCourtName = normalizeText(item.courtName)
-                    const itemOperatorId = normalizeVenueKey(item.operatorId)
-                    const itemOperatorName = normalizeText(item.operatorName)
-                    const isSameCourtById =
-                      normalizedCourtId.length > 0 &&
-                      itemCourtId.length > 0 &&
-                      itemCourtId === normalizedCourtId
-                    const isSameCourtByName =
-                      normalizedCourtName.length > 0 &&
-                      itemCourtName.length > 0 &&
-                      itemCourtName === normalizedCourtName &&
-                      ((normalizedOperatorId.length > 0 &&
-                        itemOperatorId.length > 0 &&
-                        itemOperatorId === normalizedOperatorId) ||
-                        (normalizedOperatorName.length > 0 &&
-                          itemOperatorName.length > 0 &&
-                          itemOperatorName === normalizedOperatorName))
-                    if (!isSameCourtById && !isSameCourtByName) return
-                    const itemDate =
-                      item.date instanceof Date
-                        ? item.date
-                        : new Date(item.date)
-                    if (Number.isNaN(itemDate.getTime())) return
-                    const dateKey = format(itemDate, 'yyyy-MM-dd')
-                    if (!cartLabelsByDate.has(dateKey)) {
-                      cartLabelsByDate.set(dateKey, new Set<string>())
-                    }
-                    item.timeSlots?.forEach((slotLabel) => {
-                      if (slotLabel) {
-                        cartLabelsByDate.get(dateKey)?.add(slotLabel)
-                      }
-                    })
-                  })
-
-                  const rawPurpose = String(
-                    court.purpose ?? court.type ?? 'Others',
-                  )
-                  const purposeKey =
-                    rawPurpose
-                      .toLowerCase()
-                      .replace(/\bcourts?\b/g, '')
-                      .replace(/\s+/g, ' ')
-                      .trim() || 'others'
-                  const purposeText =
-                    purposeKey.charAt(0).toUpperCase() + purposeKey.slice(1)
-                  const purposeIcon = courtTypeIcons[purposeKey]
-
-                  const isCourtExpanded = expandedCourtId === court.id
-
-                  return (
-                    <div
-                      key={court.id}
-                      className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
-                    >
-                      {/* Court Header – Accordion Toggle */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          // On mobile, open booking modal; on desktop, toggle accordion
-                          if (window.innerWidth < 768) {
-                            handleBookCourt(court)
-                          } else {
-                            setExpandedCourtId(prev => (prev === court.id ? null : court.id))
-                          }
-                        }}
-                        className="w-full bg-white py-3 sm:py-4 px-5 sm:px-4 border-0 md:border-b md:border-gray-200 text-left hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div
-                              className="w-10 h-10 flex items-center justify-center shrink-0"
-                            >
-                              {(purposeKey === 'pickleball' || purposeKey === 'pickle') ? (
-                                <Icons.pickleball className="size-7 text-gray-900" />
-                              ) : purposeIcon && (
-                                <img
-                                  src={purposeIcon}
-                                  alt={`${purposeText} icon`}
-                                  className="size-7"
-                                  loading="lazy"
-                                />
-                              )}
-                            </div>
-                            <div>
-                              <h3 className="font-medium text-sm truncate">
-                                {purposeText} {court.name}
-                              </h3>
-                              <p className="mt-[2px] text-xs text-gray-500">
-                                {availableSlotsCount} slot{availableSlotsCount !== 1 ? 's' : ''} available
-                              </p>
-                            </div>
-                          </div>
-                          <ChevronDown
-                            className={`hidden md:block size-5 text-gray-400 transition-transform duration-200 shrink-0 ${isCourtExpanded ? 'rotate-180' : ''}`}
-                          />
-                        </div>
-                      </button>
-
-                      {/* Time Slots – Accordion Body */}
-                      {isCourtExpanded && (
-                        <div className="hidden md:block p-4">
-                          {selectedDates
-                            .sort((a, b) => a.getTime() - b.getTime())
-                            .map((date, dateIndex) => {
-                              const dateStr = format(date, 'yyyy-MM-dd')
-                              return (
-                                <div
-                                  key={dateStr}
-                                  className={
-                                    dateIndex > 0
-                                      ? 'mt-4 pt-4 border-t border-gray-200'
-                                      : ''
-                                  }
-                                >
-                                  {selectedDates.length > 1 && (
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                                      {format(date, 'EEE, MMM dd')}
-                                    </h4>
-                                  )}
-                                  <div className="space-y-4">
-                                    {(
-                                      ['', 'Morning', 'Afternoon', 'Evening'] as const
-                                    ).map((label, labelIndex) => {
-                                      const groupedRanges = timeRanges.filter(
-                                        (range) =>
-                                          getTimeGroup(range.startSlot.time) ===
-                                          label,
-                                      )
-                                      if (groupedRanges.length === 0) {
-                                        return null
-                                      }
-                                      return (
-                                        <div
-                                          key={`${dateStr}-${label}`}
-                                          className={`space-y-2 ${labelIndex > 0 ? 'pt-3' : ''}`}
-                                        >
-                                          {label ? (
-                                            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-500">
-                                              {label}
-                                            </div>
-                                          ) : null}
-                                          <div className="grid grid-cols-1 gap-2">
-                                            {groupedRanges.map((range) => {
-                                              const isAlreadyInCart =
-                                                cartLabelsByDate
-                                                  .get(dateStr)
-                                                  ?.has(range.label) ?? false
-                                              const isSelected =
-                                                isAlreadyInCart ||
-                                                selectedSlots[court.id]?.[
-                                                  dateStr
-                                                ]?.includes(range.id)
-                                              const isLimitReached =
-                                                !isAlreadyInCart &&
-                                                !selectedSlots[court.id]?.[
-                                                  dateStr
-                                                ]?.includes(range.id) &&
-                                                selectedCountForCourt >=
-                                                selectionLimit
-
-                                              return (
-                                                <button
-                                                  key={`${dateStr}-${range.id}`}
-                                                  onClick={() => {
-                                                    if (isAlreadyInCart) {
-                                                      toast.info(
-                                                        'Already added to cart',
-                                                        {
-                                                          description:
-                                                            'Check your cart to manage this slot.',
-                                                        },
-                                                      )
-                                                      return
-                                                    }
-                                                    if (range.available) {
-                                                      toggleTimeSlot(
-                                                        court.id,
-                                                        dateStr,
-                                                        range.id,
-                                                      )
-                                                    }
-                                                  }}
-                                                  disabled={
-                                                    (!range.available &&
-                                                      !isAlreadyInCart) ||
-                                                    isLimitReached
-                                                  }
-                                                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all text-left ${isSelected
-                                                    ? 'bg-gray-900 text-white'
-                                                    : !range.available ||
-                                                      isLimitReached
-                                                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                      : 'bg-gray-50 hover:bg-gray-100'
-                                                    }`}
-                                                >
-                                                  <div className="flex items-center gap-2">
-                                                    {isSelected ? (
-                                                      <Check className="size-4 flex-shrink-0" />
-                                                    ) : (
-                                                      <DynamicClock
-                                                        time={
-                                                          range.startSlot.time
-                                                        }
-                                                        className="size-4 flex-shrink-0"
-                                                      />
-                                                    )}
-                                                    <span className="font-medium whitespace-nowrap">
-                                                      {range.label}
-                                                    </span>
-                                                  </div>
-                                                  {(range.available ||
-                                                    isAlreadyInCart) && (
-                                                      <span className={`font-semibold ${isSelected ? 'text-white' : ''}`}>
-                                                        ₱{formatCurrency(range.price)}
-                                                      </span>
-                                                    )}
-                                                </button>
-                                              )
-                                            })}
-                                          </div>
-                                        </div>
-                                      )
-                                    })}
-                                  </div>
-                                </div>
-                              )
-                            })}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+                {/* Desktop View: Independent Columns Split */}
+                <div className="hidden sm:grid sm:grid-cols-2 sm:gap-4 md:gap-5 lg:gap-6 items-start">
+                  <div className="flex flex-col gap-4 md:gap-5 lg:gap-6">
+                    {operatorCourts
+                      .filter((_, index) => index % 2 === 0)
+                      .map((court) => renderCourt(court))}
+                  </div>
+                  <div className="flex flex-col gap-4 md:gap-5 lg:gap-6">
+                    {operatorCourts
+                      .filter((_, index) => index % 2 !== 0)
+                      .map((court) => renderCourt(court))}
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                <p className="text-gray-500 text-lg">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <p className="text-gray-500 text-sm sm:text-base">
                   No courts available at this facility
                 </p>
               </div>
