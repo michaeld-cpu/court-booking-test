@@ -1983,10 +1983,10 @@ export function HomePage({
           </div>
         ) : hasLoadedCourts && availableCourts.length === 0 ? (
           <EmptyState
-            wrapperClassName="min-h-[calc(100dvh-260px)] pb-[59px] md:min-h-[calc(100dvh-260px)] md:pb-0 flex items-center justify-center px-4 pt-0 pb-4"
+            wrapperClassName="min-h-[400px] flex items-start justify-center px-4 pt-24 sm:pt-32 pb-4"
             icon={
-              <div className="rounded-full bg-blue-100 p-4">
-                <LayoutGrid className="size-8 text-blue-600" />
+              <div className="rounded-full bg-gray-100/80 p-4">
+                <Icons.court className="size-8 text-gray-400 stroke-2" />
               </div>
             }
             title="No courts found"
