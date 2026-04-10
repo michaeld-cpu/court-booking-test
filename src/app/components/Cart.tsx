@@ -50,7 +50,7 @@ export function Cart({
       />
 
       {/* Cart Sidebar */}
-      <div className="fixed right-0 top-14 bottom-0 w-full md:w-[400px] bg-white shadow-xl z-[1300] flex flex-col border-t border-gray-100">
+      <div className="fixed right-0 top-14 bottom-0 w-full md:w-[400px] bg-white shadow-xl z-[1150] flex flex-col border-t border-gray-100">
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-4">
           {items.length === 0 ? (
