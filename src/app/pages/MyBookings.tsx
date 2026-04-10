@@ -741,9 +741,10 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   if (shouldShowSkeleton) {
     return (
       <div className="pt-0 md:pt-8 pb-0 md:pb-12 min-h-svh">
-        <div className="px-5 md:px-0 mb-2 md:mb-6 flex items-center justify-between pt-6 pb-4 sm:py-5 md:py-2 border-b border-gray-100 sm:border-none">
+        <div className="px-6 pr-4 sm:px-0 mb-0 md:mb-3 flex items-center justify-between gap-3 py-4 sm:py-5 md:py-2 lg:py-2 bg-neutral-900 text-white sm:bg-transparent sm:text-inherit">
           <h1
-            className="text-2xl md:text-3xl font-bold font-bebas uppercase tracking-wide text-gray-900"
+            className="text-xl md:text-2xl font-semibold text-white sm:text-inherit font-alegreya"
+            style={{ letterSpacing: '0.02em' }}
           >
             Bookings
           </h1>
