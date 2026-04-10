@@ -741,36 +741,6 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   if (shouldShowSkeleton) {
     return (
       <div className="pt-0 md:pt-8 pb-0 md:pb-12 min-h-svh">
-        <div className="px-6 pr-4 sm:px-0 mb-0 md:mb-3 flex items-center justify-between gap-3 py-4 sm:py-5 md:py-2 lg:py-2 bg-neutral-900 text-white sm:bg-transparent sm:text-inherit">
-          <h1
-            className="text-xl md:text-2xl font-semibold text-white sm:text-inherit font-alegreya"
-            style={{ letterSpacing: '0.02em' }}
-          >
-            Bookings
-          </h1>
-          <Select
-            value={groupBy}
-            onValueChange={(value: 'booking_date' | 'status') => setGroupBy(value)}
-          >
-            <SelectTrigger className="size-10 shrink-0 justify-center rounded-full border border-white/20 bg-transparent p-0 text-white shadow-none [&>svg]:hidden sm:h-9 sm:w-fit sm:min-w-0 sm:justify-end sm:rounded-md sm:border sm:border-border sm:bg-transparent sm:px-3 sm:text-sm sm:text-secondary-foreground sm:hover:bg-secondary/80">
-              <span className="inline-flex items-center justify-center sm:hidden">
-                <ListFilter className="size-4 text-white/85" />
-              </span>
-              <span className="hidden items-center justify-end gap-1.5 whitespace-nowrap sm:flex">
-                <ListFilter className="mr-1 size-3.5 text-muted-foreground" />
-                <SelectValue />
-              </span>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="booking_date">
-                Booking Date
-              </SelectItem>
-              <SelectItem value="status">
-                Status
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
         <div className="">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:items-start">
             <div className="hidden md:block order-2 md:order-1 md:col-span-1 md:sticky md:top-20">
