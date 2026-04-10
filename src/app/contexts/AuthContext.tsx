@@ -19,38 +19,18 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Helper to get initial state from localStorage
-  const getInitialAuth = () => {
-    if (typeof window === 'undefined') return { isAuthenticated: false, mobileNumber: null, token: null, name: null, user: null };
-    try {
-      const savedAuth = localStorage.getItem('courtbook_auth');
-      if (savedAuth) {
-        const { mobileNumber, token, name, user, timestamp } = JSON.parse(savedAuth);
-        const isValid = Date.now() - timestamp < 30 * 24 * 60 * 60 * 1000;
-        if (isValid && token) {
-          setAuthToken(token);
-          return { isAuthenticated: true, mobileNumber, token, name: name ?? null, user: user ?? null };
-        }
-      }
-    } catch (e) {
-      console.error('Failed to parse auth state', e);
-    }
-    return { isAuthenticated: false, mobileNumber: null, token: null, name: null, user: null };
-  };
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
+  const [user, setUser] = useState<{ id: number; name: string; email: string | null; role: string | null } | null>(null);
 
-  const initialAuth = getInitialAuth();
-  const [isAuthenticated, setIsAuthenticated] = useState(initialAuth.isAuthenticated);
-  const [mobileNumber, setMobileNumber] = useState<string | null>(initialAuth.mobileNumber);
-  const [token, setToken] = useState<string | null>(initialAuth.token);
-  const [name, setName] = useState<string | null>(initialAuth.name);
-  const [user, setUser] = useState<{ id: number; name: string; email: string | null; role: string | null } | null>(initialAuth.user);
-
-  // Still keep the useEffect but it will mostly be redundant now for initial load, 
-  // but good for cross-tab sync or if we need to re-verify.
+  // Load auth state from localStorage on mount
   useEffect(() => {
     const savedAuth = localStorage.getItem('courtbook_auth');
-    if (savedAuth && !isAuthenticated) {
+    if (savedAuth) {
       const { mobileNumber, token, name, user, timestamp } = JSON.parse(savedAuth);
+      // Keep user logged in for 30 days
       const isValid = Date.now() - timestamp < 30 * 24 * 60 * 60 * 1000;
       if (isValid && token) {
         setIsAuthenticated(true);
@@ -59,9 +39,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setName(name ?? null);
         setUser(user ?? null);
         setAuthToken(token);
+      } else {
+        localStorage.removeItem('courtbook_auth');
+        setAuthToken(null);
       }
     }
-  }, [isAuthenticated]);
+  }, []);
 
   const login = (auth: {
     mobileNumber: string;
