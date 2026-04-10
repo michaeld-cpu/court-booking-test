@@ -526,7 +526,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
     <>
       <Dialog open={isOpen && !isSummaryModalOpen} onOpenChange={handleClose}>
         <DialogContent
-          className="top-auto left-0 right-0 bottom-0 z-[1400] max-w-full translate-x-0 translate-y-0 rounded-t-2xl rounded-b-none border-0 p-0 !bg-gray-900 max-h-[80vh] overflow-hidden flex flex-col gap-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom [&>[data-slot='dialog-close']]:hidden sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0 sm:[&>[data-slot='dialog-close']]:inline-flex sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto sm:max-w-lg sm:max-h-[90vh] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:p-0"
+          className="top-auto left-0 right-0 bottom-0 z-[1400] max-w-full translate-x-0 translate-y-0 rounded-t-3xl rounded-b-none border-0 p-0 !bg-gray-900 max-h-[80vh] overflow-hidden flex flex-col gap-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom [&>[data-slot='dialog-close']]:hidden sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0 sm:[&>[data-slot='dialog-close']]:inline-flex sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto sm:max-w-lg sm:max-h-[90vh] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border sm:p-0"
           onTouchStart={handleSheetTouchStart}
           onTouchMove={handleSheetTouchMove}
           onTouchEnd={handleSheetTouchEnd}
@@ -565,9 +565,9 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
             <div className="flex items-center justify-between mt-2 gap-3">
               <div className="min-w-0 flex items-center gap-1.5 text-sm text-white/70">
                 {court.purpose?.toLowerCase().includes('pickle') ? (
-                  <Icons.pickleball className="size-4 text-[#C8F542]" />
+                  <Icons.pickleball className="size-4 text-white/70" />
                 ) : (
-                  <DynamicClock time="12:00 PM" className="size-4 text-[#C8F542]" />
+                  <DynamicClock time="12:00 PM" className="size-4 text-white/70" />
                 )}
                 <p className="truncate font-medium">
                   {(court.purpose ?? 'Others').charAt(0).toUpperCase() +
@@ -638,7 +638,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                       className={`space-y-2 ${groupIndex > 0 ? 'pt-3' : ''}`}
                     >
                       {group ? (
-                        <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+                        <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-gray-500">
                           {group}
                         </div>
                       ) : null}
@@ -675,9 +675,9 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                                 ) : (
                                   <DynamicClock time={range.startSlot.time} className="size-4 flex-shrink-0" />
                                 )}
-                                <div className="font-medium">{range.label}</div>
+                                <div className="font-semibold">{range.label}</div>
                               </div>
-                              <div className="font-medium">₱{formatCurrency(range.price)}</div>
+                              <div className="font-semibold">₱{formatCurrency(range.price)}</div>
                             </div>
                           </button>
                         );
@@ -697,8 +697,8 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
             {bookingDetails ? (
               <div className="h-12 rounded-lg bg-gray-50 px-4">
                 <div className="flex h-full items-center justify-between">
-                  <span className="text-sm font-bold">Total ({bookingDetails.duration} slot{bookingDetails.duration !== 1 ? 's' : ''})</span>
-                  <span className="text-sm font-bold">₱{formatCurrency(bookingDetails.totalPrice)}</span>
+                  <span className="text-sm font-semibold text-slate-900">Total ({bookingDetails.duration} slot{bookingDetails.duration !== 1 ? 's' : ''})</span>
+                  <span className="text-sm font-semibold text-slate-900">₱{formatCurrency(bookingDetails.totalPrice)}</span>
                 </div>
               </div>
             ) : (
@@ -736,7 +736,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                 <Button
                   onClick={handleConfirmBooking}
                   disabled={!bookingDetails}
-                  className="w-full h-12 gap-2 rounded-lg border-gray-300 text-sm font-semibold"
+                  className="w-full h-12 gap-2 rounded-xl border-gray-300 text-sm font-semibold"
                   variant="outline"
                 >
                   <ShoppingCart className="size-4" />
@@ -745,7 +745,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
                 <Button
                   onClick={handleOpenSummary}
                   disabled={!bookingDetails}
-                  className="w-full h-12 rounded-lg bg-gray-900 text-sm font-semibold hover:bg-gray-800"
+                  className="w-full h-12 rounded-xl bg-gray-900 text-sm font-semibold hover:bg-gray-800"
                 >
                   Checkout
                 </Button>

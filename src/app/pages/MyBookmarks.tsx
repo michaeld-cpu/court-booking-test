@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { mockCourts, operators } from '../data/mockData';
 import { Card } from '../components/ui/card';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import { EmptyState } from '../components/EmptyState';
 import { ArrowUpRight, Bookmark, ChevronRight, ListFilter, MapPin, Share2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Operator, Court } from '../types';
@@ -15,7 +16,6 @@ import {
 } from '../components/ui/select';
 import { resolveVenueBannerUrl } from '../lib/venueBanner';
 import { toast } from '@/app/lib/toast';
-import { EmptyState } from '../components/EmptyState';
 
 interface MyBookmarksProps {
   bookmarkedOperatorIds: string[];
@@ -170,27 +170,31 @@ export function MyBookmarks({
 
   if (resolvedBookmarkedOperators.length === 0) {
     return (
-      <div className="mx-auto flex min-h-[70vh] w-full max-w-[1300px] flex-col items-center justify-center px-4 md:px-0">
-        <Card className="flex w-full max-w-5xl flex-col items-center justify-center bg-white p-10 md:p-16 text-center border-gray-100 shadow-sm rounded-xl">
-          <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100/80">
-            <Bookmark className="size-8 text-gray-400" />
-          </div>
-          <h2 className="mb-0 text-3xl font-bold font-bebas uppercase tracking-widest text-gray-900">
-            No Saved Venues
-          </h2>
-          <p className="mb-4 max-w-sm text-sm font-medium leading-relaxed text-gray-500">
-            Tap the bookmark icon on any venue to save it<br className="hidden sm:block" /> here for quick access later.
-          </p>
-          <Button
-            asChild
-            className="h-12 rounded-full bg-[#C8F542] px-8 text-sm font-bold text-gray-900 hover:bg-[#b8e33b] shadow-sm transition-all"
-          >
-            <Link to="/" className="flex items-center gap-2">
-              Browse Courts
-              <ArrowUpRight className="size-4" />
-            </Link>
-          </Button>
-        </Card>
+      <div className="flex-1 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <EmptyState
+          wrapperClassName="flex items-center justify-center"
+          icon={
+            <div className="rounded-full bg-gray-100/80 p-4">
+              <Bookmark className="size-8 text-gray-400" />
+            </div>
+          }
+          title="No Saved Venues"
+          description={
+            <>
+              Tap the bookmark icon on any venue to save it<br className="hidden sm:block" /> here for quick access later.
+            </>
+          }
+          action={
+            <Button
+              asChild
+              className="h-11 px-6 py-2.5 rounded-lg text-sm font-medium bg-black text-white hover:bg-gray-900 shadow-sm transition-all w-fit"
+            >
+              <Link to="/">
+                Browse Courts
+              </Link>
+            </Button>
+          }
+        />
       </div>
     );
   }

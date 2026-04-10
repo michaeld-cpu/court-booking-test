@@ -76,6 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('courtbook_auth');
     setAuthToken(null);
     if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.clear();
+      } catch {
+        // Ignore session clearing failures.
+      }
       window.dispatchEvent(new Event('courtbook:logout'));
     }
   };

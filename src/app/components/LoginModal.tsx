@@ -472,7 +472,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-[350px]  border-0 overflow-hidden [&>button:last-child]:text-white [&>button:last-child]:opacity-90 [&>button:last-child]:hover:opacity-100 [&>button:last-child]:data-[state=open]:bg-white/10 [&>button:last-child]:data-[state=open]:text-white"
+        className="max-w-[350px] rounded-3xl border-0 overflow-hidden [&>button:last-child]:text-white [&>button:last-child]:opacity-90 [&>button:last-child]:hover:opacity-100 [&>button:last-child]:data-[state=open]:bg-white/10 [&>button:last-child]:data-[state=open]:text-white"
         aria-describedby={undefined}
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
@@ -497,7 +497,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
                   setRegisterMobile(playerNotFoundMobile)
                 }}
                 size="lg"
-                className="w-full h-11 sm:h-14 text-sm sm:text-lg gap-2 bg-gray-900 hover:bg-gray-800 shadow-md"
+                className="w-full h-11 sm:h-14 text-sm sm:text-lg gap-2 bg-gray-900 hover:bg-gray-800 shadow-md rounded-2xl"
               >
                 Register
               </Button>
@@ -662,7 +662,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
                     !loginPassword
                   }
                   size="lg"
-                  className="mt-2 w-full h-11 sm:h-14 text-sm sm:text-lg gap-2 bg-gray-900 hover:bg-gray-800 shadow-md"
+                  className="mt-2 w-full h-11 sm:h-14 text-sm sm:text-lg gap-2 bg-gray-900 hover:bg-gray-800 shadow-md rounded-2xl"
                 >
                   {isLoading ? (
                     'Signing in...'
