@@ -102,12 +102,6 @@ export function Header({
                 >
                   <span className="relative">
                     <Icon className="size-[18px]" strokeWidth={2.5} />
-                    {to === '/bookings' && (hasPendingBookings || hasConfirmedBookings) && (
-                      <span
-                        className={`absolute -top-1 -left-1 size-2 rounded-full ring-2 ring-white ${hasPendingBookings ? 'bg-red-500' : 'bg-emerald-500'
-                          }`}
-                      />
-                    )}
                   </span>
                   <span>{label}</span>
                 </Link>
@@ -225,9 +219,6 @@ export function Header({
                 >
                   <div className="relative">
                     <Icons.booking className="size-[18px] text-slate-900" strokeWidth={1.5} />
-                    {(hasPendingBookings || hasConfirmedBookings) && (
-                      <span className={`absolute -top-0.5 -right-0.5 size-1.5 rounded-full ring-[1.5px] ring-white ${hasPendingBookings ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                    )}
                   </div>
                   <span className="font-semibold text-[13px]">My Bookings</span>
                 </Link>

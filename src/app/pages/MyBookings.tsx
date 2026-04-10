@@ -8,6 +8,15 @@ import { isAxiosError } from 'axios';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog';
+import {
   addDays,
   addMonths,
   endOfDay,
@@ -105,6 +114,8 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   const [cancellingBookingId, setCancellingBookingId] = useState<string | null>(
     null,
   );
+  const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
+  const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'confirmed' | 'cancelled' | 'pending'>('all');
   const handledExpiredPendingKeysRef = useRef<Set<string>>(new Set());
 
@@ -241,6 +252,31 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
       // Ignore storage write failures.
     }
   }, [groupBy, groupingStorageKey]);
+
+  // Disable header interactions and darken background when dialog is open
+  useEffect(() => {
+    const header = document.querySelector('header');
+    const root = document.getElementById('root');
+    
+    if (isConfirmCancelOpen) {
+      header?.style.setProperty('pointer-events', 'none');
+      if (root) {
+        root.style.opacity = '0.5';
+      }
+    } else {
+      header?.style.setProperty('pointer-events', 'auto');
+      if (root) {
+        root.style.opacity = '1';
+      }
+    }
+
+    return () => {
+      header?.style.setProperty('pointer-events', 'auto');
+      if (root) {
+        root.style.opacity = '1';
+      }
+    };
+  }, [isConfirmCancelOpen]);
 
   const displayBookings = useMemo(
     () => (remoteBookings.length > 0 ? remoteBookings : bookings),
@@ -648,16 +684,17 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   };
 
   const handleCancelBooking = async (booking: Booking) => {
-    const shouldCancel = window.confirm(
-      'Cancel this pending booking? This action cannot be undone.',
-    );
-    if (!shouldCancel) {
-      return;
-    }
+    setBookingToCancel(booking);
+    setIsConfirmCancelOpen(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!bookingToCancel) return;
 
     try {
-      setCancellingBookingId(booking.id);
-      await api.post(`/api/bookings/${booking.id}/cancel`);
+      setCancellingBookingId(bookingToCancel.id);
+      setIsConfirmCancelOpen(false);
+      await api.post(`/api/bookings/${bookingToCancel.id}/cancel`);
       toast.success('Booking cancelled');
       await fetchBookings({ background: false });
     } catch (error) {
@@ -667,6 +704,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
       toast.error(message);
     } finally {
       setCancellingBookingId(null);
+      setBookingToCancel(null);
     }
   };
 
@@ -845,7 +883,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   }
 
   return (
-    <div className="pt-0 md:pt-4 pb-0 md:pb-8 min-h-svh">
+    <div className="pt-0 md:pt-4 pb-16 md:pb-24 min-h-svh">
       <div className="mx-auto w-full max-w-[1300px] mb-2 md:mb-6 flex items-center justify-between px-4 md:px-0 pt-6 pb-4 sm:py-5 md:py-2 border-b border-gray-100 sm:border-none">
         <h1
           className="text-2xl md:text-3xl font-bold font-bebas uppercase tracking-wide text-gray-900"
@@ -856,7 +894,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
       <div className="mx-auto w-full max-w-[1300px]">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:items-start">
-          <aside className="hidden md:block order-2 md:order-1 md:col-span-1 md:sticky md:top-20">
+          <aside className="hidden md:block order-2 md:order-1 md:col-span-1">
             <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:rounded-lg">
               <div className="mb-4 flex items-center justify-between gap-2 border-b border-gray-100 pb-3">
                 <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Calendar</p>
@@ -970,7 +1008,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
           <div className="order-1 md:order-2 md:col-span-2 flex flex-col gap-4">
             {/* Status Tabs/Pills */}
-            <div className="sticky top-[64px] z-20 py-3 md:sticky md:top-20 -mr-4 pr-4 md:mr-0 md:pr-0">
+            <div className="py-3 -mr-4 pr-4 md:mr-0 md:pr-0">
               <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar sm:pb-0">
                 <Select
                   value={groupBy}
@@ -1102,9 +1140,8 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                           {groupBy === 'status' && (
                             <Badge
                               variant="outline"
-                              className={`flex items-center gap-1 border-transparent bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${currentStatus.text}`}
+                              className={`border-transparent bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${currentStatus.text}`}
                             >
-                              <StatusIcon className="size-3" />
                               {statusText}
                             </Badge>
                           )}
@@ -1217,6 +1254,46 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
           </div>
         </div>
       </div>
+
+      {/* Cancellation Confirmation Dialog */}
+      <AlertDialog open={isConfirmCancelOpen} onOpenChange={(open) => {
+        // Prevent closing by pressing escape or clicking outside
+        if (!open && cancellingBookingId) {
+          return;
+        }
+        setIsConfirmCancelOpen(open);
+      }}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-bold">
+              Cancel Booking
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-600 mt-2">
+              {bookingToCancel && (
+                <div className="space-y-2">
+                  <p>
+                    Are you sure you want to cancel your booking for <strong>{bookingToCancel.operatorName}</strong>?
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    This action cannot be undone.
+                  </p>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-2 pt-4">
+            <AlertDialogCancel className="flex-1">
+              Keep
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmCancel}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+            >
+              Cancel
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
