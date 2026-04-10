@@ -15,7 +15,7 @@ export function AppErrorPage({ onRetry, onGoHome, errorMessage }: AppErrorPagePr
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-rose-600">
             Application Error
           </p>
-          <h1 className="mt-3 text-4xl font-semibold text-slate-900 md:text-5xl">
+          <h1 className="mt-3 text-4xl font-bebas uppercase tracking-widest text-slate-900 md:text-5xl">
             Something went wrong
           </h1>
           <p className="mt-4 text-base text-slate-600 md:text-lg">

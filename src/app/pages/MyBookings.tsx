@@ -80,7 +80,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
     }
   };
   const writeBookingsCache = useCallback((items: Booking[]) => {
-    if (typeof window === 'undefined' || items.length === 0) {
+    if (typeof window === 'undefined') {
       return;
     }
     try {
@@ -88,7 +88,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
     } catch {
       // Ignore cache write failures.
     }
-  }, []);
+  }, [bookingsCacheKey]);
   const [remoteBookings, setRemoteBookings] = useState<Booking[]>(getCachedBookings);
   const [hasCompletedInitialFetch, setHasCompletedInitialFetch] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -861,24 +861,27 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
   if (displayBookings.length === 0) {
     return (
-      <EmptyState
-        icon={
-          <div className="rounded-full bg-emerald-100 p-4">
-            <Calendar className="size-8 text-emerald-600" />
-          </div>
-        }
-        title="No bookings yet"
-        description={
-          <>
-            Your bookings will appear here <br />after you complete a payment.
-          </>
-        }
-        action={
-          <Button asChild size="lg" className="w-full sm:w-auto">
-            <Link to="/">Browse Courts</Link>
-          </Button>
-        }
-      />
+      <div className="flex-1 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <EmptyState
+          wrapperClassName="flex items-center justify-center"
+          icon={
+            <div className="rounded-full bg-gray-100/80 p-4">
+              <Calendar className="size-8 text-gray-400" />
+            </div>
+          }
+          title="No Bookings Yet"
+          description={
+            <>
+              Your bookings will appear here <br />after you complete a payment.
+            </>
+          }
+          action={
+            <Button asChild className="h-11 px-6 py-2.5 rounded-lg text-sm font-medium w-fit">
+              <Link to="/">Browse Courts</Link>
+            </Button>
+          }
+        />
+      </div>
     );
   }
 
@@ -1032,6 +1035,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                     {[
                       { id: 'all', label: 'All' },
                       { id: 'confirmed', label: 'Confirmed' },
+                      { id: 'pending', label: 'Pending' },
                       { id: 'cancelled', label: 'Cancelled' },
                     ].map((tab) => (
                       <button
@@ -1059,7 +1063,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 mb-3">
                     <ListFilter className="size-6 text-gray-300" />
                   </div>
-                  <p className="text-sm font-semibold text-gray-900">No results found</p>
+                  <p className="font-bebas text-[2rem] uppercase tracking-widest text-gray-900 leading-none mb-2">No results found</p>
                   <p className="text-xs text-gray-500 mt-1">Try clearing your filters or select a different date.</p>
                   <Button 
                     variant="outline" 
@@ -1205,17 +1209,17 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                               <div className="flex flex-col gap-2 mt-1">
                                 <div className="flex gap-2">
                                   {continuePaymentLink ? (
-                                    <Button className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest" asChild>
+                                    <Button className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest rounded-lg" asChild>
                                       <a href={continuePaymentLink} target="_blank" rel="noreferrer">Continue to Payment</a>
                                     </Button>
                                   ) : (
-                                    <Button className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest" onClick={() => toast.error('Payment link not found')}>
+                                    <Button className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest rounded-lg" onClick={() => toast.error('Payment link not found')}>
                                       Pay Now
                                     </Button>
                                   )}
                                   <Button 
                                     variant="outline" 
-                                    className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest border-gray-200"
+                                    className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest border-gray-200 rounded-lg"
                                     onClick={() => handleCancelBooking(booking)}
                                     disabled={cancellingBookingId === booking.id}
                                   >

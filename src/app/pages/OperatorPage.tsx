@@ -451,7 +451,7 @@ export function OperatorPage({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Operator Not Found</h1>
+          <h1 className="text-2xl font-bebas uppercase tracking-widest mb-4">Operator Not Found</h1>
           <Button onClick={() => navigate('/')}>Back to Home</Button>
         </div>
       </div>

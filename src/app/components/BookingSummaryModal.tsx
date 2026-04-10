@@ -1,4 +1,4 @@
-import { Calendar, ChevronDown, Loader2, ShoppingCart, X } from 'lucide-react'
+import { Calendar, ChevronDown, Loader2, ShoppingCart, X, ArrowLeft, Clock } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Court, TimeSlot } from '../types'
 import { format } from 'date-fns'
+import { Icons } from './ui/icons'
 import { DynamicClock } from './DynamicClock'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
@@ -561,225 +562,180 @@ export function BookingSummaryModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent
-          className="max-w-full w-full h-[100dvh] max-h-[100dvh] rounded-none overflow-hidden p-4 pb-[env(safe-area-inset-bottom)] sm:p-5 sm:pb-0 flex flex-col bg-[#f3f4f6] sm:max-h-[90vh] sm:h-auto sm:w-full sm:max-w-lg sm:rounded-lg"
+      <DialogContent
+          className="max-w-full w-full h-full sm:h-auto sm:max-h-[95vh] sm:w-[500px] top-0 sm:top-[50%] translate-y-0 sm:translate-y-[-50%] rounded-none sm:rounded-3xl overflow-hidden p-0 flex flex-col bg-white z-[1500] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
-          <DialogHeader className="pb-0 pl-1">
-            <DialogTitle
-              className="text-xl"
-              style={{ fontFamily: 'Alegreya Sans, sans-serif', letterSpacing: '0.02em' }}
-            >
-              Booking Summary
-            </DialogTitle>
-            <DialogDescription className="text-sm text-gray-500 -mt-1">
-              Please review your booking details below.
-            </DialogDescription>
-            {bookingError && (
-              <div className="mt-2 mb-0 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                {bookingError}
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 sm:px-8 pt-5 sm:pt-6 pb-0 relative bg-transparent z-10">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={onClose}
+                className="flex items-center justify-center size-10 rounded-full bg-white/80 backdrop-blur shadow-sm text-slate-900 hover:bg-white transition-colors"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="size-5" />
+              </button>
+              <div>
+                <DialogTitle
+                  className="text-xl font-medium text-slate-900"
+                  style={{ fontFamily: 'Alegreya Sans, sans-serif', letterSpacing: '0.01em' }}
+                >
+                  Booking Summary
+                </DialogTitle>
+                <DialogDescription className="text-xs text-gray-400 font-medium mt-0.5">
+                  Please review your booking details below.
+                </DialogDescription>
               </div>
-            )}
-          </DialogHeader>
+            </div>
+          </div>
+          {bookingError && (
+            <div className="mt-4 mx-1 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {bookingError}
+            </div>
+          )}
 
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain space-y-6 pb-2 px-0.5">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain space-y-6 pb-6 px-5 sm:px-8">
             <div className="bg-transparent p-0">
               {/* <h3 className="mb-3 text-base font-semibold text-gray-900">Venue</h3> */}
               <div className="space-y-4">
               {visibleBookingGroups.map(({ court, date, ranges, groupKey }) => {
                 return (
-                  <div
-                    key={groupKey}
-                    className="overflow-hidden rounded-lg border border-gray-200 bg-white"
-                  >
-                    {/* Court Header */}
-                    <div className="bg-white px-4 py-4 border-b border-gray-200">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <strong className="font-semibold text-sm text-gray-900">
-                            {court.operatorName} -{' '}
-                            {(court.purpose ?? 'Others')
-                              .charAt(0)
-                              .toUpperCase() +
-                              (court.purpose ?? 'Others').slice(1)}{' '}
-                            {court.name}
-                          </strong>
-                          <div className="mt-2 flex items-center gap-2">
-                            <Calendar className="size-4 text-slate-500" />
-                            <p className="text-xs text-slate-600">
-                              {format(
-                                typeof date === 'string'
-                                  ? new Date(date)
-                                  : date,
-                                'EEE, MMM dd, yyyy',
-                              )}
-                            </p>
+                      <div
+                        key={groupKey}
+                        className="overflow-hidden rounded-2xl bg-[#0a1e30] text-white p-5 shadow-sm"
+                      >
+                        {/* Dark Venue Card Content */}
+                        <div className="space-y-4">
+                          <div className="space-y-3">
+                            <strong className="text-xl font-medium block">
+                              {court.operatorName}
+                            </strong>
+                            <div className="flex flex-col gap-2.5">
+                              <div className="flex items-center gap-2 text-gray-400">
+                                <Icons.paddle className="size-4 shrink-0" />
+                                <span className="text-sm">
+                                  {(court.purpose ?? 'Others')
+                                    .charAt(0)
+                                    .toUpperCase() +
+                                    (court.purpose ?? 'Others').slice(1)}{' '}
+                                  {court.name}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-gray-400">
+                                <Calendar className="size-4 shrink-0" />
+                                <span className="text-sm">
+                                  {format(
+                                    typeof date === 'string'
+                                      ? new Date(date)
+                                      : date,
+                                    'EEE, MMM dd, yyyy',
+                                  )}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        {visibleBookingGroups.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setRemovedBookingGroupKeys((prev) => {
-                                const next = new Set(prev)
-                                next.add(groupKey)
-                                return next
-                              })
-                            }}
-                            className="inline-flex h-6 w-6 shrink-0 items-center justify-center text-gray-500 hover:text-gray-700 -mr-1"
-                            aria-label="Remove booking group"
-                          >
-                            <X className="size-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Time Slots */}
-                    <div className="space-y-1 bg-white px-4 py-3">
-                      {ranges.length > bookingSummaryToggleMinSlots ? (
-                        <>
-                          <button
-                            type="button"
-                            className="flex w-full items-center justify-between py-1 text-left"
-                            onClick={() => {
-                              setExpandedSlotGroups((prev) => {
-                                const next = new Set(prev)
-                                if (next.has(groupKey)) {
-                                  next.delete(groupKey)
-                                } else {
-                                  next.add(groupKey)
-                                }
-                                return next
-                              })
-                            }}
-                            aria-label={
-                              expandedSlotGroups.has(groupKey)
-                                ? 'Hide all slots'
-                                : 'Show all slots'
-                            }
-                          >
-                            <div className="flex items-center gap-1.5 text-sm">
-                              <DynamicClock
-                                time={formatTimeValue(
-                                  ranges[0].startSlot.time,
-                                  true,
-                                )}
-                                className="size-4 flex-shrink-0"
-                              />
-                              <span className="text-sm font-semibold text-gray-900">
-                                {formatTimeRangeLabel(
-                                  ranges[0].startSlot.time,
-                                  ranges[ranges.length - 1].endSlot.time,
-                                )}
-                              </span>
-                              {/* <span className="text-[11px] text-slate-600">
-                                · {ranges.length} hours
-                              </span> */}
-                            </div>
-                            <div className="inline-flex items-center gap-2">
-                              <span className="text-sm font-semibold text-gray-900">
-                                ₱
-                                {formatCurrency(
-                                  ranges.reduce(
-                                    (sum, range) => sum + range.price,
-                                    0,
-                                  ),
-                                )}
-                              </span>
-                              <ChevronDown
-                                className={`size-4 text-gray-500 transition-transform ${
-                                  expandedSlotGroups.has(groupKey)
-                                    ? 'rotate-180'
-                                    : ''
-                                }`}
-                              />
-                            </div>
-                          </button>
-                          {expandedSlotGroups.has(groupKey) &&
-                            ranges.map((range, rangeIndex) => (
+ 
+                          {/* Time Slots - Dark Highlight Box */}
+                          <div className="mt-4 space-y-2">
+                            {ranges.map((range, rangeIndex) => (
                               <div
                                 key={rangeIndex}
-                                className="flex items-center justify-between py-1 pl-4.5"
+                                className="flex items-center justify-between py-3 px-4 rounded-xl bg-[#162e44] border border-white/5"
                               >
-                                <div className="flex items-center gap-2 text-sm">
-                                  <DynamicClock
-                                    time={formatTimeValue(
-                                      range.startSlot.time,
-                                      true,
-                                    )}
-                                    className="size-4 flex-shrink-0"
-                                  />
-                                  <span>
+                                <div className="flex items-center gap-3 text-sm">
+                                  <Clock className="size-4 text-[#C8F542]" />
+                                  <span className="font-medium text-slate-100">
                                     {formatTimeRangeLabel(
                                       range.startSlot.time,
                                       range.endSlot.time,
                                     )}
                                   </span>
                                 </div>
-                                <span className="text-sm">
+                                <span className="text-sm font-medium text-slate-100">
                                   ₱{formatCurrency(range.price)}
                                 </span>
                               </div>
                             ))}
-                        </>
-                      ) : (
-                        ranges.map((range, rangeIndex) => (
-                          <div
-                            key={rangeIndex}
-                            className="flex items-center justify-between py-1"
-                          >
-                            <div className="flex items-center gap-2 text-sm">
-                              <DynamicClock
-                                time={formatTimeValue(range.startSlot.time, true)}
-                                className="size-5 flex-shrink-0"
-                              />
-                              <span>
-                                {formatTimeRangeLabel(
-                                  range.startSlot.time,
-                                  range.endSlot.time,
-                                )}
-                              </span>
-                            </div>
-                            <span className="text-sm">
-                              ₱{formatCurrency(range.price)}
-                            </span>
                           </div>
-                        ))
-                      )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
 
-                      {/* Subtotal removed */}
+            {/* Guest Details */}
+            <div className="space-y-3 px-0.5">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500">Contact</p>
+                <button
+                  type="button"
+                  onClick={() => setShowGuestForm((prev) => !prev)}
+                  className="text-xs font-medium text-blue-600 uppercase tracking-wider"
+                >
+                  {showGuestForm ? 'Done' : 'Edit'}
+                </button>
+              </div>
+              <div className="overflow-hidden rounded-xl bg-gray-50/50">
+                {showGuestForm ? (
+                  <div className="space-y-4 p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Name</label>
+                      <Input
+                        value={guestName}
+                        onChange={(event) => setGuestName(event.target.value)}
+                        placeholder="Guest name"
+                        className="h-11 bg-gray-50/50 border-gray-100 text-slate-900 placeholder:text-gray-400 focus:bg-white transition-all rounded-lg"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Mobile Number</label>
+                      <Input
+                        value={contactNumber}
+                        onChange={(event) => setContactNumber(event.target.value)}
+                        placeholder="09XXXXXXXXX"
+                        className="h-11 bg-gray-50/50 border-gray-100 text-slate-900 placeholder:text-gray-400 focus:bg-white transition-all rounded-lg"
+                      />
                     </div>
                   </div>
-                )
-              })}
+                ) : (
+                  <div className="flex flex-col">
+                    <div className="px-4 py-3.5 text-base font-medium text-slate-700 bg-gray-50/80 rounded-t-xl">
+                      {guestName?.trim() || 'Guest name'}
+                    </div>
+                    <div className="px-4 py-3.5 text-base font-medium text-slate-500 bg-gray-50/30 rounded-b-xl border-t border-white">
+                      {contactNumber?.trim() || 'Mobile number'}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             {(isLoadingPaymentOutlets || paymentOutlets.length > 0) && (
               <div className="space-y-3 px-0.5">
-                <p className="text-base font-semibold text-slate-700">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500 leading-none">
                   Payment Method
                 </p>
                 {isLoadingPaymentOutlets && paymentOutlets.length === 0 ? (
-                  <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+                  <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
                     {Array.from({ length: 3 }).map((_, index) => (
                       <div
                         key={`payment-method-skeleton-${index}`}
-                        className={`flex items-center justify-between px-4 py-3 ${
-                          index < 2 ? 'border-b border-gray-200' : ''
+                        className={`flex items-center justify-between px-4 py-4 ${
+                          index < 2 ? 'border-b border-gray-100' : ''
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="size-6 rounded-full bg-gray-200 animate-pulse" />
-                          <div className="h-4 w-32 rounded bg-gray-200 animate-pulse" />
+                          <div className="size-5 rounded-full bg-gray-100 animate-pulse" />
+                          <div className="h-4 w-32 rounded bg-gray-100 animate-pulse" />
                         </div>
-                        <div className="h-6 w-16 rounded bg-gray-200 animate-pulse" />
+                        <div className="h-6 w-16 rounded bg-gray-100 animate-pulse" />
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+                  <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
                     {paymentOutlets.map((outlet, index) => {
                       const isSelected = selectedPaymentOutletId === outlet.id
                       return (
@@ -788,34 +744,38 @@ export function BookingSummaryModal({
                           type="button"
                           onClick={() => setSelectedPaymentOutletId(outlet.id)}
                           aria-pressed={isSelected}
-                          className={`flex w-full items-center justify-between px-4 py-3 text-left transition-colors ${
+                          className={`flex w-full items-center justify-between px-4 py-4 text-left transition-all ${
                             index < paymentOutlets.length - 1
-                              ? 'border-b border-gray-200'
+                              ? 'border-b border-gray-100'
                               : ''
                           } ${
                             isSelected
-                              ? 'bg-blue-50'
+                              ? 'bg-blue-50/50'
                               : 'bg-white hover:bg-gray-50'
                           }`}
                         >
-                          <div className="flex items-center gap-3 -ml-1">
-                            <span
-                              className={`size-6 rounded-full border ${
+                          <div className="flex items-center gap-3.5">
+                            <div
+                              className={`size-5 rounded-full border-2 flex items-center justify-center transition-all ${
                                 isSelected
-                                  ? 'border-blue-600 bg-blue-600 shadow-[inset_0_0_0_4px_#eff6ff]'
-                                  : 'border-slate-400 bg-white'
+                                  ? 'border-blue-600 bg-blue-600'
+                                  : 'border-gray-300 bg-white'
                               }`}
-                            />
-                            <span className="text-sm font-medium text-slate-900">
+                            >
+                              {isSelected && (
+                                <div className="size-2 rounded-full bg-white" />
+                              )}
+                            </div>
+                            <span className="text-[15px] font-medium text-slate-900">
                               {outlet.name}
                             </span>
                           </div>
-                          <span className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-2">
                             {outlet.iconUrl1 && (
                               <img
                                 src={outlet.iconUrl1}
                                 alt=""
-                                className="h-5 w-auto object-contain"
+                                className="h-5 w-auto object-contain brightness-105"
                                 loading="lazy"
                               />
                             )}
@@ -823,11 +783,11 @@ export function BookingSummaryModal({
                               <img
                                 src={outlet.iconUrl2}
                                 alt=""
-                                className="h-5 w-auto object-contain"
+                                className="h-5 w-auto object-contain brightness-105"
                                 loading="lazy"
                               />
                             )}
-                          </span>
+                          </div>
                         </button>
                       )
                     })}
@@ -836,98 +796,33 @@ export function BookingSummaryModal({
               </div>
             )}
 
-            {/* Guest Details */}
-            <div className="space-y-3 px-0.5">
-              <div className="flex items-center justify-between">
-                <p className="text-base font-semibold text-slate-700">Contact</p>
-                <button
-                  type="button"
-                  onClick={() => setShowGuestForm((prev) => !prev)}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700"
-                >
-                  {showGuestForm ? 'Done' : 'Edit'}
-                </button>
-              </div>
-              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-                {showGuestForm ? (
-                  <div className="space-y-3 p-5">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-500">Name</label>
-                      <Input
-                        value={guestName}
-                        onChange={(event) => setGuestName(event.target.value)}
-                        placeholder="Guest name"
-                        className={`mt-1 h-12 sm:h-14 text-base sm:text-lg border-0 focus-visible:ring-1 focus-visible:ring-blue-500 transition-colors ${subtleInsetFieldClass}`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-500">Mobile Number</label>
-                      <Input
-                        value={contactNumber}
-                        onChange={(event) => setContactNumber(event.target.value)}
-                        placeholder="09XXXXXXXXX"
-                        className={`mt-1 h-12 sm:h-14 text-base sm:text-lg border-0 focus-visible:ring-1 focus-visible:ring-blue-500 transition-colors ${subtleInsetFieldClass}`}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-500">
-                        Add booking notes
-                      </label>
-                      <Textarea
-                        ref={notesTextareaRef}
-                        value={userNotes}
-                        onChange={(event) => setUserNotes(event.target.value)}
-                       
-                        className={`mt-1 min-h-24 text-base border-0 text-slate-700 focus-visible:ring-1 focus-visible:ring-blue-500 transition-colors ${subtleInsetFieldClass}`}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="px-4 py-3 text-sm text-slate-900">
-                      {guestName?.trim() || 'Guest name'}
-                    </div>
-                    <div className="border-t border-gray-200 px-4 py-3 text-sm text-slate-600">
-                      {contactNumber?.trim() || 'Mobile number'}
-                    </div>
-                    {userNotes.trim() && (
-                      <div className="border-t border-gray-200 px-4 py-3 text-sm text-slate-600">
-                        {userNotes.trim()}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* Footer with Total and Actions */}
-          <div className="sticky z-20 -mt-4 -mx-4 sm:-mx-5  bg-white/150  shadow-[0_-2px_12px_rgba(15,23,42,0.12)]  ">
-              <div className="flex items-center justify-between px-5 py-3">
-                <span className="text-mediun font-semibold text-slate-900">
-                  Total
-                </span>
-                <span className="text-mediun font-bold text-slate-900">
-                  ₱{formatCurrency(finalTotalPrice)}
-                </span>
-              </div>
-              <div className="p-5 pt-1">
-                <Button
-                  onClick={handlePayNow}
-                  disabled={
-                    isSubmitting ||
-                    visibleBookingGroups.length === 0 ||
-                    (paymentOutlets.length > 0 && !selectedPaymentOutletId)
-                  }
-                  className=" w-full  hover:brightness-105"
-                >
-                  {isSubmitting
-                    ? 'Submitting...'
-                    : visibleBookingGroups.length === 0
-                      ? 'No slots selected'
-                      : `Pay Now`}
-                </Button>
-              </div>
+          <div className="sticky bottom-0 z-20 mt-auto bg-white border-t border-gray-50 px-5 sm:px-8 py-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-8">
+            <div className="flex items-center justify-between mb-5">
+              <span className="text-lg font-medium text-slate-900">
+                Total
+              </span>
+              <span className="text-xl font-medium text-slate-900">
+                ₱{formatCurrency(finalTotalPrice)}
+              </span>
+            </div>
+            <Button
+              onClick={handlePayNow}
+              disabled={
+                isSubmitting ||
+                visibleBookingGroups.length === 0 ||
+                (paymentOutlets.length > 0 && !selectedPaymentOutletId)
+              }
+              className="w-full h-14 text-lg font-medium bg-black hover:bg-slate-900 text-white rounded-2xl shadow-lg transition-all active:scale-[0.98] disabled:bg-gray-200"
+            >
+              {isSubmitting
+                ? 'Submitting...'
+                : visibleBookingGroups.length === 0
+                  ? 'No slots selected'
+                  : `Pay Now`}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -981,7 +876,7 @@ export function BookingSummaryModal({
                       className="transition-[stroke-dashoffset] duration-1000 ease-linear"
                     />
                   </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-gray-900">
+                  <div className="absolute inset-0 flex items-center justify-center text-lg font-medium text-gray-900">
                     {redirectCountdown}
                   </div>
                 </div>
@@ -1007,7 +902,7 @@ export function BookingSummaryModal({
               <Button
                 className="w-full max-w-sm"
                 onClick={() => {
-                  const opened = window.open(paymentLink, '_blank')
+                  const opened = window.open(paymentLink || undefined, '_blank')
                   if (opened) {
                     setPaymentLink(null)
                     navigate('/bookings')
