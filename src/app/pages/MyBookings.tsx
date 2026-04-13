@@ -464,7 +464,25 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
       });
     }
 
-    return result;
+    const statusPriority: Record<string, number> = {
+      active: 0,
+      confirmed: 1,
+      pending: 2,
+      expired: 3,
+      cancelled: 4,
+    };
+
+    return [...result].sort((a, b) => {
+      const aStatus = getStatusMeta(a).statusLabel;
+      const bStatus = getStatusMeta(b).statusLabel;
+      const aPrio = statusPriority[aStatus] ?? 99;
+      const bPrio = statusPriority[bStatus] ?? 99;
+
+      if (aPrio !== bPrio) {
+        return aPrio - bPrio;
+      }
+      return 0;
+    });
   }, [displayBookings, calendarMode, calendarRange, filterStatus, now]);
 
   useEffect(() => {
@@ -758,7 +776,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
       return [{ key: 'booking_date', label: null, items: indexed }];
     }
 
-    const statusOrder = ['pending', 'confirmed', 'expired', 'cancelled'];
+    const statusOrder = ['active', 'confirmed', 'pending', 'expired', 'cancelled'];
     const sectionMap = new Map<string, typeof indexed>();
     indexed.forEach((item) => {
       const key = item.statusLabel;
