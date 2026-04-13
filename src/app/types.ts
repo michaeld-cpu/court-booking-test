@@ -16,6 +16,7 @@ export interface Court {
   location: string;
   city: string;
   image: string;
+  photos?: string[];
   amenities: string[];
   rating: number;
   pricePerHour: number;
@@ -37,6 +38,7 @@ export interface Operator {
   operatingHours: string;
   websiteUrl?: string;
   image: string;
+  photos?: string[];
   profileImage?: string;
   coordinates: {
     lat: number;

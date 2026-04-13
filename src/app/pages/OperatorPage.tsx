@@ -19,6 +19,7 @@ import {
   Globe,
   ChevronDown,
   X,
+  Camera,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Icons } from '../components/ui/icons';
@@ -34,6 +35,7 @@ import { BookingSummaryModal } from '../components/BookingSummaryModal';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { CourtCard } from '../components/CourtCard';
 import { VenueMapView } from '../components/VenueMapView';
+import { ImageViewerModal } from '../components/ImageViewerModal';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 import { Calendar as CalendarComponent } from '../components/ui/calendar';
 import { addHours, format, isSameDay, parse } from 'date-fns';
@@ -123,6 +125,9 @@ export function OperatorPage({
   const [isMobileDatePickerOpen, setIsMobileDatePickerOpen] = useState(false);
   const [isMobileDateBarPinned, setIsMobileDateBarPinned] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [imageViewerIndex, setImageViewerIndex] = useState(0);
+  const [imageViewerPhotos, setImageViewerPhotos] = useState<string[]>([]);
   const [preselectedTimeSlot, setPreselectedTimeSlot] = useState<string | null>(null);
   const [selectedSlots, setSelectedSlots] = useState<Record<string, Record<string, string[]>>>({});
   const [expandedCourtId, setExpandedCourtId] = useState<string | null>(null);
@@ -257,7 +262,7 @@ export function OperatorPage({
           city: cityGuess,
           isCovered: venue.is_covered ?? undefined,
           description: venue.description ?? '',
-          amenities: [],
+          amenities: ['Parking', 'Restrooms', 'Water Station', 'Covered Courts', 'Equipment Rental'],
           rating: 0,
           phone: venue.contact_number ?? '',
           email: '',
@@ -267,6 +272,12 @@ export function OperatorPage({
             getVenueBannerUrl(venue, false),
             operatorIdValue,
           ),
+          photos: [
+            'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=640&q=80',
+            'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=640&q=80',
+            'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=640&q=80',
+            'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=640&q=80'
+          ],
           profileImage: resolveVenueBannerUrl(
             getVenueBannerUrl(venue, true),
             `${operatorIdValue}-profile`,
@@ -361,7 +372,16 @@ export function OperatorPage({
             location: operatorLocation,
             city: operatorCity,
             image: courtInfo.image ?? '',
-            amenities: [],
+            amenities: index % 2 === 0 ? ['Indoor', 'Air Conditioning', 'Parking'] : ['Outdoor', 'Restrooms', 'Equipment Rental'],
+            photos: index % 2 === 0 ? [
+              'https://images.unsplash.com/photo-1544298621-35a764866120?w=640&q=80',
+              'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=640&q=80',
+              'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=640&q=80'
+            ] : [
+              'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=640&q=80',
+              'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=640&q=80',
+              'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=640&q=80'
+            ],
             rating: 0,
             pricePerHour: 0,
             availableSlots: mapSlots(entry.slots ?? courtInfo.slots ?? entry.time_slots ?? []),
@@ -1297,6 +1317,8 @@ export function OperatorPage({
                 </p>
               </div>
 
+
+
               <div>
                 <h3 className="text-sm sm:text-base font-medium mb-3">
                   Location
@@ -1328,6 +1350,59 @@ export function OperatorPage({
                   <span className="truncate">{operator.location}</span>
                 </div>
               </div>
+
+              {/* Photos Section */}
+              {(() => {
+                const allPhotos: string[] = [];
+                if (operator.photos) allPhotos.push(...operator.photos);
+                operatorCourts.forEach((c) => {
+                  if (c.photos) {
+                    c.photos.forEach((p) => {
+                      if (!allPhotos.includes(p)) allPhotos.push(p);
+                    });
+                  }
+                });
+                if (allPhotos.length === 0) return null;
+                const maxVisible = 3;
+                const visible = allPhotos.slice(0, maxVisible);
+                const remaining = allPhotos.length - maxVisible;
+                return (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm sm:text-base font-medium">Photos</h3>
+                      <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                        <Camera className="size-3.5" />
+                        <span>{allPhotos.length}</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5 rounded-lg overflow-hidden">
+                      {visible.map((photo, index) => (
+                        <div 
+                          key={index} 
+                          className="relative aspect-square overflow-hidden bg-gray-100 cursor-pointer"
+                          onClick={() => {
+                            setImageViewerPhotos(allPhotos);
+                            setImageViewerIndex(index);
+                            setIsImageViewerOpen(true);
+                          }}
+                        >
+                          <img
+                            src={photo}
+                            alt={`Venue photo ${index + 1}`}
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                          {index === maxVisible - 1 && remaining > 0 && (
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                              <span className="text-white text-lg font-semibold">+{remaining}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div>
                 <h3 className="text-sm sm:text-base font-medium mb-3">
@@ -1435,21 +1510,28 @@ export function OperatorPage({
                   )}
                 </div>
               </div>
-              {operator.amenities && operator.amenities.length > 0 && (
-                <div>
-                  <h3 className="text-sm sm:text-base font-semibold mb-3">Amenities</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {operator.amenities.map((amenity) => (
-                      <span
-                        key={amenity}
-                        className="inline-block rounded-full bg-gray-900 px-3.5 py-1.5 text-xs font-medium text-white"
-                      >
-                        {amenity}
-                      </span>
-                    ))}
+              {(() => {
+                const allAmenities = new Set<string>(operator.amenities ?? []);
+                operatorCourts.forEach((c) => {
+                  c.amenities?.forEach((a) => allAmenities.add(a));
+                });
+                if (allAmenities.size === 0) return null;
+                return (
+                  <div>
+                    <h3 className="text-sm sm:text-base font-medium mb-3">Amenities</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {Array.from(allAmenities).map((amenity) => (
+                        <span
+                          key={amenity}
+                          className="inline-block rounded-full bg-gray-900 px-3.5 py-1.5 text-xs font-medium text-white"
+                        >
+                          {amenity}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </div>
 
@@ -1630,6 +1712,13 @@ export function OperatorPage({
           </div>
         </DialogContent>
       </Dialog>
+
+      <ImageViewerModal
+        images={imageViewerPhotos}
+        initialIndex={imageViewerIndex}
+        isOpen={isImageViewerOpen}
+        onClose={() => setIsImageViewerOpen(false)}
+      />
 
       {/* Floating Cart Pill / Expanded Summary */}
       {totals.hasSelections && (
