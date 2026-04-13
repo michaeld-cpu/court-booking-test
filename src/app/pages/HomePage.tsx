@@ -1453,166 +1453,160 @@ export function HomePage({
   return (
     <>
       {/* Mobile Header Banner - Layered Variant */}
-      <header className="flex sm:hidden flex-col -mx-4 px-4 pt-2 pb-6 space-y-4">
-        {/* Title Card */}
-        <div className="bg-[#0D1F35] rounded-[1rem] p-8 pb-10 flex flex-col space-y-2.5 relative overflow-hidden border border-white/5">
-          {/* Subtle accent light */}
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#C8F542]/10 to-transparent rounded-full pointer-events-none" />
+      <header className="flex sm:hidden flex-col relative z-0 overflow-hidden text-white -mx-4 mb-2">
+        <ImageWithFallback
+          src={bannerImages[currentImageIndex]}
+          alt="Banner"
+          className="absolute inset-0 w-full h-full object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-[#0F273A]/90 pointer-events-none"></div>
 
-          <div className="text-[#C8F542] text-[10px] font-regular tracking-[0.25em] uppercase opacity-90">
-            Book Your Game
+        <div className="relative z-10 flex flex-col">
+          {/* Title Area */}
+          <div className="px-6 pt-10 pb-8 flex flex-col space-y-2.5">
+            <div className="text-[#C8F542] text-[10px] font-medium tracking-[0.2em] uppercase opacity-90">
+              Book Your Game
+            </div>
+            <h1
+              className="text-[46px] font-medium leading-[0.95] text-white tracking-wide"
+              style={{
+                fontFamily: 'Bebas Neue, sans-serif',
+                letterSpacing: '0.01em',
+              }}
+            >
+              FIND YOUR <span className="text-[#C8F542]">COURT</span>
+            </h1>
+            <p className="text-gray-300 text-sm leading-relaxed mt-2 max-w-sm"
+              style={{ fontFamily: 'DM sans, sans-serif' }}>
+              Browse and book courts near you. Play pickleball, badminton, tennis and more across the Philippines.
+            </p>
           </div>
-          <h1
-            className="text-[50px] font-medium leading-[0.95] text-white tracking-wide"
-            style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              letterSpacing: '0.02em',
-            }}
-          >
-            FIND YOUR <span className="text-[#C8F542]">COURT</span>
-          </h1>
-          <p className="text-gray-400 text-[13px] leading-relaxed font-regular"
-            style={{ fontFamily: 'DM sans, sans-serif' }}>
-            Browse and book courts near you. Play pickleball, badminton, tennis and more access the Philippines.
-          </p>
-        </div>
 
-        {/* Filter Card */}
-        <div className="bg-white rounded-[1rem] shadow-sm sm:shadow-md border border-gray-200 overflow-hidden divide-y divide-gray-50">
-          {/* Filter 1: City */}
-          <Select
-            value={selectedCity}
-            onValueChange={(value) => {
-              if (value === 'Current Location') {
-                requestUserLocation(undefined, {
-                  fallbackToDumaguete: false,
-                  showPromptOnError: true,
-                })
-                return
-              }
-              setSelectedCity(value)
-              if (value === 'All Locations') {
-                setSelectedLocationCoords(null)
-                setHasUserLocation(false)
-                setUserLocation(null)
-                setIsLocationResolved(true);
-                return
-              }
-              const selectedLocation = availableLocations.find(
-                (location) => location.name === value,
-              )
-              if (selectedLocation) {
-                setSelectedLocationCoords({
-                  lat: Number(selectedLocation.latitude),
-                  lng: Number(selectedLocation.longitude),
-                })
-                setHasUserLocation(false)
-                setIsLocationResolved(true)
-              }
-            }}
-          >
-            <SelectTrigger className="flex w-full items-center gap-4 p-5 py-10 hover:bg-gray-50/50 transition-colors border-0 bg-transparent h-auto shadow-none focus:ring-0 [&>svg]:hidden text-left group">
-              <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
-                <MapPin className="size-5 text-gray-500" />
-              </div>
-              <div className="flex-1 flex flex-col items-start min-w-0">
-                <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider mb-0.5 pointer-events-none">Location</span>
-                <span className="text-gray-900 text-[15px] font-medium truncate pointer-events-none w-full text-left">
-                  <SelectValue placeholder="Select city" />
-                </span>
-              </div>
-              <div className="flex shrink-0">
-                <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="z-[3000]">
-              {(!availableLocations.some((loc) => loc.name === selectedCity) &&
-                selectedCity !== 'All Locations') && (
-                  <SelectItem value={selectedCity.startsWith('lat:') ? selectedCity : 'Current Location'}>
-                    {selectedCity.startsWith('lat:')
-                      ? selectedCity
-                      : 'Current Location'}
-                  </SelectItem>
-                )}
-              {availableLocations.map((location) => (
-                <SelectItem key={location.name} value={location.name}>
-                  {location.description || location.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Filter 2: Date */}
-          <Popover
-            open={isMobileDatePickerOpen}
-            onOpenChange={setIsMobileDatePickerOpen}
-          >
-            <PopoverTrigger asChild>
-              <button className="flex w-full items-center gap-4 p-5 py-5 hover:bg-gray-50/50 transition-colors border-0 bg-transparent h-auto text-left group">
-                <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
-                  <Calendar className="size-5 text-gray-500" />
-                </div>
-                <div className="flex-1 flex flex-col items-start min-w-0">
-                  <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Date</span>
-                  <span className="w-full text-left text-gray-900 text-[15px] font-medium truncate">
-                    {isSameDay(selectedDate, new Date()) ? 'Today' : format(selectedDate, 'MMM d')}
+          {/* Filters Area */}
+          <div className="flex flex-col bg-[#0F273A]/40 backdrop-blur-md divide-y divide-white/10 border-t border-white/10 relative z-20 pb-2">
+            {/* Filter 1: City */}
+            <Select
+              value={selectedCity}
+              onValueChange={(value) => {
+                if (value === 'Current Location') {
+                  requestUserLocation(undefined, {
+                    fallbackToDumaguete: false,
+                    showPromptOnError: true,
+                  })
+                  return
+                }
+                setSelectedCity(value)
+                if (value === 'All Locations') {
+                  setSelectedLocationCoords(null)
+                  setHasUserLocation(false)
+                  setUserLocation(null)
+                  setIsLocationResolved(true);
+                  return
+                }
+                const selectedLocation = availableLocations.find(
+                  (location) => location.name === value,
+                )
+                if (selectedLocation) {
+                  setSelectedLocationCoords({
+                    lat: Number(selectedLocation.latitude),
+                    lng: Number(selectedLocation.longitude),
+                  })
+                  setHasUserLocation(false)
+                  setIsLocationResolved(true)
+                }
+              }}
+            >
+              <SelectTrigger className="w-full h-auto py-4 px-6 border-0 bg-transparent text-white hover:bg-white/5 transition-colors rounded-none shadow-none focus:ring-0 [&>svg]:hidden flex items-center justify-between group">
+                <div className="flex items-center justify-start gap-4">
+                  <MapPin className="size-[18px] text-[#C8F542] shrink-0" />
+                  <span className="text-[15px] font-medium pointer-events-none text-left flex-1 min-w-0 truncate">
+                    <SelectValue placeholder="Select city" />
                   </span>
                 </div>
-                <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="z-[3000] w-auto p-0"
-              align="end"
-            >
-              <CalendarComponent
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => {
-                  if (!date) return
-                  setSelectedDate(date)
-                  setIsMobileDatePickerOpen(false)
-                }}
-                disabled={{ before: new Date() }}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
+                <ChevronDown className="size-4 text-white/50 shrink-0 group-data-[state=open]:rotate-180 transition-transform" />
+              </SelectTrigger>
+              <SelectContent className="z-[3000]">
+                {(!availableLocations.some((loc) => loc.name === selectedCity) &&
+                  selectedCity !== 'All Locations') && (
+                    <SelectItem value={selectedCity.startsWith('lat:') ? selectedCity : 'Current Location'}>
+                      {selectedCity.startsWith('lat:')
+                        ? selectedCity
+                        : 'Current Location'}
+                    </SelectItem>
+                  )}
+                {availableLocations.map((location) => (
+                  <SelectItem key={location.name} value={location.name}>
+                    {location.description || location.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {/* Filter 3: Court Type */}
-          <Select
-            value={selectedCourtType}
-            onValueChange={setSelectedCourtType}
-          >
-            <SelectTrigger className="flex w-full items-center gap-4 p-5 py-10 hover:bg-gray-50/50 transition-colors border-0 bg-transparent h-auto shadow-none focus:ring-0 [&>svg]:hidden text-left group">
-              <div className="bg-gray-50 flex items-center justify-center size-10 rounded-full shrink-0">
-                <LayoutGrid className="size-5 text-gray-500" />
-              </div>
-              <div className="flex-1 flex flex-col items-start min-w-0">
-                <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider mb-0.5 pointer-events-none">Court Type</span>
-                <span className="w-full text-left text-gray-900 text-[15px] font-medium truncate pointer-events-none">
-                  <SelectValue placeholder="Select court type" />
-                </span>
-              </div>
-              <div className="flex shrink-0">
-                <ChevronDown className="size-5 text-gray-300 group-data-[state=open]:rotate-180 transition-transform" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="z-[3000]">
-              <SelectItem value="All Courts">All Courts</SelectItem>
-              {Array.from(
-                new Set(
-                  availableCourts.map(
-                    (court) => court.purpose ?? court.type ?? 'Others',
+            {/* Filter 2: Date */}
+            <Popover
+              open={isMobileDatePickerOpen}
+              onOpenChange={setIsMobileDatePickerOpen}
+            >
+              <PopoverTrigger asChild>
+                <button className="flex w-full items-center justify-between p-4 px-6 hover:bg-white/5 transition-colors border-0 bg-transparent h-auto text-left group text-white">
+                  <div className="flex items-center justify-start gap-4 min-w-0">
+                    <Calendar className="size-[18px] text-[#C8F542] shrink-0" />
+                    <span className="text-[15px] font-medium truncate flex-1 block">
+                      {renderDateLabel(selectedDate)}
+                    </span>
+                  </div>
+                  <ChevronDown className="size-4 text-white/50 shrink-0 group-data-[state=open]:rotate-180 transition-transform" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="z-[3000] w-auto p-0"
+                align="end"
+              >
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    if (!date) return
+                    setSelectedDate(date)
+                    setIsMobileDatePickerOpen(false)
+                  }}
+                  disabled={{ before: new Date() }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            {/* Filter 3: Court Type */}
+            <Select
+              value={selectedCourtType}
+              onValueChange={setSelectedCourtType}
+            >
+              <SelectTrigger className="w-full h-auto py-4 px-6 border-0 bg-transparent text-white hover:bg-white/5 transition-colors rounded-none shadow-none focus:ring-0 [&>svg]:hidden flex items-center justify-between group">
+                <div className="flex items-center justify-start gap-4 min-w-0">
+                  <LayoutGrid className="size-[18px] text-[#C8F542] shrink-0" />
+                  <span className="text-[15px] font-medium pointer-events-none truncate text-left flex-1 block">
+                    <SelectValue placeholder="Select court type" />
+                  </span>
+                </div>
+                <ChevronDown className="size-4 text-white/50 shrink-0 group-data-[state=open]:rotate-180 transition-transform" />
+              </SelectTrigger>
+              <SelectContent className="z-[3000]">
+                <SelectItem value="All Courts">All Courts</SelectItem>
+                {Array.from(
+                  new Set(
+                    availableCourts.map(
+                      (court) => court.purpose ?? court.type ?? 'Others',
+                    ),
                   ),
-                ),
-              ).map((purpose) => (
-                <SelectItem key={purpose} value={purpose}>
-                  {purpose.charAt(0).toUpperCase() + purpose.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                ).map((purpose) => (
+                  <SelectItem key={purpose} value={purpose}>
+                    {purpose.charAt(0).toUpperCase() + purpose.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </header>
 
@@ -1799,7 +1793,7 @@ export function HomePage({
                   : <>&nbsp;</>
                 : 'Loading courts...'}
             </h2>
-            <div className="hidden md:flex items-center gap-1 bg-white pt-1 pb-1 shadow-none border-none">
+            <div className="flex items-center gap-1 bg-white pt-1 pb-1 shadow-none border-none">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
