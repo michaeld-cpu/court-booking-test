@@ -563,7 +563,7 @@ export function BookingSummaryModal({
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-          className="max-w-full w-full h-full sm:h-auto sm:max-h-[95vh] sm:w-[500px] top-0 sm:top-[50%] translate-y-0 sm:translate-y-[-50%] rounded-none sm:rounded-3xl overflow-hidden p-0 flex flex-col bg-white z-[1500] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none"
+          className="max-w-full w-full h-full sm:h-auto sm:max-h-[95vh] sm:w-[500px] top-0 sm:top-[50%] translate-y-0 sm:translate-y-[-50%] rounded-none sm:rounded-3xl overflow-hidden p-0 flex flex-col bg-white z-[3020] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           {/* Header */}
@@ -828,7 +828,7 @@ export function BookingSummaryModal({
       </Dialog>
       {(isSubmitting || paymentLink) && (
         <div
-          className="fixed inset-0 z-[3000] flex h-screen w-screen items-center justify-center bg-white p-6"
+          className="fixed inset-0 z-[4000] flex h-screen w-screen items-center justify-center bg-white p-6"
           role="dialog"
           aria-modal="true"
           aria-label="Payment Redirect"

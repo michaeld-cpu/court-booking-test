@@ -526,7 +526,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
     <>
       <Dialog open={isOpen && !isSummaryModalOpen} onOpenChange={handleClose}>
         <DialogContent
-          className="top-auto left-0 right-0 bottom-0 z-[1400] max-w-full translate-x-0 translate-y-0 rounded-t-3xl rounded-b-none border-0 p-0 !bg-gray-900 max-h-[80vh] overflow-hidden flex flex-col gap-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom [&>[data-slot='dialog-close']]:hidden sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0 sm:[&>[data-slot='dialog-close']]:inline-flex sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto sm:max-w-lg sm:max-h-[90vh] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border sm:p-0"
+          className="top-auto left-0 right-0 bottom-0 z-[3010] max-w-full translate-x-0 translate-y-0 rounded-t-3xl rounded-b-none border-0 p-0 !bg-gray-900 max-h-[80vh] overflow-hidden flex flex-col gap-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom [&>[data-slot='dialog-close']]:hidden sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0 sm:[&>[data-slot='dialog-close']]:inline-flex sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto sm:max-w-lg sm:max-h-[90vh] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:border sm:p-0"
           onTouchStart={handleSheetTouchStart}
           onTouchMove={handleSheetTouchMove}
           onTouchEnd={handleSheetTouchEnd}
