@@ -278,10 +278,46 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
     };
   }, [isConfirmCancelOpen]);
 
-  const displayBookings = useMemo(
-    () => (remoteBookings.length > 0 ? remoteBookings : bookings),
-    [remoteBookings, bookings]
-  );
+  const displayBookings = useMemo(() => {
+    const baseBookings = remoteBookings.length > 0 ? remoteBookings : bookings;
+    
+    // Inject a fake Active booking for side-by-side previewing
+    const fakeActiveBooking: Booking = {
+      id: 'fake-active-001',
+      courtId: 'court-11',
+      courtName: 'Court 1',
+      courtType: 'Pickleball',
+      status: 'active',
+      guestName: 'Michael Diopenes',
+      venueContactNumber: '0917-123-4567',
+      date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+      timeSlotFrom: '09:00 AM',
+      timeSlotTo: '11:00 AM',
+      price: 600,
+      operatorId: 'operator-f1',
+      operatorName: 'PREMIUM PICKLEBALL ARENA',
+      location: '123 Elite Sports Ave, Central City',
+      city: 'Central City',
+      bookingCourts: [
+        {
+          id: 1,
+          court: {
+            id: 1,
+            number: 1,
+            purpose: 'PICKLE',
+            type: 'Pickleball'
+          },
+          slot_count: 2,
+          slots: [
+            { id: 1, start_time: '09:00', end_time: '10:00' },
+            { id: 2, start_time: '10:00', end_time: '11:00' }
+          ]
+        }
+      ]
+    };
+
+    return [fakeActiveBooking, ...baseBookings];
+  }, [remoteBookings, bookings]);
 
   useEffect(() => {
     const activePendingKeys = new Set(
@@ -1136,14 +1172,18 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
                     // Dynamic Status Styling for the new lime-green ticket card side
                     // Dynamic Status Styling for the navy background
+                    const isActive = statusLabel === 'confirmed' || statusLabel === 'active';
+
+                    // Dynamic Status Styling depending on card theme
                     const getStatusBadgeClasses = (status: string) => {
+                      if (isActive) {
+                        return 'bg-[#C8F542]/10 text-[#C8F542] border border-[#C8F542]/20';
+                      }
                       switch (status) {
-                        case 'pending': return 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
+                        case 'pending': return 'bg-amber-50 text-amber-600 border border-amber-200';
                         case 'cancelled': 
-                        case 'expired': return 'bg-red-500/10 text-red-500 border border-red-500/20';
-                        case 'active':
-                        case 'confirmed': return 'bg-[#C8F542]/10 text-[#C8F542] border border-[#C8F542]/20';
-                        default: return 'bg-white/5 text-gray-300 border border-white/10';
+                        case 'expired': return 'bg-red-50 text-red-600 border border-red-200';
+                        default: return 'bg-gray-50 text-gray-600 border border-gray-200';
                       }
                     };
 
@@ -1151,137 +1191,114 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
                     return (
                       <div key={booking.id} className="flex flex-col">
-                        <div className="overflow-hidden rounded-[1.25rem] shadow-lg relative flex flex-col sm:flex-row bg-[#0A1E2D] ring-1 ring-white/10 mb-4 items-stretch">
-                          {/* LEFT PANEL: Dark Navy */}
-                          <div className="flex-1 flex flex-col p-5 sm:p-6 text-white min-w-0">
+                        <div className={`overflow-hidden rounded-[1.25rem] shadow-sm relative flex flex-col sm:flex-row mb-4 items-stretch ${isActive ? 'bg-[#0A1E2D] ring-1 ring-white/10 shadow-lg' : 'bg-white ring-1 ring-gray-200'}`}>
+                          {/* LEFT PANEL */}
+                          <div className={`flex-1 flex flex-col p-5 sm:p-6 min-w-0 ${isActive ? 'text-white' : 'text-gray-900'}`}>
                             <div className="flex w-full justify-between items-start mb-3">
-                              <div className="flex flex-col">
-                                <div className="text-xl md:text-2xl font-bebas tracking-wide text-white uppercase break-words pr-2 leading-none">{booking.operatorName}</div>
-                                <div className="text-gray-400 text-xs font-bold tracking-tight mt-1.5 whitespace-nowrap">PK-{bookingIdShort}</div>
-                              </div>
-                              <div className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest shadow-sm shrink-0 ${getStatusBadgeClasses(statusLabel)}`}>
-                                {statusText}
+                              <div className="flex flex-col gap-1.5">
+                                <div className={`text-xl md:text-2xl font-bebas tracking-wide uppercase break-words pr-2 leading-none ${isActive ? 'text-white' : 'text-gray-900'}`}>{booking.operatorName}</div>
+                                <div className={`flex items-start gap-1.5 text-xs font-medium pr-4 ${isActive ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  <MapPin className={`size-3.5 shrink-0 mt-0.5 ${isActive ? 'text-[#C8F542]' : 'text-gray-400'}`} />
+                                  <span className="line-clamp-2">{booking.location}</span>
+                                </div>
+                                <div className={`text-[10px] font-bold tracking-widest mt-0.5 whitespace-nowrap ${isActive ? 'text-gray-500' : 'text-gray-400'}`}>PK-{bookingIdShort}</div>
                               </div>
                             </div>
                             
-                            <div className="border-t border-white/10 w-full mb-5"></div>
+                            <div className={`border-t w-full mb-4 ${isActive ? 'border-white/10' : 'border-gray-100'}`}></div>
 
                             {/* Court / Sport */}
-                            <div className="flex flex-col space-y-2 mb-6">
-                              <div className="text-[8.5px] font-bold uppercase tracking-widest text-[#C8F542] px-2.5 py-1 rounded-full border border-[#C8F542]/40 w-fit shrink-0 bg-[#C8F542]/10 mb-1">
+                            <div className="flex flex-col space-y-2 mb-5">
+                              <div className={`text-[8.5px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border w-fit shrink-0 mb-0.5 ${isActive ? 'text-[#C8F542] border-[#C8F542]/40 bg-[#C8F542]/10' : 'text-gray-500 border-gray-200 bg-gray-50'}`}>
                                 {bookingCourts[0]?.court?.purpose || booking.courtType}
                               </div>
-                              <h3 className="text-lg sm:text-xl font-semibold tracking-tight text-white line-clamp-1">
+                              <h3 className={`text-lg sm:text-xl font-semibold tracking-tight line-clamp-1 ${isActive ? 'text-white' : 'text-gray-900'}`}>
                                 {bookingCourts[0]?.court?.number ? `Court ${bookingCourts[0]?.court?.number}` : booking.courtName}
                               </h3>
-                              <div className="flex items-start gap-1.5 text-gray-400 text-xs font-medium">
-                                <MapPin className="size-4 shrink-0 text-[#C8F542]" />
-                                <span className="line-clamp-2">{booking.location}</span>
-                              </div>
                             </div>
 
-                            {/* Date / Time / Duration Grid */}
-                            <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-auto">
+                            {/* Date / Time / Duration / Cost Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-auto">
                                <div className="flex flex-col">
-                                  <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1.5">
-                                     <Calendar className="size-3.5 text-[#C8F542]"/> DATE
+                                  <div className={`flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-widest font-bold mb-1.5 ${isActive ? 'text-gray-400' : 'text-gray-500'}`}>
+                                     <Calendar className={`size-3.5 ${isActive ? 'text-[#C8F542]' : 'text-gray-400'}`}/> DATE
                                   </div>
-                                  <div className="text-[11px] sm:text-sm font-bold tracking-tight text-white">{playDateLabel}</div>
+                                  <div className={`text-[11px] sm:text-sm font-bold tracking-tight ${isActive ? 'text-white' : 'text-gray-900'}`}>{playDateLabel}</div>
                                </div>
-                               <div className="flex flex-col border-l border-white/10 pl-3 sm:pl-4">
-                                  <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1.5">
-                                     <Clock className="size-3.5 text-[#C8F542]"/> TIME
+                               <div className={`flex flex-col border-l pl-3 sm:pl-4 ${isActive ? 'border-white/10' : 'border-gray-200'}`}>
+                                  <div className={`flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-widest font-bold mb-1.5 ${isActive ? 'text-gray-400' : 'text-gray-500'}`}>
+                                     <Clock className={`size-3.5 ${isActive ? 'text-[#C8F542]' : 'text-gray-400'}`}/> TIME
                                   </div>
-                                  <div className="text-[11px] sm:text-sm font-bold tracking-tight text-white">
+                                  <div className={`text-[11px] sm:text-sm font-bold tracking-tight ${isActive ? 'text-white' : 'text-gray-900'}`}>
                                     {bookingCourts[0]?.slots?.[0]?.start_time 
                                       ? formatTimeRangeLabel(bookingCourts[0].slots[0].start_time, bookingCourts[bookingCourts.length-1]?.slots?.[(bookingCourts[bookingCourts.length-1]?.slots?.length || 1) - 1]?.end_time || '')
                                       : 'TBD'}
                                   </div>
                                </div>
-                               <div className="flex flex-col border-l border-white/10 pl-3 sm:pl-4">
-                                  <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1.5">
+                               <div className={`flex flex-col border-l pl-3 sm:pl-4 ${isActive ? 'border-white/10' : 'border-gray-200'}`}>
+                                  <div className={`flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-widest font-bold mb-1.5 ${isActive ? 'text-gray-400' : 'text-gray-500'}`}>
                                      DURATION
                                   </div>
-                                  <div className="text-[11px] sm:text-sm font-bold tracking-tight text-white">
+                                  <div className={`text-[11px] sm:text-sm font-bold tracking-tight ${isActive ? 'text-white' : 'text-gray-900'}`}>
                                     {slotCount} hour{slotCount !== 1 ? 's' : ''}
+                                  </div>
+                               </div>
+                               <div className={`flex flex-col border-l pl-3 sm:pl-4 ${isActive ? 'border-white/10' : 'border-gray-200'}`}>
+                                  <div className={`flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-widest font-bold mb-1.5 ${isActive ? 'text-gray-400' : 'text-gray-500'}`}>
+                                     TOTAL COST
+                                  </div>
+                                  <div className={`text-[11px] sm:text-sm font-bold tracking-tight ${isActive ? 'text-[#C8F542]' : 'text-gray-900'}`}>
+                                    ₱{formatCurrency(Number(booking.price ?? 0))}
                                   </div>
                                </div>
                             </div>
 
-                            <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between">
+                            <div className={`mt-5 pt-4 border-t flex items-center justify-between ${isActive ? 'border-white/10' : 'border-gray-100'}`}>
                               <div className="flex items-center">
-                                <span className="text-[8.5px] uppercase font-bold tracking-widest text-gray-500 mr-2">BOOKED BY</span>
-                                <span className="text-xs font-semibold tracking-tight text-gray-300">{booking.guestName || 'David Garcia'}</span>
+                                <span className={`text-[8.5px] uppercase font-bold tracking-widest mr-2 ${isActive ? 'text-gray-500' : 'text-gray-400'}`}>BOOKED BY</span>
+                                <span className={`text-xs font-semibold tracking-tight ${isActive ? 'text-gray-300' : 'text-gray-700'}`}>{booking.guestName || 'David Garcia'}</span>
                               </div>
-                              <div className="text-[9px] text-gray-500 font-medium hidden sm:block italic">
+                              <div className={`text-[9px] font-medium hidden sm:block italic ${isActive ? 'text-gray-500' : 'text-gray-400'}`}>
                                 Keep this ticket handy.
                               </div>
                             </div>
 
                             {/* Action Buttons Section */}
-                            <div className="mt-5 pt-4 border-t border-white/5 flex flex-col gap-2 w-full">
-                              {statusLabel === 'pending' && (
-                                <>
-                                  <div className="flex flex-col sm:flex-row gap-2">
-                                    {continuePaymentLink ? (
-                                      <Button className="flex-1 h-11 bg-[#C8F542] text-[#0A1E2D] hover:bg-[#b5de3b] rounded-lg font-bold text-[11px] uppercase tracking-widest shadow-md" asChild>
-                                        <a href={continuePaymentLink} target="_blank" rel="noreferrer">Pay Now</a>
-                                      </Button>
-                                    ) : (
-                                      <Button className="flex-1 h-11 bg-[#C8F542] text-[#0A1E2D] hover:bg-[#b5de3b] rounded-lg font-bold text-[11px] uppercase tracking-widest shadow-md" onClick={() => toast.error('Payment link not found')}>
-                                        Pay Now
-                                      </Button>
-                                    )}
-                                    <Button 
-                                      variant="outline" 
-                                      className="sm:w-[120px] h-11 border-gray-600 text-gray-300 bg-transparent rounded-lg font-bold text-[10px] uppercase tracking-widest hover:text-white hover:bg-white/5 transition-colors"
-                                      onClick={() => handleCancelBooking(booking)}
-                                      disabled={cancellingBookingId === booking.id}
-                                    >
-                                      Cancel
-                                    </Button>
-                                  </div>
-                                  <div className="text-center sm:text-left mt-1">
-                                    <span className="text-[10px] sm:bg-transparent bg-white/5 font-bold text-amber-500 rounded p-1 sm:p-0 inline-block uppercase tracking-widest animate-pulse">
-                                      {isBookingExpired ? 'Expired' : `Holds for ${countdown ?? '00:00'}`}
-                                    </span>
-                                  </div>
-                                </>
-                              )}
-
-                              {(statusLabel === 'confirmed' || statusLabel === 'active') && (
+                            {statusLabel === 'pending' && (
+                              <div className="mt-5 pt-4 border-t flex flex-col gap-2 w-full border-gray-50">
                                 <div className="flex flex-col sm:flex-row gap-2">
-                                  <Button 
-                                    className="flex-1 h-10 bg-white/10 text-white hover:bg-white/20 rounded-lg font-bold text-[10px] uppercase tracking-widest shadow-sm transition-colors"
-                                    onClick={() => handleShareVenue(booking)}
-                                  >
-                                    <Share2 className="size-3.5 mr-2" /> Share Ticket
-                                  </Button>
-                                  <Button 
-                                    variant="outline" 
-                                    className="flex-1 h-10 border-gray-600 text-white bg-transparent hover:bg-white/5 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-colors p-0"
-                                    asChild
-                                  >
-                                    <Link to={`/operator/${booking.operatorId}`}>Browse</Link>
-                                  </Button>
+                                  {continuePaymentLink ? (
+                                    <Button className="flex-1 h-11 bg-black text-white hover:bg-neutral-800 rounded-lg font-bold text-[11px] uppercase tracking-widest shadow-md" asChild>
+                                      <a href={continuePaymentLink} target="_blank" rel="noreferrer">Pay Now</a>
+                                    </Button>
+                                  ) : (
+                                    <Button className="flex-1 h-11 bg-black text-white hover:bg-neutral-800 rounded-lg font-bold text-[11px] uppercase tracking-widest shadow-md" onClick={() => toast.error('Payment link not found')}>
+                                      Pay Now
+                                    </Button>
+                                  )}
                                   <Button 
                                     variant="outline" 
-                                    className="flex-1 h-10 border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20 hover:text-red-300 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-colors p-0"
+                                    className="sm:w-[120px] h-11 border-gray-300 text-gray-700 bg-transparent rounded-lg font-bold text-[10px] uppercase tracking-widest hover:text-black hover:bg-gray-50 transition-colors"
                                     onClick={() => handleCancelBooking(booking)}
                                     disabled={cancellingBookingId === booking.id}
                                   >
                                     Cancel
                                   </Button>
                                 </div>
-                              )}
-                            </div>
+                                <div className="text-center sm:text-left mt-1">
+                                  <span className="text-[10px] bg-red-50 font-bold text-red-600 rounded-md px-2 py-1 inline-block uppercase tracking-widest animate-pulse border border-red-100">
+                                    {isBookingExpired ? 'Expired' : `Holds for ${countdown ?? '00:00'}`}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
                           </div>
 
-                          {/* RIGHT PANEL: Lime Green (Price Stub) */}
-                          <div className="w-full sm:w-[140px] shrink-0 bg-[#C8F542] p-5 sm:p-6 flex flex-col justify-center items-center text-[#0A1E2D]">
-                            <div className="text-[10px] uppercase font-bold tracking-widest opacity-60 mb-1">Total Cost</div>
-                            <div className="text-4xl sm:text-5xl font-bebas tracking-wide tabular-nums leading-none">
-                              ₱{formatCurrency(Number(booking.price ?? 0))}
+                          {/* RIGHT PANEL: Status Stub */}
+                          <div className={`w-full sm:w-[150px] shrink-0 p-5 sm:px-4 sm:py-6 flex flex-col justify-center items-center ${isActive ? 'bg-[#C8F542] text-[#0A1E2D]' : 'bg-gray-50 text-gray-900 border-t sm:border-t-0 sm:border-l border-gray-200'}`}>
+                            <div className="text-[10px] uppercase font-bold tracking-widest opacity-60 mb-2">Pass Status</div>
+                            <div className={`font-bebas tracking-wide uppercase leading-none text-center w-full whitespace-nowrap ${statusText.length > 7 ? 'text-2xl sm:text-2xl' : 'text-3xl lg:text-4xl'}`}>
+                              {statusText}
                             </div>
                           </div>
                         </div>
