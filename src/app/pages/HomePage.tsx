@@ -1524,7 +1524,9 @@ export function HomePage({
                     <SelectValue placeholder="Select city" />
                   </span>
                 </div>
-                <ChevronDown className="size-4 text-white/50 shrink-0 group-data-[state=open]:rotate-180 transition-transform" />
+                <div className="shrink-0 group-data-[state=open]:rotate-180 transition-transform">
+                  <ChevronDown className="size-4 text-white/50" />
+                </div>
               </SelectTrigger>
               <SelectContent className="z-[3000]">
                 {(!availableLocations.some((loc) => loc.name === selectedCity) &&
@@ -1589,7 +1591,9 @@ export function HomePage({
                     <SelectValue placeholder="Select court type" />
                   </span>
                 </div>
-                <ChevronDown className="size-4 text-white/50 shrink-0 group-data-[state=open]:rotate-180 transition-transform" />
+                <div className="shrink-0 group-data-[state=open]:rotate-180 transition-transform">
+                  <ChevronDown className="size-4 text-white/50" />
+                </div>
               </SelectTrigger>
               <SelectContent className="z-[3000]">
                 <SelectItem value="All Courts">All Courts</SelectItem>
