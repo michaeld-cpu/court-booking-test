@@ -71,7 +71,7 @@ export function Header({
 
   return (
     <header
-      className="bg-white fixed top-0 left-0 right-0 z-[1200] block w-full"
+      className="bg-white fixed top-0 left-0 right-0 z-[2000] block w-full"
     >
       <div className="mx-auto w-full max-w-[1300px] px-4 md:px-8 py-3">
         <nav className="flex items-center justify-between h-14">
@@ -114,7 +114,7 @@ export function Header({
             {/* Cart button */}
             <button
               onClick={isAuthenticated ? onCartClick : onLoginClick}
-              className="hidden md:flex relative items-center justify-center h-10 w-10 rounded-full bg-gray-100/80 text-slate-700 hover:bg-gray-100 transition-colors"
+              className="hidden md:flex relative items-center justify-center h-10 w-10 rounded-full bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors"
               aria-label="Cart"
             >
               <Icons.cart className="size-[18px] text-slate-800" strokeWidth={2.5} />

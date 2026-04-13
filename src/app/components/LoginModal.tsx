@@ -463,7 +463,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
     >
       <div className="absolute inset-0 bg-gradient-to-b from-black/75 to-black/50 backdrop-blur-lg" />
       <div className="relative px-5 py-6 text-center sm:px-6 sm:py-7">
-        <h2 className="text-xl sm:text-2xl font-semibold text-white">{title}</h2>
+        <h2 className="text-3xl sm:text-4xl font-normal tracking-wide uppercase text-white" style={{ fontFamily: "'Bebas Neue', cursive" }}>{title}</h2>
         <p className="mt-1 text-sm sm:text-base text-white/85">{subtitle}</p>
       </div>
     </div>
@@ -662,7 +662,7 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
                     !loginPassword
                   }
                   size="lg"
-                  className="mt-2 w-full h-11 sm:h-14 text-sm sm:text-lg gap-2 bg-gray-900 hover:bg-gray-800 shadow-md rounded-2xl"
+                  className="mt-2 w-full h-11 sm:h-14 text-sm sm:text-lg gap-2 bg-gray-900 hover:bg-gray-800 shadow-md"
                 >
                   {isLoading ? (
                     'Signing in...'
