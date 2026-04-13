@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Booking } from '../types';
-import { Calendar, ChevronDown, Globe, ListFilter, Phone, User, Clock, Share2, CheckCircle2, XCircle, PlayCircle, AlertCircle } from 'lucide-react';
+import { Calendar, ChevronDown, Globe, ListFilter, Phone, User, Clock, Share2, CheckCircle2, XCircle, PlayCircle, AlertCircle, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '../components/ui/card';
 import { api } from '../lib/api';
@@ -116,7 +116,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   );
   const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
   const [isConfirmCancelOpen, setIsConfirmCancelOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'confirmed' | 'cancelled' | 'pending'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'confirmed' | 'cancelled' | 'pending'>('all');
   const handledExpiredPendingKeysRef = useRef<Set<string>>(new Set());
 
   const normalizeAddress = (address?: string | null) => {
@@ -399,6 +399,9 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
         // or keep them separate. The screenshot shows Cancelled.
         if (filterStatus === 'cancelled') {
           return statusLabel === 'cancelled' || statusLabel === 'expired';
+        }
+        if (filterStatus === 'active') {
+          return statusLabel === 'active' || statusLabel === 'confirmed';
         }
         return statusLabel === filterStatus;
       });
@@ -1034,6 +1037,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                   <>
                     {[
                       { id: 'all', label: 'All' },
+                      { id: 'active', label: 'Active' },
                       { id: 'confirmed', label: 'Confirmed' },
                       { id: 'pending', label: 'Pending' },
                       { id: 'cancelled', label: 'Cancelled' },
@@ -1130,126 +1134,158 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                     const continuePaymentLink = getPaymentLinkForBooking(booking.id);
                     const venuePhone = String(booking.venueContactNumber ?? '').trim();
 
+                    // Dynamic Status Styling for the new dark ticket card
+                    const getStatusBadgeClasses = (status: string) => {
+                      switch (status) {
+                        case 'pending': return 'bg-amber-500/10 text-amber-500';
+                        case 'cancelled': 
+                        case 'expired': return 'bg-red-500/10 text-red-500';
+                        case 'active':
+                        case 'confirmed': return 'bg-white/10 text-white';
+                        default: return 'bg-gray-500/10 text-gray-400';
+                      }
+                    };
+
+                    const bookingIdShort = booking.id.length > 8 ? booking.id.substring(0, 8).toUpperCase() : booking.id.toUpperCase();
+
                     return (
-                      <Card
-                        key={booking.id}
-                        className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md"
-                      >
-                        {/* Header: Booked Date + Status */}
-                        <div className="flex items-center justify-between border-b border-gray-50 px-5 py-3">
-                          <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                            <Calendar className="size-3.5" />
-                            Booked {format(bookingDate, 'MMM d, yyyy h:mma').toLowerCase()}
+                      <div key={booking.id} className="flex flex-col gap-2.5">
+                        {/* Dark Ticket Card */}
+                        <div className="overflow-hidden rounded-[1.25rem] bg-[#0A1E2D] text-white flex flex-col p-4 shadow-lg relative ring-1 ring-white/10">
+                          {/* Header */}
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex flex-col justify-center mt-0.5">
+                               <div className="text-2xl font-bebas tracking-wide text-white uppercase">{booking.operatorName}</div>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                               <div className={`px-2 py-0.5 rounded-full text-[8.5px] font-bold uppercase tracking-widest ${getStatusBadgeClasses(statusLabel)}`}>
+                                 {statusText}
+                               </div>
+                               <div className="text-white text-lg font-bold tracking-tight">
+                                 PK-{bookingIdShort}
+                               </div>
+                            </div>
                           </div>
-                          {groupBy === 'status' && (
-                            <Badge
-                              variant="outline"
-                              className={`border-transparent bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${currentStatus.text}`}
-                            >
-                              {statusText}
-                            </Badge>
-                          )}
+                          
+                          <div className="border-t border-white/10 w-full mb-4"></div>
+
+                          {/* Court / Sport */}
+                          <div className="flex flex-col space-y-2">
+                            <div className="text-[8.5px] font-bold uppercase tracking-widest text-gray-300 px-2 py-0.5 rounded-full border border-gray-600 w-fit">
+                              {bookingCourts[0]?.court?.purpose || booking.courtType}
+                            </div>
+                            <h3 className="text-lg font-semibold tracking-tight">
+                              {bookingCourts[0]?.court?.number ? `Court ${bookingCourts[0]?.court?.number}` : booking.courtName}
+                            </h3>
+                            <div className="flex items-start gap-1.5 text-gray-400 text-xs font-medium line-clamp-1">
+                              <MapPin className="size-3.5 shrink-0 mt-0.5" />
+                              <span>{booking.location}</span>
+                            </div>
+                          </div>
+
+                          {/* Highlighted Inner Date/Time Panel */}
+                          <div className="rounded-xl border border-white/10 bg-white/5 p-3.5 mt-4 grid grid-cols-2 gap-3">
+                             <div className="flex flex-col">
+                                <div className="flex items-center gap-1.5 text-[8.5px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                                   <Calendar className="size-3"/> DATE
+                                </div>
+                                <div className="text-[13px] font-bold tracking-tight">{playDateLabel}</div>
+                             </div>
+                             <div className="flex flex-col border-l border-white/10 pl-3">
+                                <div className="flex items-center gap-1.5 text-[8.5px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                                   <Clock className="size-3"/> TIME
+                                </div>
+                                <div className="text-[13px] font-bold tracking-tight">
+                                  {bookingCourts[0]?.slots?.[0]?.start_time 
+                                    ? formatTimeRangeLabel(bookingCourts[0].slots[0].start_time, bookingCourts[bookingCourts.length-1]?.slots?.[(bookingCourts[bookingCourts.length-1]?.slots?.length || 1) - 1]?.end_time || '')
+                                    : 'TBD'}
+                                </div>
+                             </div>
+                          </div>
+
+                          {/* 2-col info section */}
+                          <div className="mt-4 grid grid-cols-2 gap-3 px-1">
+                            <div className="flex flex-col">
+                               <span className="text-[8.5px] uppercase font-bold tracking-widest text-gray-500 mb-0.5">DURATION</span>
+                               <span className="text-sm font-semibold tracking-tight">{slotCount} hour{slotCount !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div className="flex flex-col border-l border-transparent pl-3">
+                               <span className="text-[8.5px] uppercase font-bold tracking-widest text-gray-500 mb-0.5">PRICE</span>
+                               <span className="text-sm font-semibold tracking-tight">₱{formatCurrency(Number(booking.price ?? 0))}</span>
+                            </div>
+                          </div>
+
+                          <div className="mt-4 flex flex-col px-1">
+                            <span className="text-[8.5px] uppercase font-bold tracking-widest text-gray-500 mb-0.5">BOOKED BY</span>
+                            <span className="text-sm font-semibold tracking-tight">{booking.guestName || 'David Garcia'}</span>
+                          </div>
+
+                          <div className="border-t border-white/10 w-full mt-5 mb-3.5"></div>
+                          <div className="text-[11px] text-gray-500 font-medium text-center">
+                             Keep this ticket handy at the facility.
+                          </div>
                         </div>
 
-                        <CardContent className="px-5 pb-5 pt-0">
-                          <div className="flex flex-col gap-3">
-                            {/* Venue & Court Info */}
-                            <div className="-mt-1">
-                              <h3 className="text-[2rem] font-bebas font-medium uppercase text-gray-900 leading-none">
-                                {booking.operatorName}
-                              </h3>
-                              <p className="mt-2 text-xs font-medium text-gray-500">
-                                {bookingCourts[0]?.court?.purpose || booking.courtType} Court {bookingCourts[0]?.court?.number || ''} {' · '} {playDateLabel}
-                              </p>
-                            </div>
-
-                            {/* Guest Info */}
-                            <div className="flex items-center gap-4 text-xs font-medium text-gray-600">
-                              <div className="flex items-center gap-1.5">
-                                <User className="size-3.5 text-gray-400" />
-                                {booking.guestName || 'Paul Brett'}
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <Phone className="size-3.5 text-gray-400" />
-                                {booking.contactNumber || 'n/a'}
-                              </div>
-                            </div>
-
-                            {/* Slots & Pricing (Gray Container) */}
-                            <div className="rounded-lg bg-gray-50/80 p-1">
-                              <div className="space-y-0.5">
-                                {bookingCourts.map((bc) => (
-                                  bc.slots?.map((slot, sIdx) => (
-                                    <div key={`${bc.id}-${sIdx}`} className="flex items-center justify-between px-3 py-2.5">
-                                      <div className="flex items-center gap-2.5 text-xs font-bold text-gray-700">
-                                        <Clock className="size-3.5 text-gray-400" />
-                                        {formatTimeRangeLabel(slot.start_time || '00:00:00', slot.end_time || '00:00:00')}
-                                      </div>
-                                      <div className="text-xs font-bold text-gray-700">
-                                        ₱{formatCurrency(Number(slot.price ?? 0))}
-                                      </div>
-                                    </div>
-                                  ))
-                                ))}
-                              </div>
-
-                              {/* Total Line inside Gray box */}
-                              <div className="mt-1 flex items-center justify-between border-t border-gray-200/50 px-3 py-3">
-                                <span className="text-xs font-semibold text-gray-500">
-                                  Total ({slotCount} Slot{slotCount !== 1 ? 's' : ''})
-                                </span>
-                                <span className="text-sm font-black text-gray-900">
-                                  ₱{formatCurrency(booking.price)}
+                        {/* Action Buttons Below the Card */}
+                        <div className="flex flex-col gap-1.5 relative px-1">
+                          {statusLabel === 'pending' && (
+                            <div className="flex flex-col gap-1.5">
+                              {continuePaymentLink ? (
+                                <Button className="w-full h-11 bg-[#0A1E2D] text-white hover:bg-[#0A1E2D]/90 rounded-xl font-bold text-[10px] uppercase tracking-widest ring-1 ring-white/10" asChild>
+                                  <a href={continuePaymentLink} target="_blank" rel="noreferrer">Continue to Payment</a>
+                                </Button>
+                              ) : (
+                                <Button className="w-full h-11 bg-[#0A1E2D] text-white hover:bg-[#0A1E2D]/90 rounded-xl font-bold text-[10px] uppercase tracking-widest ring-1 ring-white/10" onClick={() => toast.error('Payment link not found')}>
+                                  Pay Now
+                                </Button>
+                              )}
+                              <Button 
+                                variant="outline" 
+                                className="w-full h-11 border-gray-300 text-gray-700 bg-transparent rounded-xl font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-gray-50"
+                                onClick={() => handleCancelBooking(booking)}
+                                disabled={cancellingBookingId === booking.id}
+                              >
+                                <XCircle className="size-3.5" />
+                                {cancellingBookingId === booking.id ? 'Cancelling...' : 'Cancel Booking'}
+                              </Button>
+                              <div className="text-center py-1.5 bg-amber-50 rounded-xl mt-0.5">
+                                <span className="text-[9px] font-bold text-amber-600 uppercase tracking-widest animate-pulse">
+                                  {isBookingExpired ? 'Expired' : `Holds for ${countdown ?? '00:00'}`}
                                 </span>
                               </div>
                             </div>
+                          )}
 
-                            {/* Pending State Actions */}
-                            {statusLabel === 'pending' && (
-                              <div className="flex flex-col gap-2 mt-1">
-                                <div className="flex gap-2">
-                                  {continuePaymentLink ? (
-                                    <Button className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest rounded-lg" asChild>
-                                      <a href={continuePaymentLink} target="_blank" rel="noreferrer">Continue to Payment</a>
-                                    </Button>
-                                  ) : (
-                                    <Button className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest rounded-lg" onClick={() => toast.error('Payment link not found')}>
-                                      Pay Now
-                                    </Button>
-                                  )}
-                                  <Button 
-                                    variant="outline" 
-                                    className="flex-1 font-bold h-10 text-[11px] uppercase tracking-widest border-gray-200 rounded-lg"
-                                    onClick={() => handleCancelBooking(booking)}
-                                    disabled={cancellingBookingId === booking.id}
-                                  >
-                                    {cancellingBookingId === booking.id ? 'Cancelling...' : 'Cancel'}
-                                  </Button>
-                                </div>
-                                <div className="text-center py-1.5 bg-amber-50 rounded-lg">
-                                  <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest animate-pulse">
-                                    {isBookingExpired ? 'Expired' : `Holds for ${countdown ?? '00:00'}`}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Footer Action: Share */}
-                            {statusLabel === 'confirmed' && (
-                              <div className="mt-1 border-t border-gray-100 pt-4 flex justify-center">
-                                <button
-                                  type="button"
+                          {(statusLabel === 'confirmed' || statusLabel === 'active') && (
+                            <div className="flex flex-col gap-1.5">
+                              <Button 
+                                variant="outline" 
+                                className="w-full h-11 bg-transparent border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
+                                onClick={() => handleCancelBooking(booking)}
+                                disabled={cancellingBookingId === booking.id}
+                              >
+                                <XCircle className="size-3.5" />
+                                {cancellingBookingId === booking.id ? 'Cancelling...' : 'Cancel Booking'}
+                              </Button>
+                              <div className="flex gap-1.5 w-full flex-col sm:flex-row">
+                                <Button 
+                                  className="flex-1 h-11 bg-[#0A1E2D] text-white hover:bg-[#0A1E2D]/90 rounded-xl font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 ring-1 ring-gray-200 shadow-sm"
                                   onClick={() => handleShareVenue(booking)}
-                                  className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors"
                                 >
-                                  <Share2 className="size-3.5" />
-                                  Share Venue
-                                </button>
+                                  <Share2 className="size-3.5" /> Share Image
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  className="flex-1 h-11 bg-transparent border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-sm"
+                                  asChild
+                                >
+                                  <Link to={`/operator/${booking.operatorId}`}>Browse Facilities</Link>
+                                </Button>
                               </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     );
                   })}
                 </React.Fragment>
