@@ -835,7 +835,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
   if (shouldShowSkeleton) {
     return (
-      <div className="pt-20 md:pt-24 pb-0 md:pb-12 min-h-svh">
+      <div className="pt-0 pb-0 md:pb-8 min-h-svh">
         <div className="">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:items-start">
             <div className="hidden md:block order-2 md:order-1 md:col-span-1 md:sticky md:top-20">
@@ -909,7 +909,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
 
   if (loadError && displayBookings.length === 0) {
     return (
-      <div className="pt-20 md:pt-24 pb-0 md:pb-12">
+      <div className="pt-4 md:pt-4 pb-0 md:pb-12">
         <h1 className="text-xl md:text-2xl font-bold mb-5 md:mb-8">Bookings</h1>
         <div className="text-red-600">{loadError}</div>
       </div>
@@ -943,8 +943,8 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
   }
 
   return (
-    <div className="pt-20 md:pt-24 pb-16 md:pb-24 min-h-svh">
-      <div className="mx-auto w-full max-w-[1300px] mb-2 md:mb-6 flex items-center justify-between px-4 md:px-0 pt-6 pb-4 sm:py-5 md:py-2 border-b border-gray-100 sm:border-none">
+    <div className="pt-0 pb-16 md:pb-24 min-h-svh">
+      <div className="mx-auto w-full max-w-[1300px] mb-2 md:mb-6 flex items-center justify-between px-4 md:px-0 py-2 border-b border-gray-100 sm:border-none">
         <h1
           className="text-2xl md:text-3xl font-bold font-bebas uppercase tracking-wide text-gray-900"
         >

@@ -595,7 +595,7 @@ export function BookingSummaryModal({
             </div>
           )}
 
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain space-y-6 pb-6 px-5 sm:px-8">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain space-y-4 pb-4 px-5 sm:px-8">
             <div className="bg-transparent p-0">
               {/* <h3 className="mb-3 text-base font-semibold text-gray-900">Venue</h3> */}
               <div className="space-y-4">
