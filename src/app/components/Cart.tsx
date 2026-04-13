@@ -30,8 +30,8 @@ export function Cart({
 }: CartProps) {
   const navigate = useNavigate();
   if (!isOpen) return null;
-  const itemCardClass = 'overflow-hidden rounded-2xl md:rounded-lg border border-gray-100 bg-white shadow-sm';
-  const slotsListClass = 'space-y-1 bg-white px-4 py-3 pb-4';
+  const itemCardClass = 'overflow-hidden rounded-[1.25rem] border border-white/5 bg-[#0A1E2D] shadow-lg';
+  const slotsListClass = 'space-y-1 bg-white/5 px-4 py-3 pb-4';
 
   const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
   const totalSlots = items.reduce((sum, item) => {
@@ -50,7 +50,7 @@ export function Cart({
       />
 
       {/* Cart Sidebar */}
-      <div className="fixed right-0 top-14 bottom-0 w-full md:w-[400px] bg-white shadow-xl z-[1150] flex flex-col border-t border-gray-100">
+      <div className="fixed right-0 top-20 bottom-0 w-full md:w-[400px] bg-white shadow-xl z-[1150] flex flex-col border-t border-gray-100">
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-4">
           {items.length === 0 ? (
@@ -90,22 +90,32 @@ export function Cart({
 
                 return (
                   <div key={item.id} className={itemCardClass}>
-                    <div className="bg-white px-4 py-4 border-b border-gray-200">
+                    <div className="bg-white/5 px-4 py-4 border-b border-white/10">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <strong className="font-semibold text-sm text-gray-900">
-                            {item.operatorName} - {(item.courtType ?? 'Others').charAt(0).toUpperCase() +
-                              (item.courtType ?? 'Others').slice(1)} {item.courtName}
+                          <strong className="font-bebas tracking-wide text-lg text-white uppercase break-words leading-none block">
+                            {item.operatorName} - {(item.courtType ?? 'Others').charAt(0).toUpperCase() + (item.courtType ?? 'Others').slice(1)} {' '}
+                            {(() => {
+                              const match = item.courtName.match(/^(.*?)\s*(\d+)$/);
+                              if (match) {
+                                return (
+                                  <>
+                                    {match[1]} <span className="text-[0.65em] opacity-60 font-medium ml-0.5">#{match[2]}</span>
+                                  </>
+                                );
+                              }
+                              return item.courtName;
+                            })()}
                           </strong>
-                          <div className="mt-2 flex items-center gap-2 text-xs text-gray-600">
-                            <Calendar className="size-4 text-slate-500" />
+                          <div className="mt-2 flex items-center gap-2 text-[11px] font-bold tracking-tight text-gray-400">
+                            <Calendar className="size-3.5 text-[#C8F542]" />
                             <span>{format(item.date, 'EEE, MMM dd, yyyy')}</span>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => onRemoveItem(item.id)}
-                          className="text-gray-500 hover:text-red-600 shrink-0 mr-1 mt-1"
+                          className="text-gray-500 hover:text-red-400 shrink-0 mr-1 mt-1 transition-colors"
                           aria-label="Remove court from cart"
                         >
                           <X className="size-4" />
@@ -120,21 +130,17 @@ export function Cart({
                           startTimeRaw?.trim() ?? item.timeSlotFrom,
                           false
                         );
-                        const endTime = formatTimeValue(
-                          endTimeRaw?.trim() ?? item.timeSlotTo,
-                          true
-                        );
                         const rangeLabel = formatTimeRangeLabel(
                           startTimeRaw?.trim() ?? item.timeSlotFrom,
                           endTimeRaw?.trim() ?? item.timeSlotTo
                         );
                         return (
                           <div key={`${item.id}-slot-${index}`} className="flex items-center justify-between py-1 text-sm">
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <DynamicClock time={startTime} className="size-4 flex-shrink-0" />
+                            <div className="flex items-center gap-2 text-gray-300 font-medium">
+                              <DynamicClock time={startTime} className="size-4 flex-shrink-0 text-[#C8F542]" />
                               <span>{rangeLabel}</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 text-white font-bold">
                               <span>₱{formatCurrency(perSlotPrice)}</span>
                             </div>
                           </div>

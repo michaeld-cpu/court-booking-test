@@ -1464,7 +1464,7 @@ export function HomePage({
 
         <div className="relative z-10 flex flex-col">
           {/* Title Area */}
-          <div className="px-6 pt-10 pb-8 flex flex-col space-y-2.5">
+          <div className="px-6 pt-8 pb-3.5 flex flex-col space-y-2.5">
             <div className="text-[#C8F542] text-[10px] font-medium tracking-[0.2em] uppercase opacity-90">
               Book Your Game
             </div>
@@ -1612,7 +1612,7 @@ export function HomePage({
 
       {/* Desktop Header Banner - Original Style */}
       <header
-        className="hidden sm:flex relative z-0 flex-col overflow-hidden text-white sm:mx-0 mt-6 md:mt-8 min-[1300px]:mt-10 rounded-lg min-h-[350px]"
+        className="hidden sm:flex relative z-0 flex-col overflow-hidden text-white sm:mx-0 mt-4 md:mt-6 min-[1300px]:mt-8 rounded-lg min-h-[350px]"
       >
         <ImageWithFallback
           src={bannerImages[currentImageIndex]}
@@ -1624,7 +1624,7 @@ export function HomePage({
         <div className="absolute inset-0 bg-[#0F273A]/90 pointer-events-none"></div>
 
         {/* Top Content: Main Title & Text */}
-        <div className="relative flex-1 flex flex-col justify-center items-center px-4 pt-10 pb-10 text-center">
+        <div className="relative flex-1 flex flex-col justify-center items-center px-4 pt-8 pb-8 text-center">
           <div className="w-full max-w-3xl space-y-4">
             {/* Pre-title */}
             <div className="text-[#C8F542] text-xs md:text-sm font-regular tracking-[0.2em] uppercase mb-2 p-4">
@@ -1934,7 +1934,7 @@ export function HomePage({
           </div>
         ) : shouldShowVenueSkeleton ? (
           <div
-            className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6 ${isUsingDummyData ? 'opacity-70' : ''}`}
+            className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 ${isUsingDummyData ? 'opacity-70' : ''}`}
           >
             {Array.from({ length: 6 }).map((_, index) => (
               <Card
@@ -1968,7 +1968,7 @@ export function HomePage({
           </div>
         ) : hasLoadedCourts && availableCourts.length === 0 ? (
           <EmptyState
-            wrapperClassName="min-h-[400px] flex items-start justify-center px-4 pt-24 sm:pt-32 pb-4"
+            wrapperClassName="min-h-[400px] flex items-start justify-center px-4 pt-12 sm:pt-16 pb-4"
             icon={
               <div className="rounded-full bg-gray-100/80 p-4">
                 <Icons.court className="size-8 text-gray-400 stroke-2" />
@@ -1982,7 +1982,7 @@ export function HomePage({
             className={`transition-opacity duration-200 ${isRefreshingAvailability
               ? 'opacity-45 pointer-events-none'
               : 'opacity-100'
-              } grid grid-cols-1 gap-3 md:block md:columns-2 xl:columns-3 md:gap-6`}
+              } grid grid-cols-1 gap-2 md:block md:columns-2 xl:columns-3 md:gap-5`}
           >
             {displayedCourtsByOperator.map((operatorGroup, index) => {
               const operator = operatorById.get(operatorGroup.operatorId)
@@ -2239,7 +2239,7 @@ export function HomePage({
 
       {/* Call to Action for Operators */}
       <section
-        className={`py-12 max-w-[1720px] mx-auto ${hasLoadedCourts && availableCourts.length === 0 ? 'hidden sm:block' : ''
+        className={`py-8 max-w-[1720px] mx-auto ${hasLoadedCourts && availableCourts.length === 0 ? 'hidden sm:block' : ''
           }`}
       >
         <div className="relative overflow-hidden rounded-2xl bg-[#0D2032] flex flex-col md:flex-row">

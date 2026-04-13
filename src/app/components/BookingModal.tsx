@@ -611,7 +611,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
             className="flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-0 bg-white px-5 sm:px-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400"
           >
               {/* Time Range Selection */}
-              <div className="pt-6 pb-6">
+              <div className="pt-4 pb-4">
               {/* <div className="flex items-center justify-between mb-3"> */}
                 {/* <h4 className="font-semibold text-sm">Select Time Slots</h4> */}
                 {/* <button
@@ -691,7 +691,7 @@ export function BookingModal({ court, date, timeFrom, timeTo, isOpen, onClose, o
 
           {/* Sticky Booking Summary and Actions */}
           <div
-            className="bg-white space-y-3 px-5 pb-5 pt-3 sm:px-6 sm:pb-6 shrink-0"
+            className="bg-white space-y-3 px-5 pb-4 pt-2 sm:px-6 sm:pb-6 shrink-0"
           >
             {/* Booking Summary */}
             {bookingDetails ? (
