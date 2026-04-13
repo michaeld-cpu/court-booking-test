@@ -30,6 +30,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
+import { Icons } from '../components/ui/icons';
 import { courtTypeColors } from '../lib/courtTypeColors';
 import { formatCurrency } from '../lib/formatCurrency';
 import { toast } from '@/app/lib/toast';
@@ -1214,7 +1215,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                           <div className={`flex-1 flex flex-col p-5 sm:p-6 min-w-0 ${isActive ? 'text-white' : 'text-gray-900'}`}>
                             <div className="flex w-full justify-between items-start mb-3">
                               <div className="flex flex-col gap-1.5">
-                                <div className={`text-xl md:text-2xl font-bebas tracking-wide uppercase break-words pr-2 leading-none ${isActive ? 'text-white' : 'text-gray-900'}`}>{booking.operatorName}</div>
+                                <div className={`text-2xl md:text-3xl font-bebas tracking-wide uppercase break-words pr-2 leading-none ${isActive ? 'text-white' : 'text-gray-900'}`}>{booking.operatorName}</div>
                                 <div className={`flex items-start gap-1.5 text-xs font-medium pr-4 ${isActive ? 'text-gray-400' : 'text-gray-500'}`}>
                                   <MapPin className={`size-3.5 shrink-0 mt-0.5 ${isActive ? 'text-[#C8F542]' : 'text-gray-400'}`} />
                                   <span className="line-clamp-2">{booking.location}</span>
@@ -1230,7 +1231,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                               <div className={`text-[8.5px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border w-fit shrink-0 mb-0.5 ${isActive ? 'text-[#C8F542] border-[#C8F542]/40 bg-[#C8F542]/10' : 'text-gray-500 border-gray-200 bg-gray-50'}`}>
                                 {bookingCourts[0]?.court?.purpose || booking.courtType}
                               </div>
-                              <h3 className={`text-xl sm:text-2xl font-bold tracking-tight line-clamp-1 ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                              <h3 className={`text-xl sm:text-[18px] font-bold tracking-tight line-clamp-1 ${isActive ? 'text-white' : 'text-gray-900'}`}>
                                 {(() => {
                                   const fullText = bookingCourts[0]?.court?.number 
                                     ? `Court ${bookingCourts[0]?.court?.number}` 
@@ -1239,7 +1240,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                                   if (match) {
                                     return (
                                       <>
-                                        {match[1]} <span className="text-[0.65em] opacity-60 font-medium ml-0.5">#{match[2]}</span>
+                                        {match[1]} <span className="text-[0.55em] opacity-60 font-medium ml-0.5">#{match[2]}</span>
                                       </>
                                     );
                                   }
@@ -1326,9 +1327,15 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                           </div>
 
                           {/* RIGHT PANEL: Status Stub */}
-                          <div className={`w-full sm:w-[150px] shrink-0 p-5 sm:px-4 sm:py-6 flex flex-col justify-center items-center ${isActive ? 'bg-[#C8F542] text-[#0A1E2D]' : 'bg-gray-50 text-gray-900 border-t sm:border-t-0 sm:border-l border-gray-200'}`}>
-                            <div className="text-[10px] uppercase font-bold tracking-widest opacity-60 mb-2">Pass Status</div>
-                            <div className={`font-bebas tracking-wide uppercase leading-none text-center w-full whitespace-nowrap ${statusText.length > 7 ? 'text-2xl sm:text-2xl' : 'text-3xl lg:text-4xl'}`}>
+                          <div className={`relative overflow-hidden w-full sm:w-[180px] shrink-0 p-5 sm:p-8 flex flex-col justify-center items-center ${isActive ? 'bg-[#C8F542] text-[#0A1E2D]' : 'bg-gray-50 text-gray-900 border-t sm:border-t-0 sm:border-l border-gray-200'}`}>
+                            <div className="absolute inset-0 pointer-events-none opacity-[0.12] sm:opacity-[0.18] z-0 overflow-hidden">
+                              <Icons.brandAccent
+                                className={`absolute ${isActive ? 'text-[#415210]' : 'text-gray-400'}`}
+                                style={{ width: '500px', height: '350px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                              />
+                            </div>
+                            <div className="relative z-10 text-[12px] uppercase font-bold tracking-widest opacity-60 mb-3">Pass Status</div>
+                            <div className={`relative z-10 font-bebas tracking-wide uppercase leading-tight text-center w-full ${statusText.length > 7 ? 'text-2xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>
                               {statusText}
                             </div>
                           </div>
