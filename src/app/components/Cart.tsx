@@ -57,7 +57,7 @@ export function Cart({
             <EmptyState
               icon={
                 <div className="rounded-full bg-gray-100/80 p-4">
-                  <ShoppingCart className="size-8 text-gray-400" />
+                  <ShoppingCart className="size-14 text-gray-400" />
                 </div>
               }
               title="No items in cart"
