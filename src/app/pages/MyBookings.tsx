@@ -80,7 +80,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
     }
   };
   const writeBookingsCache = useCallback((items: Booking[]) => {
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || items.length === 0) {
       return;
     }
     try {
@@ -88,7 +88,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
     } catch {
       // Ignore cache write failures.
     }
-  }, [bookingsCacheKey]);
+  }, []);
   const [remoteBookings, setRemoteBookings] = useState<Booking[]>(getCachedBookings);
   const [hasCompletedInitialFetch, setHasCompletedInitialFetch] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -869,7 +869,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
               <Calendar className="size-8 text-gray-400" />
             </div>
           }
-          title="No Bookings Yet"
+          title="No bookings yet"
           description={
             <>
               Your bookings will appear here <br />after you complete a payment.
@@ -1063,7 +1063,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 mb-3">
                     <ListFilter className="size-6 text-gray-300" />
                   </div>
-                  <p className="font-bebas text-[2rem] uppercase tracking-widest text-gray-900 leading-none mb-2">No results found</p>
+                  <p className="text-sm font-semibold text-gray-900">No results found</p>
                   <p className="text-xs text-gray-500 mt-1">Try clearing your filters or select a different date.</p>
                   <Button 
                     variant="outline" 
