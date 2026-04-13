@@ -8,6 +8,13 @@ export const operators: Operator[] = [
     city: 'Dumaguete City',
     description: 'Premier sports facility in Dumaguete offering professional pickleball courts. We provide top-notch facilities with excellent amenities for athletes and sports enthusiasts.',
     amenities: ['Parking', 'Restrooms', 'Water Station', 'Covered Courts', 'Equipment Rental', 'LED Lighting', 'Scoreboard', 'Locker Rooms'],
+    photos: [
+      'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=640&q=80',
+      'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=640&q=80',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=640&q=80',
+      'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=640&q=80',
+      'https://images.unsplash.com/photo-1519315901367-f34ff9154487?w=640&q=80'
+    ],
     rating: 4.8,
     phone: '+63 935 123 4567',
     email: 'info@dumaguesportshub.com',
@@ -31,6 +38,14 @@ export const operators: Operator[] = [
     city: 'Metro Manila',
     description: 'Premium pickleball facility in BGC with multiple indoor courts, pro shop, and cafe. The ultimate destination for pickleball enthusiasts in Metro Manila.',
     amenities: ['Indoor', '4 Courts', 'Parking', 'Pro Shop', 'Cafe', 'Locker Rooms', 'Equipment Rental', 'Air Conditioning'],
+    photos: [
+      'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=640&q=80',
+      'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=640&q=80',
+      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=640&q=80',
+      'https://images.unsplash.com/photo-1544298621-35a764866120?w=640&q=80',
+      'https://images.unsplash.com/photo-1461896836934-bd45ba8f8e29?w=640&q=80',
+      'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=640&q=80'
+    ],
     rating: 4.9,
     phone: '+63 917 123 4567',
     email: 'hello@manilappb.com',
@@ -59,6 +74,11 @@ export const mockCourts: Court[] = [
     city: 'Dumaguete City',
     image: 'pickleball court',
     amenities: ['Parking', 'Restrooms', 'Equipment Rental', 'Outdoor'],
+    photos: [
+      'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=640&q=80',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=640&q=80',
+      'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=640&q=80'
+    ],
     rating: 4.9,
     pricePerHour: 250,
     availableSlots: [
@@ -86,6 +106,12 @@ export const mockCourts: Court[] = [
     city: 'Dumaguete City',
     image: 'pickleball court',
     amenities: ['Parking', 'Restrooms', 'Equipment Rental', 'Covered Court'],
+    photos: [
+      'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=640&q=80',
+      'https://images.unsplash.com/photo-1519315901367-f34ff9154487?w=640&q=80',
+      'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=640&q=80',
+      'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=640&q=80'
+    ],
     rating: 4.8,
     pricePerHour: 250,
     availableSlots: [
@@ -113,6 +139,13 @@ export const mockCourts: Court[] = [
     city: 'Metro Manila',
     image: 'pickleball court',
     amenities: ['Indoor', '4 Courts', 'Parking', 'Pro Shop', 'Cafe'],
+    photos: [
+      'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=640&q=80',
+      'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=640&q=80',
+      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=640&q=80',
+      'https://images.unsplash.com/photo-1544298621-35a764866120?w=640&q=80',
+      'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=640&q=80'
+    ],
     rating: 4.9,
     pricePerHour: 450,
     availableSlots: [
@@ -140,6 +173,12 @@ export const mockCourts: Court[] = [
     city: 'Metro Manila',
     image: 'pickleball court',
     amenities: ['Indoor', 'Air Conditioning', 'Parking', 'Locker Rooms', 'Equipment Rental'],
+    photos: [
+      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=640&q=80',
+      'https://images.unsplash.com/photo-1461896836934-bd45ba8f8e29?w=640&q=80',
+      'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=640&q=80',
+      'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=640&q=80'
+    ],
     rating: 4.8,
     pricePerHour: 450,
     availableSlots: [
@@ -167,6 +206,11 @@ export const mockCourts: Court[] = [
     city: 'Metro Manila',
     image: 'pickleball court',
     amenities: ['Indoor', 'Air Conditioning', 'Parking', 'Pro Shop', 'Cafe'],
+    photos: [
+      'https://images.unsplash.com/photo-1544298621-35a764866120?w=640&q=80',
+      'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=640&q=80',
+      'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=640&q=80'
+    ],
     rating: 4.9,
     pricePerHour: 450,
     availableSlots: [
