@@ -200,7 +200,7 @@ export function MyBookmarks({
   }
 
   return (
-    <div className="pt-0 pb-0 md:pb-8 min-h-svh">
+    <div className="pt-4 pb-0 md:pb-8 min-h-svh">
       <div className="mx-auto w-full max-w-[1300px] mb-6 flex items-center justify-between px-4 md:px-0 py-2 border-b border-gray-100 sm:border-none">
         <h1 className="text-2xl md:text-3xl font-bold font-bebas uppercase tracking-wide text-gray-900">
           Saved
