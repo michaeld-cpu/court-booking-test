@@ -246,9 +246,9 @@ export function HomePage({
   const [selectedCourtType, setSelectedCourtType] = useState(() => {
     return getSessionValue('courtbook_selected_court_type') ?? 'All Courts'
   })
-  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>(() => {
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>(() => {
     const stored = getLocalValue(viewModeStorageKey)
-    if (stored === 'list' || stored === 'map') return stored
+    if (stored === 'map') return stored
     return 'grid'
   })
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
@@ -1799,39 +1799,30 @@ export function HomePage({
                   : <>&nbsp;</>
                 : 'Loading courts...'}
             </h2>
-            <div className="hidden md:flex items-center gap-1.5 bg-white border border-gray-100 pt-2 pb-2 shadow-sm p-1 rounded-lg">
+            <div className="hidden md:flex items-center gap-1 bg-white pt-1 pb-1 shadow-none border-none">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'grid'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-500 hover:bg-gray-100'
+                className={`inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'grid'
+                  ? 'bg-[#E5E7EB] text-[#111827]'
+                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-gray-50'
                   }`}
                 aria-label="Grid view"
               >
-                <PanelBottom className="size-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'list'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-500 hover:bg-gray-100'
-                  }`}
-                aria-label="List view"
-              >
-                <List className="size-4" />
+                <PanelBottom className="mr-2 size-4" strokeWidth={2} />
+                Venue
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('map')}
-                className={`inline-flex size-[26px] items-center justify-center rounded ${viewMode === 'map'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-500 hover:bg-gray-100'
+                className={`inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'map'
+                  ? 'bg-[#E5E7EB] text-[#111827]'
+                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-gray-50'
                   }`}
                 aria-label="Map view"
               >
-                <MapIcon className="size-4" />
+                <MapIcon className="mr-2 size-4" strokeWidth={2} />
+                Map View
               </button>
             </div>
           </>
@@ -1966,7 +1957,7 @@ export function HomePage({
                 </div>
                 <CardContent className="py-0 px-5 sm:pb-3 flex-1 mt-4">
                   <div className="space-y-3 py-2">
-                    {Array.from({ length: viewMode === 'list' ? 3 : 2 }).map((__, rowIndex) => (
+                    {Array.from({ length: 2 }).map((__, rowIndex) => (
                       <div
                         key={rowIndex}
                         className="rounded-lg border border-gray-100 bg-gray-50/70 px-3 py-3"
@@ -1997,10 +1988,7 @@ export function HomePage({
             className={`transition-opacity duration-200 ${isRefreshingAvailability
               ? 'opacity-45 pointer-events-none'
               : 'opacity-100'
-              } ${viewMode === 'grid'
-                ? 'grid grid-cols-1 gap-3 md:block md:columns-2 xl:columns-3 md:gap-6'
-                : 'grid grid-cols-1 gap-3 md:gap-4'
-              }`}
+              } grid grid-cols-1 gap-3 md:block md:columns-2 xl:columns-3 md:gap-6`}
           >
             {displayedCourtsByOperator.map((operatorGroup, index) => {
               const operator = operatorById.get(operatorGroup.operatorId)
