@@ -288,7 +288,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
       courtName: 'Court 1',
       courtType: 'Pickleball',
       status: 'active',
-      guestName: 'Michael Diopenes',
+      guestName: 'Michael John Diopenes',
       venueContactNumber: '0917-123-4567',
       date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
       timeSlotFrom: '09:00 AM',
