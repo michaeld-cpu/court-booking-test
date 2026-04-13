@@ -1231,7 +1231,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                               <div className={`text-[8.5px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border w-fit shrink-0 mb-0.5 ${isActive ? 'text-[#C8F542] border-[#C8F542]/40 bg-[#C8F542]/10' : 'text-gray-500 border-gray-200 bg-gray-50'}`}>
                                 {bookingCourts[0]?.court?.purpose || booking.courtType}
                               </div>
-                              <h3 className={`text-xl sm:text-[18px] font-bold tracking-tight line-clamp-1 ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                              <h3 className={`text-[16px] sm:text-[18px] font-bold tracking-tight line-clamp-1 ${isActive ? 'text-white' : 'text-gray-900'}`}>
                                 {(() => {
                                   const fullText = bookingCourts[0]?.court?.number 
                                     ? `Court ${bookingCourts[0]?.court?.number}` 
