@@ -1240,7 +1240,7 @@ export function MyBookings({ bookings, onBookingsSync }: MyBookingsProps) {
                                   if (match) {
                                     return (
                                       <>
-                                        {match[1]} <span className="text-[0.55em] opacity-60 font-medium ml-0.5">#{match[2]}</span>
+                                        {match[1]} <span className="text-[1em] opacity-60 font-medium ml-0.5">#{match[2]}</span>
                                       </>
                                     );
                                   }
