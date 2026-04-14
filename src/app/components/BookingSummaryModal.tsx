@@ -563,7 +563,7 @@ export function BookingSummaryModal({
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-          className="max-w-full w-full h-full sm:h-auto sm:max-h-[95vh] sm:w-[500px] top-0 sm:top-[50%] translate-y-0 sm:translate-y-[-50%] rounded-none sm:rounded-3xl overflow-hidden p-0 flex flex-col bg-white z-[3020] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none"
+          className="max-w-full w-full h-full sm:h-auto sm:max-h-[95vh] sm:w-[500px] top-0 sm:top-[50%] translate-y-0 sm:translate-y-[-50%] rounded-none sm:rounded-lg overflow-hidden p-0 flex flex-col bg-white z-[3020] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           {/* Header */}
@@ -603,7 +603,7 @@ export function BookingSummaryModal({
                 return (
                       <div
                         key={groupKey}
-                        className="overflow-hidden rounded-2xl bg-[#0a1e30] text-white p-5 shadow-sm"
+                        className="overflow-hidden rounded-lg bg-[#0a1e30] text-white p-5 shadow-sm"
                       >
                         {/* Dark Venue Card Content */}
                         <div className="space-y-4">
@@ -641,7 +641,7 @@ export function BookingSummaryModal({
                             {ranges.map((range, rangeIndex) => (
                               <div
                                 key={rangeIndex}
-                                className="flex items-center justify-between py-3 px-4 rounded-xl bg-[#162e44] border border-white/5"
+                                className="flex items-center justify-between py-3 px-4 rounded-lg bg-[#162e44] border border-white/5"
                               >
                                 <div className="flex items-center gap-3 text-sm">
                                   <Clock className="size-4 text-[#C8F542]" />
@@ -677,9 +677,9 @@ export function BookingSummaryModal({
                   {showGuestForm ? 'Done' : 'Edit'}
                 </button>
               </div>
-              <div className="overflow-hidden rounded-xl bg-gray-50/50">
+              <div className="overflow-hidden rounded-lg bg-gray-50/50">
                 {showGuestForm ? (
-                  <div className="space-y-4 p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
+                  <div className="space-y-4 p-4 bg-white border border-gray-100 rounded-lg shadow-sm">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Name</label>
                       <Input
@@ -718,7 +718,7 @@ export function BookingSummaryModal({
                   Payment Method
                 </p>
                 {isLoadingPaymentOutlets && paymentOutlets.length === 0 ? (
-                  <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
+                  <div className="overflow-hidden rounded-lg border border-gray-100 bg-white">
                     {Array.from({ length: 3 }).map((_, index) => (
                       <div
                         key={`payment-method-skeleton-${index}`}
@@ -735,7 +735,7 @@ export function BookingSummaryModal({
                     ))}
                   </div>
                 ) : (
-                  <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+                  <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
                     {paymentOutlets.map((outlet, index) => {
                       const isSelected = selectedPaymentOutletId === outlet.id
                       return (
@@ -815,7 +815,7 @@ export function BookingSummaryModal({
                 visibleBookingGroups.length === 0 ||
                 (paymentOutlets.length > 0 && !selectedPaymentOutletId)
               }
-              className="w-full h-14 text-lg font-medium bg-black hover:bg-slate-900 text-white rounded-2xl shadow-lg transition-all active:scale-[0.98] disabled:bg-gray-200"
+              className="w-full h-14 text-lg font-medium bg-black hover:bg-slate-900 text-white rounded-lg shadow-lg transition-all active:scale-[0.98] disabled:bg-gray-200"
             >
               {isSubmitting
                 ? 'Submitting...'

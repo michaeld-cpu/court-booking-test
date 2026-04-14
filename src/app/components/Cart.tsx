@@ -30,15 +30,19 @@ export function Cart({
 }: CartProps) {
   const navigate = useNavigate();
   
-  // Lock scroll on desktop when cart is open
+  // Lock scroll on desktop when cart is open and prevent content shift
   React.useEffect(() => {
     if (isOpen && window.innerWidth >= 768) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     } else {
       document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '0px';
     }
     return () => {
       document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '0px';
     };
   }, [isOpen]);
 
@@ -85,7 +89,7 @@ export function Cart({
         </div>
 
         {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto px-8 py-4 pt-0 md:p-4">
+        <div className="flex-1 overflow-y-auto px-8 py-4 pt-0 md:p-4 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
           {items.length === 0 ? (
             <EmptyState
               icon={
@@ -101,7 +105,7 @@ export function Cart({
               }
               action={
                 <Button
-                  className="h-11 px-6 py-2.5 rounded-xl text-sm font-semibold bg-black text-white hover:bg-gray-900 shadow-sm transition-all w-fit"
+                  className="h-11 px-6 py-2.5 rounded-lg text-sm font-semibold bg-black text-white hover:bg-gray-900 shadow-sm transition-all w-fit"
                   onClick={() => {
                     onClose();
                     navigate('/');
