@@ -66,7 +66,7 @@ const buildTimeRanges = (slots: TimeSlot[]): TimeRange[] => {
       endSlot,
       label: formatTimeRangeLabel(startSlot.time, endSlot.time),
       available: startSlot.available,
-      price: startSlot.price,
+      price: startSlot.price, 
     });
   }
   return ranges;
