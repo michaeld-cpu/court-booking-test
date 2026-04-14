@@ -29,6 +29,19 @@ export function Cart({
   hasPendingBookings,
 }: CartProps) {
   const navigate = useNavigate();
+  
+  // Lock scroll on desktop when cart is open
+  React.useEffect(() => {
+    if (isOpen && window.innerWidth >= 768) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
   const itemCardClass = 'overflow-hidden rounded-[1.25rem] border border-slate-100 bg-white shadow-sm';
   const slotsListClass = 'space-y-1 bg-slate-50/50 px-4 py-3 pb-4';
@@ -50,7 +63,7 @@ export function Cart({
       />
 
       {/* Cart Sidebar */}
-      <div className="fixed right-0 top-[72px] md:top-0 bottom-0 w-full md:w-[400px] bg-white shadow-xl z-[1150] md:z-[2600] flex flex-col border-t border-gray-100 md:border-t-0 pt-4 md:pt-0">
+      <div className="fixed right-0 top-[72px] md:top-0 bottom-0 w-full md:w-[400px] bg-gray-50 shadow-xl z-[1150] md:z-[2600] flex flex-col border-t border-gray-100 md:border-t-0 pt-4 md:pt-0">
         <div className="md:hidden mx-auto w-full mb-2 flex items-center justify-between px-8 py-1 border-b border-gray-100 shrink-0">
           <h1 className="text-2xl font-bold font-bebas uppercase tracking-wide text-gray-900 mt-1">
             Cart
