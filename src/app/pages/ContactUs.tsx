@@ -1,25 +1,46 @@
 import React from 'react';
+import { Mail, MessageSquare, Phone } from 'lucide-react';
 
 export function ContactUs() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-100 via-white to-cyan-50 py-20">
-      <div className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-cyan-200/40 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 bottom-12 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl" />
+    <div className="relative min-h-svh overflow-hidden flex flex-col items-center justify-center px-4 py-20">
 
-      <div className="mx-auto flex min-h-[65vh] max-w-3xl items-center justify-center">
-        <div className="w-full rounded-2xl border border-white/70 bg-white/85 p-10 text-center shadow-[0_20px_60px_-30px_rgba(15,23,42,0.35)] backdrop-blur-sm md:p-14">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">
-            Korte.ph
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold text-slate-900 md:text-5xl">
-            Contact Us
-          </h1>
-          <p className="mt-5 text-base text-slate-600 md:text-lg">
-            We are preparing a better support experience.
-          </p>
-          <p className="mt-1 text-base font-medium text-slate-800 md:text-lg">
-            Coming soon.
-          </p>
+
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center text-center max-w-xl w-full">
+        {/* Eyebrow */}
+        <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-900">
+          Contact Us
+        </p>
+
+        {/* Big Bebas heading */}
+        <h1 className="font-bebas text-[clamp(3rem,14vw,6rem)] leading-none uppercase text-slate-950">
+          Coming Soon
+        </h1>
+
+        {/* Lime divider */}
+        <div className="mt-5 mb-7 h-[3px] w-16 bg-slate-300 rounded-full" />
+
+        {/* Body copy */}
+        <p className="text-sm font-medium text-slate-500 leading-relaxed max-w-sm">
+          We are preparing a better support experience for you.
+        </p>
+
+        {/* Channel chips */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          {[
+            { icon: <Mail className="size-4" />, label: 'Email' },
+            { icon: <Phone className="size-4" />, label: 'Phone' },
+            { icon: <MessageSquare className="size-4" />, label: 'Live Chat' },
+          ].map(({ icon, label }) => (
+            <div
+              key={label}
+              className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-slate-400"
+            >
+              {icon}
+              {label}
+            </div>
+          ))}
         </div>
       </div>
     </div>
