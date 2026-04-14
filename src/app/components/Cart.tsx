@@ -30,8 +30,8 @@ export function Cart({
 }: CartProps) {
   const navigate = useNavigate();
   if (!isOpen) return null;
-  const itemCardClass = 'overflow-hidden rounded-[1.25rem] border border-white/5 bg-[#0A1E2D] shadow-lg';
-  const slotsListClass = 'space-y-1 bg-white/5 px-4 py-3 pb-4';
+  const itemCardClass = 'overflow-hidden rounded-[1.25rem] border border-slate-100 bg-white shadow-sm';
+  const slotsListClass = 'space-y-1 bg-slate-50/50 px-4 py-3 pb-4';
 
   const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
   const totalSlots = items.reduce((sum, item) => {
@@ -45,14 +45,34 @@ export function Cart({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-x-0 top-0 bottom-0 bg-black/50 z-[1120]"
+        className="fixed inset-0 bg-black/50 z-[1120] md:z-[2500]"
         onClick={onClose}
       />
 
       {/* Cart Sidebar */}
-      <div className="fixed right-0 top-20 bottom-0 w-full md:w-[400px] bg-white shadow-xl z-[1150] flex flex-col border-t border-gray-100">
+      <div className="fixed right-0 top-[72px] md:top-0 bottom-0 w-full md:w-[400px] bg-white shadow-xl z-[1150] md:z-[2600] flex flex-col border-t border-gray-100 md:border-t-0 pt-4 md:pt-0">
+        <div className="md:hidden mx-auto w-full mb-2 flex items-center justify-between px-8 py-1 border-b border-gray-100 shrink-0">
+          <h1 className="text-2xl font-bold font-bebas uppercase tracking-wide text-gray-900 mt-1">
+            Cart
+          </h1>
+        </div>
+
+        {/* Desktop Header*/}
+        <div className="hidden md:flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold font-bebas tracking-wide uppercase text-gray-900">Cart</h1>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center size-8 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-all"
+            aria-label="Close cart"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+
         {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto px-8 py-4 pt-0 md:p-4">
           {items.length === 0 ? (
             <EmptyState
               icon={
@@ -90,32 +110,32 @@ export function Cart({
 
                 return (
                   <div key={item.id} className={itemCardClass}>
-                    <div className="bg-white/5 px-4 py-4 border-b border-white/10">
+                    <div className="px-4 py-4 border-b border-slate-50">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <strong className="font-bebas tracking-wide text-lg text-white uppercase break-words leading-none block">
+                          <strong className="font-bebas tracking-wide text-lg text-slate-900 uppercase break-words leading-none block">
                             {item.operatorName} - {(item.courtType ?? 'Others').charAt(0).toUpperCase() + (item.courtType ?? 'Others').slice(1)} {' '}
                             {(() => {
                               const match = item.courtName.match(/^(.*?)\s*(\d+)$/);
                               if (match) {
                                 return (
                                   <>
-                                    {match[1]} <span className="text-[0.65em] opacity-60 font-medium ml-0.5">#{match[2]}</span>
+                                    {match[1]} <span className="text-[0.65em] opacity-40 font-medium ml-0.5">#{match[2]}</span>
                                   </>
                                 );
                               }
                               return item.courtName;
                             })()}
                           </strong>
-                          <div className="mt-2 flex items-center gap-2 text-[11px] font-bold tracking-tight text-gray-400">
-                            <Calendar className="size-3.5 text-[#C8F542]" />
+                          <div className="mt-2 flex items-center gap-2 text-[11px] font-bold tracking-tight text-slate-500">
+                            <Calendar className="size-3.5 text-slate-400" />
                             <span>{format(item.date, 'EEE, MMM dd, yyyy')}</span>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => onRemoveItem(item.id)}
-                          className="text-gray-500 hover:text-red-400 shrink-0 mr-1 mt-1 transition-colors"
+                          className="text-gray-400 hover:text-red-500 shrink-0 mr-1 mt-1 transition-colors"
                           aria-label="Remove court from cart"
                         >
                           <X className="size-4" />
@@ -136,11 +156,11 @@ export function Cart({
                         );
                         return (
                           <div key={`${item.id}-slot-${index}`} className="flex items-center justify-between py-1 text-sm">
-                            <div className="flex items-center gap-2 text-gray-300 font-medium">
-                              <DynamicClock time={startTime} className="size-4 flex-shrink-0 text-[#C8F542]" />
+                            <div className="flex items-center gap-2 text-slate-600 font-medium">
+                              <DynamicClock time={startTime} className="size-4 flex-shrink-0 text-slate-400" />
                               <span>{rangeLabel}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-white font-bold">
+                            <div className="flex items-center gap-2 text-slate-900 font-bold">
                               <span>₱{formatCurrency(perSlotPrice)}</span>
                             </div>
                           </div>
