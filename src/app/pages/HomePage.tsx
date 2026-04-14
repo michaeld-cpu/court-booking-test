@@ -1453,7 +1453,7 @@ export function HomePage({
   return (
     <>
       {/* Mobile Header Banner - Layered Variant */}
-      <header className="flex sm:hidden flex-col relative z-0 overflow-hidden text-white -mx-4 mb-2">
+      <header className="flex sm:hidden flex-col relative z-0 overflow-hidden text-white -mx-4 mb-2 p-2">
         <ImageWithFallback
           src={bannerImages[currentImageIndex]}
           alt="Banner"
@@ -1477,127 +1477,122 @@ export function HomePage({
             >
               FIND YOUR <span className="text-[#C8F542]">COURT</span>
             </h1>
-            <p className="text-gray-300 text-sm leading-relaxed mt-2 max-w-sm"
+            <p className="text-gray-300 text-sm leading-relaxed mt-2 max-w-sm pb-2"
               style={{ fontFamily: 'DM sans, sans-serif' }}>
               Browse and book courts near you. Play pickleball, badminton, tennis and more across the Philippines.
             </p>
           </div>
 
-          {/* Filters Area */}
-          <div className="flex flex-col bg-[#0F273A]/40 backdrop-blur-md divide-y divide-white/10 border-t border-white/10 relative z-20 pb-2">
+          {/* Filters Area - Standalone Rounded Cards Style */}
+          <div className="flex flex-row gap-2 px-3.5 pb-5 relative z-20">
             {/* Filter 1: City */}
-            <Select
-              value={selectedCity}
-              onValueChange={(value) => {
-                if (value === 'Current Location') {
-                  requestUserLocation(undefined, {
-                    fallbackToDumaguete: false,
-                    showPromptOnError: true,
-                  })
-                  return
-                }
-                setSelectedCity(value)
-                if (value === 'All Locations') {
-                  setSelectedLocationCoords(null)
-                  setHasUserLocation(false)
-                  setUserLocation(null)
-                  setIsLocationResolved(true);
-                  return
-                }
-                const selectedLocation = availableLocations.find(
-                  (location) => location.name === value,
-                )
-                if (selectedLocation) {
-                  setSelectedLocationCoords({
-                    lat: Number(selectedLocation.latitude),
-                    lng: Number(selectedLocation.longitude),
-                  })
-                  setHasUserLocation(false)
-                  setIsLocationResolved(true)
-                }
-              }}
-            >
-              <SelectTrigger className="w-full h-auto py-4 px-6 border-0 bg-transparent text-white hover:bg-white/5 transition-colors rounded-none shadow-none focus:ring-0 [&>svg]:hidden flex items-center justify-between group">
-                <div className="flex items-center justify-start gap-4">
-                  <MapPin className="size-[18px] text-[#C8F542] shrink-0" />
-                  <span className="text-[15px] font-medium pointer-events-none text-left flex-1 min-w-0 truncate">
-                    <SelectValue placeholder="Select city" />
+            <div className="flex-1 flex flex-col pt-2.5 pb-2 px-3 rounded-xl bg-[#ffffff]/5 backdrop-blur-md border border-white/10 min-w-0">
+              <span className="text-[8.5px] font-bold uppercase tracking-wider text-white/40 mb-0.5 px-0.5">Location</span>
+              <Select
+                value={selectedCity}
+                onValueChange={(value) => {
+                  if (value === 'Current Location') {
+                    requestUserLocation(undefined, {
+                      fallbackToDumaguete: false,
+                      showPromptOnError: true,
+                    })
+                    return
+                  }
+                  setSelectedCity(value)
+                  if (value === 'All Locations') {
+                    setSelectedLocationCoords(null)
+                    setHasUserLocation(false)
+                    setUserLocation(null)
+                    setIsLocationResolved(true);
+                    return
+                  }
+                  const selectedLocation = availableLocations.find(
+                    (location) => location.name === value,
+                  )
+                  if (selectedLocation) {
+                    setSelectedLocationCoords({
+                      lat: Number(selectedLocation.latitude),
+                      lng: Number(selectedLocation.longitude),
+                    })
+                    setHasUserLocation(false)
+                    setIsLocationResolved(true)
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full h-5 p-0 border-0 bg-transparent text-white rounded-none shadow-none focus:ring-0 [&_svg:last-child]:hidden flex items-center gap-1.5 group">
+                  <MapPin className="size-[14px] text-[#C8F542] shrink-0" />
+                  <span className="text-[13px] font-medium truncate flex-1 text-left leading-none">
+                    {selectedCity.replace(/ City$/i, '')}
                   </span>
-                </div>
-                <div className="shrink-0 group-data-[state=open]:rotate-180 transition-transform">
-                  <ChevronDown className="size-4 text-white/50" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="z-[3000]">
-                {(!availableLocations.some((loc) => loc.name === selectedCity) &&
-                  selectedCity !== 'All Locations') && (
-                    <SelectItem value={selectedCity.startsWith('lat:') ? selectedCity : 'Current Location'}>
-                      {selectedCity.startsWith('lat:')
-                        ? selectedCity
-                        : 'Current Location'}
+                </SelectTrigger>
+                <SelectContent className="z-[3000]">
+                  {(!availableLocations.some((loc) => loc.name === selectedCity) &&
+                    selectedCity !== 'All Locations') && (
+                      <SelectItem value={selectedCity.startsWith('lat:') ? selectedCity : 'Current Location'}>
+                        {selectedCity.startsWith('lat:')
+                          ? selectedCity
+                          : 'Current Location'}
+                      </SelectItem>
+                    )}
+                  {availableLocations.map((location) => (
+                    <SelectItem key={location.name} value={location.name}>
+                      {location.description || location.name}
                     </SelectItem>
-                  )}
-                {availableLocations.map((location) => (
-                  <SelectItem key={location.name} value={location.name}>
-                    {location.description || location.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             {/* Filter 2: Date */}
-            <Popover
-              open={isMobileDatePickerOpen}
-              onOpenChange={setIsMobileDatePickerOpen}
-            >
-              <PopoverTrigger asChild>
-                <button className="flex w-full items-center justify-between p-4 px-6 hover:bg-white/5 transition-colors border-0 bg-transparent h-auto text-left group text-white">
-                  <div className="flex items-center justify-start gap-4 min-w-0">
-                    <Calendar className="size-[18px] text-[#C8F542] shrink-0" />
-                    <span className="text-[15px] font-medium truncate flex-1 block">
-                      {renderDateLabel(selectedDate)}
-                    </span>
-                  </div>
-                  <ChevronDown className="size-4 text-white/50 shrink-0 group-data-[state=open]:rotate-180 transition-transform" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="z-[3000] w-auto p-0"
-                align="end"
+            <div className="flex-1 flex flex-col pt-2.5 pb-2 px-3 rounded-xl bg-[#ffffff]/5 backdrop-blur-md border border-white/10 min-w-0">
+              <span className="text-[8.5px] font-bold uppercase tracking-wider text-white/40 mb-2.5 px-0.5">Date</span>
+              <Popover
+                open={isMobileDatePickerOpen}
+                onOpenChange={setIsMobileDatePickerOpen}
               >
-                <CalendarComponent
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => {
-                    if (!date) return
-                    setSelectedDate(date)
-                    setIsMobileDatePickerOpen(false)
-                  }}
-                  disabled={{ before: new Date() }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+                <PopoverTrigger asChild>
+                  <button className="w-full h-5 flex items-center gap-1.5 border-0 bg-transparent text-left group text-white p-0 outline-none">
+                    <Calendar className="size-[14px] text-[#C8F542] shrink-0" />
+                    <span className="text-[13px] font-medium truncate flex-1 block leading-none">
+                      {isSameDay(selectedDate, new Date()) ? format(selectedDate, 'MMM d') : format(selectedDate, 'MMM d')}
+                    </span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="z-[3000] w-auto p-0"
+                  align="start"
+                >
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => {
+                      if (!date) return
+                      setSelectedDate(date)
+                      setIsMobileDatePickerOpen(false)
+                    }}
+                    disabled={{ before: new Date() }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
             {/* Filter 3: Court Type */}
-            <Select
-              value={selectedCourtType}
-              onValueChange={setSelectedCourtType}
-            >
-              <SelectTrigger className="w-full h-auto py-4 px-6 border-0 bg-transparent text-white hover:bg-white/5 transition-colors rounded-none shadow-none focus:ring-0 [&>svg]:hidden flex items-center justify-between group">
-                <div className="flex items-center justify-start gap-4 min-w-0">
-                  <LayoutGrid className="size-[18px] text-[#C8F542] shrink-0" />
-                  <span className="text-[15px] font-medium pointer-events-none truncate text-left flex-1 block">
+            <div className="flex-1 flex flex-col pt-2.5 pb-2 px-3 rounded-xl bg-[#ffffff]/5 backdrop-blur-md border border-white/10 min-w-0">
+              <span className="text-[8.5px] font-bold uppercase tracking-wider text-white/40 mb-0.5 px-0.5">Court</span>
+              <Select
+                value={selectedCourtType}
+                onValueChange={setSelectedCourtType}
+              >
+                <SelectTrigger className="w-full h-5 p-0 border-0 bg-transparent text-white rounded-none shadow-none focus:ring-0 [&_svg:last-child]:hidden flex items-center gap-1.5 group">
+                  <LayoutGrid className="size-[14px] text-[#C8F542] shrink-0" />
+                  <span className="text-[13px] font-medium truncate flex-1 text-left leading-none">
                     <SelectValue placeholder="Select court type" />
                   </span>
-                </div>
-                <div className="shrink-0 group-data-[state=open]:rotate-180 transition-transform">
-                  <ChevronDown className="size-4 text-white/50" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="z-[3000]">
-                <SelectItem value="All Courts">All Courts</SelectItem>
-                {Array.from(
+                </SelectTrigger>
+                <SelectContent className="z-[3000]">
+                  <SelectItem value="All Courts">All Courts</SelectItem>
+                  {Array.from(
                   new Set(
                     availableCourts.map(
                       (court) => court.purpose ?? court.type ?? 'Others',
@@ -1612,7 +1607,8 @@ export function HomePage({
             </Select>
           </div>
         </div>
-      </header>
+      </div>
+    </header>
 
       {/* Desktop Header Banner - Original Style */}
       <header
